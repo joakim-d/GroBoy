@@ -11,6 +11,7 @@ void run();
 void init();
 void read_rom_info(char * rom_path);	
 char *rom_buffer;
+char *addr; 
 typedef struct {
 	unsigned short PC;
 	unsigned short SP;
