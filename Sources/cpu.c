@@ -84,32 +84,28 @@ void read_rom_info(char* rom_path){
 }
 
 void run(){
-	/*
 	int interrupt_period;
 	int counter;
 
 	counter=interrupt_period;
 
+	char op_code;
 	for(;;)
 	{
-		OpCode=Memory[PC++];
-		Counter-=Cycles[OpCode];
+		op_code=rom_buffer[z80.PC++];
+		//counter-=cycles[op_code];
 
-		switch(OpCode)
-		{
-			case OpCode1:
-			case OpCode2:
-				...
+		switch(op_code){
+			//Maxi table d'instructions
 		}
 
-		if(Counter<=0)
+		/*if(Counter<=0)
 		{
 			// Check for interrupts and do other
 			// cyclic tasks here                
 			...
 				Counter+=InterruptPeriod;
 			if(ExitRequired) break;
-		}
+		}*/
 	}
-	*/
 }
