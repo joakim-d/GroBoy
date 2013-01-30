@@ -36,8 +36,8 @@ void read_rom_info(char* rom_path){
 	
 	read(file_d, rom_buffer, file_stat.st_size);
 	close(file_d);
-
-	if(memcmp(rom_buffer + 0x0100, "0x00C3", 2) != 0){ //On vérifie si la rom est bien un fichier gb
+	
+	if(memcmp(rom_buffer + 0x0100, "\x00\xC3", 2) != 0){ //On vérifie si la rom est bien un fichier gb
 		printf("Error reading rom magic code\n");
 		exit(-1);
 	}
