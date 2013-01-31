@@ -86,7 +86,7 @@ void read_rom_info(char* rom_path){
 void run(){
 	int interrupt_period;
 	int counter;
-
+	addr = (char*)malloc(49152 * sizeof(char));
 	counter=interrupt_period;
 
 	char op_code;
