@@ -68,18 +68,18 @@ void read_rom_info(char* rom_path){
 	switch(*(rom_buffer + 0x014B)){
 		case 0x33: printf("Nintendo or extended");break;
 		case 0x79: printf("Accolade");break;
-		case (char)0xA4: printf("Konami");break;
+		case 0xA4: printf("Konami");break;
 	}
-	printf("\nVersion number %d\n", rom_buffer + 0x014C);
+	printf("\nVersion number %c\n", rom_buffer[0x014C]);
 }
 
 void run(){
 	int interrupt_period;
-	int counter;
-
+	int counter, c;
+	BYTE hl, d8;
 	counter=interrupt_period;
 
-	char op_code;
+	unsigned char op_code;
 	for(;;)
 	{
 		op_code=rom_buffer[z80.PC++];
@@ -125,7 +125,7 @@ void run(){
 			break;
 			
 			case 0xB6: //OR (HL)
-			z80.A |= ram[(z80.H << 8) + (z80.L)];
+			z80.A |= memory_read((z80.H << 8) + (z80.L));
 			if (z80.A == 0) z80.F &= 0x80;
 			else z80.F &= 0x00;
 			break;
@@ -167,7 +167,7 @@ void run(){
 			z80.F = 0x40;
 			if (z80.A - z80.H == 0) z80.F |= 0x80;
 			if (z80.A > 0xF && z80.A - z80.H <= 0xF) z80.F |= 0x20;
-			if (z80.A - z80.H < 0) |= 0x10;//C 0x10
+			if (z80.A - z80.H < 0) z80.F |= 0x10;//C 0x10
 			break;
 			
 			case 0xBD: //CP L
@@ -178,11 +178,11 @@ void run(){
 			break;
 			
 			case 0xBE: //CP (HL)
-			char hl = ram[z80.H << 8 + z80.L];
+			hl = memory_read(z80.H << 8 + z80.L);
 			z80.F = 0x40;
 			if (z80.A - hl == 0) z80.F |= 0x80;
 			if (z80.A > 0xF && z80.A - hl <= 0xF) z80.F |= 0x20;
-			if (z80.A - hl < 0) |= 0x10;//C 0x10
+			if (z80.A - hl < 0) z80.F |= 0x10;//C 0x10
 			break;
 			
 			case 0xBF: //CP A
@@ -192,117 +192,230 @@ void run(){
 
 			case 0xC0: //RET NZ
 			if(z80.F & 0x80 == 0){
-				z80.PC = ram[z80.SP + 1] << 8 + ram[z80.SP];;
+				z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);;
 				z80.SP += 2;
 			}
 			break;
 
 			case 0xC1: //POP BC
-			z80.C = ram[z80.SP];
-			z80.B = ram[z80.SP + 1];
+			z80.C = memory_read(z80.SP);
+			z80.B = memory_read(z80.SP + 1);
 			z80.SP += 2;
 			break;
 
 			case 0xC2: //JP NZ,a16
 			if(z80.F & 0x80 == 0)
-				z80.PC = rom_buffer[z80.PC] << 8 + rom_buffer[z80.PC + 1];
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
 			else z80.PC += 2;
 			break;
 
 			case 0xC3: //JP a16
-			z80.PC = rom_buffer[z80.PC] << 8 + rom_buffer[z80.PC + 1]; 
+			z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
 			break;
 
 			case 0xC4: //CALL NZ,a16
 			if(z80.F & 0x80 == 0){
-				ram[z80.SP - 1] = (z80.PC + 2) & 0xF0;
-				ram[z80.SP - 2] = (z80.PC + 2) & 0x0F;
+				memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
+				memory_write(z80.SP - 2, (z80.PC + 2) & 0xFF);
 				z80.SP -= 2;
-				z80.PC = rom_buffer[z80.PC] << 8 + rom_buffer[z80.PC + 1]; 
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
 			}
 			else z80.PC += 2;
 			break;
 			
 			case 0xC5: //PUSH BC
-			ram[z80.SP - 1] = z80.B;
-			ram[z80.SP - 2] = z80.C;
+			memory_write(z80.SP - 1, z80.B);
+			memory_write(z80.SP - 2, z80.C);
 			z80.SP -= 2;
 			break;
 
 			case 0xC6: //ADD A,d8
+			d8 = memory_read(z80.PC);
 			z80.F = 0;
-			if ((z80.A + rom_buffer[z80.PC]) % 256 == 0) z80.F |= 0x80;
-			if (z80.A + rom_buffer[z80.PC] > 0xFF) z80.F |= 0x10;
-			if(z80.A <= 0xF && z80.A + rom_buffer[z80.PC] > 0xF) z80.F |= 0x20;
-			z80.A = (z80.A + rom_buffer[z80.PC++]) % 256;
+			if ((z80.A + d8) % 256 == 0) z80.F |= 0x80;
+			if (z80.A + d8 > 0xFF) z80.F |= 0x10;
+			if(z80.A <= 0xF && z80.A + d8 > 0xF) z80.F |= 0x20;
+			z80.A = (z80.A + d8) % 256;
+			
+			z80.PC++;
 			break;
 
 			case 0xC7: //RST 00H
-			ram[z80.SP - 1] = z80.PC & 0xF0;
-			ram[z80.SP - 2] = z80.PC & 0x0F;
+			memory_write(z80.SP - 1, (z80.PC & 0xFF00) >> 8);
+			memory_write(z80.SP - 2, z80.PC & 0xFF);
 			z80.PC = 0;
 			z80.SP -= 2;
 			break;
 			
 			case 0xC8: //RET Z
 			if(z80.F & 0x80 != 0){
-				z80.PC = ram[z80.SP + 1] << 8 + ram[z80.SP];;
+				z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
 				z80.SP += 2;
 			}
 			break;
 			
 			case 0xC9: //RET 
-			z80.PC = ram[z80.SP + 1] << 8 + ram[z80.SP];;
+			z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
 			z80.SP += 2;
 			break;
 
 			case 0xCA: //JP Z,a16
 			if(z80.F & 0x80 != 0)
-				z80.PC = rom_buffer[z80.PC] << 8 + rom_buffer[z80.PC + 1]; 
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
 			else z80.PC += 2;
 			break;
 			
 			case 0xCB: //Two bytes Opcode
-				opcode = rom_buffer[z80.PC++];
-				switch(opcode){
+				op_code = rom_buffer[z80.PC++];
+				switch(op_code){
 
 				}
 			break;
 
 			case 0xCC: //CALL Z,a16
 			if(z80.F & 0x80 != 0){
-				ram[z80.SP - 1] = (z80.PC + 2) & 0xF0;
-				ram[z80.SP - 2] = (z80.PC + 2) & 0x0F;
+				memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
+				memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
 				z80.SP -= 2;
-				z80.PC = rom_buffer[z80.PC] << 8 + rom_buffer[z80.PC + 1]; 
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
 			}
 			else z80.PC += 2;
 			break;
 
 			case 0xCD: //CALL a16
-			ram[z80.SP - 1] = (z80.PC + 2) & 0xF0;
-			ram[z80.SP - 2] = (z80.PC + 2) & 0x0F;
+			memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
+			memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
 			z80.SP -= 2;
-			z80.PC = rom_buffer[z80.PC] << 8 + rom_buffer[z80.PC + 1]; 
+			z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
 			break;
 
 			case 0xCE: //ADC A,d8
-			int c;
+			
 			if (z80.F & 0x10) c = 1;
 			else c = 0;
 			
-			if ((z80.A + rom_buffer[z80.PC] + c) % 256 == 0) z80.F |= 0x80;
-			if (z80.A + rom_buffer[z80.PC] + c > 0xFF) z80.F |= 0x10;
-			if(z80.A <= 0xF && z80.A + rom_buffer[z80.PC] + c > 0xF) z80.F |= 0x20;
-			z80.A = (z80.A + rom_buffer[z80.PC] + c) % 256;
+			d8 = memory_read(z80.PC);
+			if ((z80.A + d8 + c) % 256 == 0) z80.F |= 0x80;
+			if (z80.A + d8 + c > 0xFF) z80.F |= 0x10;
+			if(z80.A <= 0xF && z80.A + d8 + c > 0xF) z80.F |= 0x20;
+			z80.A = (z80.A + d8 + c) % 256;
 			z80.PC++;
 			break;
 			
 			case 0xCF: //RST 08H
-			ram[z80.SP - 1] = z80.PC & 0xF0;
-			ram[z80.SP - 2] = z80.PC & 0x0F;
+			memory_write(z80.SP - 1, (z80.PC & 0xFF00) >> 8);
+			memory_write(z80.SP - 2, z80.PC & 0xFF);
 			z80.PC = 0x08;
 			z80.SP -= 2;
+			break;
+			
+			case 0xD0: //RET NC 
+			if(z80.F & 0x10 == 0){
+				z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);;
+				z80.SP += 2;
+			}
+			break;
+				
+			case 0xD1: //POP DE
+			z80.D = memory_read(z80.SP);
+			z80.E = memory_read(z80.SP + 1);
+			z80.SP += 2;
+			break;
+
+			case 0xD2: //JP NC,a16
+			if(z80.F & 0x10 == 0)
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
+			else z80.PC += 2;
+			break;
+
+			case 0xD4: //CALL NC,a16
+			if(z80.F & 0x10 == 0){
+				memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
+				memory_write(z80.SP - 2, (z80.PC + 2) & 0xFF);
+				z80.SP -= 2;
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
+			}
+			else z80.PC += 2;
+			break;
+			
+			case 0xD5: //PUSH DE
+			memory_write(z80.SP - 1, z80.D);
+			memory_write(z80.SP - 2, z80.E);
+			z80.SP -= 2;
+			break;
+
+			case 0xD6: //SUB d8
+			z80.F |= 0x40;
+			d8 = memory_read(z80.PC);
+			if (z80.A - d8 == 0) z80.F |= 0x80;
+			if (z80.A - d8 < 0) z80.F |= 0x10;
+			if(z80.A >= 0xF && z80.A - d8 < 0xF) z80.F |= 0x20;
+			break;
+			
+			case 0xD7: //RST 10H
+			memory_write(z80.SP - 1, (z80.PC & 0xFF00) >> 8);
+			memory_write(z80.SP - 2, z80.PC & 0xFF);
+			z80.PC = 0x10;
+			z80.SP -= 2;
+			break;
+			
+			case 0xD8: //RET C
+			if(z80.F & 0x10 != 0){
+				z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
+				z80.SP += 2;
+			}
+			break;
+			
+			case 0xD9: //RETI
+			//PLUS FLAG IF
+			z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
+			z80.SP += 2;
+			break;
+
+			case 0xDA: //JP C,a16
+			if(z80.F & 0x10 != 0)
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
+			else z80.PC += 2;
+			break;
+			
+			case 0xDC: //CALL C,a16
+			if(z80.F & 0x10 != 0){
+				memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
+				memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
+				z80.SP -= 2;
+				z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
+			}
+			else z80.PC += 2;
+			break;
+
+			case 0xDE: //SBC A,d8	
+			if (z80.F & 0x10) c = 1;
+			else c = 0;
+			
+			d8 = memory_read(z80.PC);
+			if (z80.A + d8 + c == 0) z80.F |= 0x80;
+			if (z80.A + d8 + c > 0xFF) z80.F |= 0x10;
+			if(z80.A > 0xF && z80.A + d8 + c <= 0xF) z80.F |= 0x20;
+			z80.A = (z80.A + d8 + c);
+			z80.PC++;
+			break;
+			
+			case 0xDF: //RST 18H
+			memory_write(z80.SP - 1, (z80.PC & 0xFF00) >> 8);
+			memory_write(z80.SP - 2, z80.PC & 0xFF);
+			z80.PC = 0x18;
+			z80.SP -= 2;
+			break;
+			
+			case 0xE0: //LDH (a8),A
+			memory_write(0xFF00 + memory_read(z80.PC), z80.A);
+			z80.PC++;
+			break;
+
+			case 0xE1: //POP HL
+			z80.H = memory_read(z80.SP);
+			z80.L = memory_read(z80.SP + 1);
+			z80.SP += 2;
 			break;
 			
 			
