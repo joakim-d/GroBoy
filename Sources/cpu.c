@@ -231,9 +231,7 @@ void run(){
 				break;
 			case 0x19:
 				//ADD HL,DE
-				z80.H += z80.D;
-				z80.L += z80.E;
-				//FLAGS ==================================================================================
+				add_dbl(z80.H,z80.L, (z80.D << 8) + z80.E);
 				break;
 			case 0x1A:
 				//LD A,(DE)
@@ -311,9 +309,7 @@ void run(){
 				break;
 			case 0x29:
 				//ADD HL,HL
-				z80.H += H;
-				z80.L += L;
-				//FLAGS =========================================================================================
+				add_dbl(z80.H,z80.L, (z80.H << 8) + z80.L);
 				break;
 			case 0x2A:
 				//LD A,(HL+)
@@ -1839,6 +1835,7 @@ void dec_smpl(BYTE *reg1){
 	//FLAGS
 }
 void rlca(){
+	// 0 0 0 C
 	z80.A << 1;
 	z80.F &= 0x80;
 	z80.F &= 0x40;
@@ -1846,6 +1843,7 @@ void rlca(){
 	//FLAGS
 }
 void rrca(){
+	// 0 0 0 C
 	z80.A >> 1;
 	//FLAGS
 
@@ -1855,34 +1853,63 @@ void stop(){
 }
 
 void rla(){
+	// 0 0 0 C
 	z80.A << 1;
 	//FLAGS
-	//DIFF AVEC RLCA ???
 }
 
 void rra(){
+	// 0 0 0 C
+	// Carry => bit 7
+	// bit 0 => carry
+	BYTE carry;
+	if(z80.F & 0x10){
+		carry = 0x01;
+		}
+	else  {
+		carry = 0x00;
+		}
 	z80.A >> 1;
-	//FLAGS
-
-}
+	if(carry == 0x01)
+		z80.A |= 0x80;
+	else 
+		z80.A &= ~(0x80);
+	if(z80.A & 0x01)
+		z80.F |= 0x10;
+	else
+		z80.F &= ~(0x10);
+}	
 void cpl(){
+	// - 1 1 -
 	//Inverse tous les bits de A
 	//( == A XOR 0xFF)
 	z80.A = z80.A ^ 0xFF;
-	//FLAGS
+	z80.F |= 0x40; // N
+	z80.F |= 0x20; // H
 }
 void scf(){
-	z80.F &= 0x40; 
-	z80.F &= 0x20; 
-	z80.F |= 0x10; 
+	// - 0 0 1
+	z80.F &= ~(0x40); // N 
+	z80.F &= ~(0x20); // H
+	z80.F |= 0x10; // C
 
 }
 void ccf(){
-	//Inverse le Cary Flag, ainsi que le H flag
-	//Clear le N flag
-	z80.F ^ 0x30;
-	z80.F &= 0x40;
+	// - 0 0 C
+	//Inverse le Cary Flag
+	//Clear le N flag et le H flag
+	z80.F ^ 0x10; // C
+	z80.F &= ~(0x40); // N
+	z80.F &= ~(0x20); // H
 }
 void daa(){
 	//ajustement pour addition hexa????????????????????
+}
+void add_dbl(BYTE *reg1, BYTE *reg2, short data){
+	// - 0 H C
+	short data2 = (*reg1 << 8) + *reg2 + data;
+	*reg1 =( 0xFF00 & data2) >> 8;
+	*reg2 =( 0x00FF & data2);
+	z80.F &= ~(0x40); // N	
+		
 }
