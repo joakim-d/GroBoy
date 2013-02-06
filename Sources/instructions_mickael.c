@@ -107,11 +107,10 @@ switch(op_code){
 		break;
 	case 0x18:
 	//JR r8
-		z80.PC = memory_read(z80.PC);
+		r8 = memory_read(z80.PC);
+		z80.PC += r8; 
 		z80.PC++;
 		break;
-		//Moins de Bytes que JP
-		//???????????????????????????????
 	case 0x19:
 	//ADD HL,DE
 		z80.H += z80.D;
@@ -145,8 +144,11 @@ switch(op_code){
 		break;
 	case 0x20:
 	//JR NZ, R8
-		if(z80.F & 0x80 == 0)
-			z80.PC = memory_read(z80.PC);
+		r8 = memory_read(z80.PC);
+		if(z80.F & 0x80 == 0){
+			z80.PC += r8;
+			z80.PC++;
+		}
 		else z80.PC++;
 		break;
 	case 0x21:
