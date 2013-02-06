@@ -1130,6 +1130,486 @@ void run(){
 					case 0x5F: //BIT 3,A
 						bit(0x08, z80.A);
 						break;
+					case 0x60: //BIT 4,B
+						bit((0x01 << 4),z80.B);
+						break;
+					case 0x61: //BIT 4,C
+						bit((0x01 << 4),z80.C);
+						break;
+					case 0x62: //BIT 4,D
+						bit((0x01 << 4),z80.D);
+						break;
+					case 0x63: //BIT 4,E
+						bit((0x01 << 4),z80.E);
+						break;
+					case 0x64: //BIT 4,H
+						bit((0x01 << 4),z80.H);
+						break;
+					case 0x65: //BIT 4,L
+						bit((0x01 << 4),z80.L);
+						break;
+					case 0x66: //BIT 4,HL
+						bit((0x01 << 4),memory_read((z80.H << 8) + z80.L));
+						break;
+					case 0x67: //BIT 4,A
+						bit((0x01 << 4),z80.A);
+						break;
+					case 0x68: //BIT 5,B
+						bit((0x01 << 5),z80.B);
+						break;
+					case 0x69: //BIT 5,C
+						bit((0x01 << 5),z80.C);
+						break;
+					case 0x6A: //BIT 5,D
+						bit((0x01 << 5),z80.D);
+						break;
+					case 0x6B: //BIT 5,E
+						bit((0x01 << 5),z80.E);
+						break;
+					case 0x6C: //BIT 5,H
+						bit((0x01 << 5),z80.H);
+						break;
+					case 0x6D: //BIT 5,L
+						bit((0x01 << 5),z80.L);
+						break;
+					case 0x6E: //BIT 5,HL
+						bit((0x01 << 5),memory_read((z80.H << 8) + z80.L));
+						break;
+					case 0x6F: //BIT 5,A
+						bit((0x01 << 5),z80.A);
+						break;
+					case 0x70: //BIT 6,B
+						bit((0x01 << 6),z80.B);
+						break;
+					case 0x71: //BIT 6,C
+						bit((0x01 << 6),z80.C);
+						break;
+					case 0x72: //BIT 6,D
+						bit((0x01 << 6),z80.D);
+						break;
+					case 0x73: //BIT 6,E
+						bit((0x01 << 6),z80.E);
+						break;
+					case 0x74: //BIT 6,H
+						bit((0x01 << 6),z80.H);
+						break;
+					case 0x75: //BIT 6,L
+						bit((0x01 << 6),z80.L);
+						break;
+					case 0x76: //BIT 6,HL
+						bit((0x01 << 6),memory_read((z80.H << 8) + z80.L));
+						break;
+					case 0x77: //BIT 6,A
+						bit((0x01 << 6),z80.A);
+						break;
+					case 0x78: //BIT 7,B
+						bit((0x01 << 7),z80.B);
+						break;
+					case 0x79: //BIT 7,C
+						bit((0x01 << 7),z80.C);
+						break;
+					case 0x7A: //BIT 7,D
+						bit((0x01 << 7),z80.D);
+						break;
+					case 0x7B: //BIT 7,E
+						bit((0x01 << 7),z80.E);
+						break;
+					case 0x7C: //BIT 7,H
+						bit((0x01 << 7),z80.H);
+						break;
+					case 0x7D: //BIT 7,L
+						bit((0x01 << 7),z80.L);
+						break;
+					case 0x7E: //BIT 7,HL
+						bit((0x01 << 7),memory_read((z80.H << 8) + z80.L));
+						break;
+					case 0x7F: //BIT 7,A
+						bit((0x01 << 7),z80.A);
+						break;
+					case 0x80: //RES 0,B
+						res(0,&z80.B);
+						break;
+					case 0x81: //RES 0,C
+						res(0,&z80.C);
+						break;
+					case 0x82: //RES 0,D
+						res(0,&z80.D);
+						break;
+					case 0x83: //RES 0,E
+						res(0,&z80.E);
+						break;
+					case 0x84: //RES 0,H
+						res(0,&z80.H);
+						break;
+					case 0x85: //RES 0,L
+						res(0,&z80.L);
+						break;
+					case 0x86: //RES 0,HL
+						res_hl(0);
+						break;
+					case 0x87: //RES 0,A
+						res(0,&z80.A);
+						break;
+					case 0x88: //RES 1,B
+						res(1,&z80.B);
+						break;
+					case 0x89: //RES 1,C
+						res(1,&z80.C);
+						break;
+					case 0x8A: //RES 1,D
+						res(1,&z80.D);
+						break;
+					case 0x8B: //RES 1,E
+						res(1,&z80.E);
+						break;
+					case 0x8C: //RES 1,H
+						res(1,&z80.H);
+						break;
+					case 0x8D: //RES 1,L
+						res(1,&z80.L);
+						break;
+					case 0x8E: //RES 1,HL
+						res_hl(1);
+						break;
+					case 0x8F: //RES 1,A
+						res(1,&z80.A);
+						break;
+					case 0x90: //RES 2,B
+						res(2,&z80.B);
+						break;
+					case 0x91: //RES 2,C
+						res(2,&z80.C);
+						break;
+					case 0x92: //RES 2,D
+						res(2,&z80.D);
+						break;
+					case 0x93: //RES 2,E
+						res(2,&z80.E);
+						break;
+					case 0x94: //RES 2,H
+						res(2,&z80.H);
+						break;
+					case 0x95: //RES 2,L
+						res(2,&z80.L);
+						break;
+					case 0x96: //RES 2,HL
+						res_hl(2);
+						break;
+					case 0x97: //RES 2,A
+						res(2,&z80.A);
+						break;
+					case 0x98: //RES 3,B
+						res(3,&z80.B);
+						break;
+					case 0x99: //RES 3,C
+						res(3,&z80.C);
+						break;
+					case 0x9A: //RES 3,D
+						res(3,&z80.D);
+						break;
+					case 0x9B: //RES 3,E
+						res(3,&z80.E);
+						break;
+					case 0x9C: //RES 3,H
+						res(3,&z80.H);
+						break;
+					case 0x9D: //RES 3,L
+						res(3,&z80.L);
+						break;
+					case 0x9E: //RES 3,HL
+						res_hl(3);
+						break;
+					case 0x9F: //RES 3,A
+						res(3,&z80.A);
+						break;
+					case 0xA0: //RES 4,B
+						res(4,&z80.B);
+						break;
+					case 0xA1: //RES 4,C
+						res(4,&z80.C);
+						break;
+					case 0xA2: //RES 4,D
+						res(4,&z80.D);
+						break;
+					case 0xA3: //RES 4,E
+						res(4,&z80.E);
+						break;
+					case 0xA4: //RES 4,H
+						res(4,&z80.H);
+						break;
+					case 0xA5: //RES 4,L
+						res(4,&z80.L);
+						break;
+					case 0xA6: //RES 4,HL
+						res_hl(4);
+						break;
+					case 0xA7: //RES 4,A
+						res(4,&z80.A);
+						break;
+					case 0xA8: //RES 5,B
+						res(5,&z80.B);
+						break;
+					case 0xA9: //RES 5,C
+						res(5,&z80.C);
+						break;
+					case 0xAA: //RES 5,D
+						res(5,&z80.D);
+						break;
+					case 0xAB: //RES 5,E
+						res(5,&z80.E);
+						break;
+					case 0xAC: //RES 5,H
+						res(5,&z80.H);
+						break;
+					case 0xAD: //RES 5,L
+						res(5,&z80.L);
+						break;
+					case 0xAE: //RES 5,HL
+						res_hl(5);
+						break;
+					case 0xAF: //RES 5,A
+						res(5,&z80.A);
+						break;
+					case 0xB0: //RES 6,B
+						res(6,&z80.B);
+						break;
+					case 0xB1: //RES 6,C
+						res(6,&z80.C);
+						break;
+					case 0xB2: //RES 6,D
+						res(6,&z80.D);
+						break;
+					case 0xB3: //RES 6,E
+						res(6,&z80.E);
+						break;
+					case 0xB4: //RES 6,H
+						res(6,&z80.H);
+						break;
+					case 0xB5: //RES 6,L
+						res(6,&z80.L);
+						break;
+					case 0xB6: //RES 6,Hl
+						res_hl(6);
+						break;
+					case 0xB7: //RES 6,A
+						res(6,&z80.A);
+						break;
+					case 0xB8: //RES 7,B
+						res(7,&z80.B);
+						break;
+					case 0xB9: //RES 7,C
+						res(7,&z80.C);
+						break;
+					case 0xBA: //RES 7,D
+						res(7,&z80.D);
+						break;
+					case 0xBB: //RES 7,E
+						res(7,&z80.E);
+						break;
+					case 0xBC: //RES 7,H
+						res(7,&z80.H);
+						break;
+					case 0xBD: //RES 7,L
+						res(7,&z80.L);
+						break;
+					case 0xBE: //RES 7,HL
+						res_hl(7);
+						break;
+					case 0xBF: //RES 7,A
+						res(7,&z80.A);
+						break;
+					case 0xC0: //SET 0,B
+						set(0,&z80.B);
+						break;
+					case 0xC1: //SET 0,C
+						set(0,&z80.C);
+						break;
+					case 0xC2: //SET 0,D
+						set(0,&z80.D);
+						break;
+					case 0xC3: //SET 0,E
+						set(0,&z80.E);
+						break;
+					case 0xC4: //SET 0,H
+						set(0,&z80.H);
+						break;
+					case 0xC5: //SET 0,L
+						set(0,&z80.L);
+						break;
+					case 0xC6: //SET 0,HL
+						set_hl(0);
+						break;
+					case 0xC7: //SET 0,A
+						set(0,&z80.A);
+						break;
+					case 0xC8: //SET 1,B
+						set(1,&z80.B);
+						break;
+					case 0xC9: //SET 1,C
+						set(1,&z80.C);
+						break;
+					case 0xCA: //SET 1,D
+						set(1,&z80.D);
+						break;
+					case 0xCB: //SET 1,E
+						set(1,&z80.E);
+						break;
+					case 0xCC: //SET 1,H
+						set(1,&z80.H);
+						break;
+					case 0xCD: //SET 1,L
+						set(1,&z80.L);
+						break;
+					case 0xCE: //SET 1,HL
+						set_hl(1);
+						break;
+					case 0xCF: //SET 1,A
+						set(1,&z80.A);
+						break;
+					case 0xD0: //SET 2,B
+						set(2,&z80.B);
+						break;
+					case 0xD1: //SET 2,C
+						set(2,&z80.C);
+						break;
+					case 0xD2: //SET 2,D
+						set(2,&z80.D);
+						break;
+					case 0xD3: //SET 2,E
+						set(2,&z80.E);
+						break;
+					case 0xD4: //SET 2,H
+						set(2,&z80.H);
+						break;
+					case 0xD5: //SET 2,L
+						set(2,&z80.L);
+						break;
+					case 0xD6: //SET 2,HL
+						set_hl(2);
+						break;
+					case 0xD7: //SET 2,A
+						set(2,&z80.A);
+						break;
+					case 0xD8: //SET 3,B
+						set(3,&z80.B);
+						break;
+					case 0xD9: //SET 3,C
+						set(3,&z80.C);
+						break;
+					case 0xDA: //SET 3,D
+						set(3,&z80.D);
+						break;
+					case 0xDB: //SET 3,E
+						set(3,&z80.E);
+						break;
+					case 0xDC: //SET 3,H
+						set(3,&z80.H);
+						break;
+					case 0xDD: //SET 3,L
+						set(3,&z80.L);
+						break;
+					case 0xDE: //SET 3,Hl
+						set_hl(3);
+						break;
+					case 0xDF: //SET 3,A
+						set(3,&z80.A);
+						break;
+					case 0xE0: //SET 4,B
+						set(4,&z80.B);
+						break;
+					case 0xE1: //SET 4,C
+						set(4,&z80.C);
+						break;
+					case 0xE2: //SET 4,D
+						set(4,&z80.D);
+						break;
+					case 0xE3: //SET 4,E
+						set(4,&z80.E);
+						break;
+					case 0xE4: //SET 4,H
+						set(4,&z80.H);
+						break;
+					case 0xE5: //SET 4,L
+						set(4,&z80.L);
+						break;
+					case 0xE6: //SET 4,HL
+						set_hl(4);
+						break;
+					case 0xE7: //SET 4,A
+						set(4,&z80.A);
+						break;
+					case 0xE8: //SET 5,B
+						set(5,&z80.B);
+						break;
+					case 0xE9: //SET 5,C
+						set(5,&z80.C);
+						break;
+					case 0xEA: //SET 5,D
+						set(5,&z80.D);
+						break;
+					case 0xEB: //SET 5,E
+						set(5,&z80.E);
+						break;
+					case 0xEC: //SET 5,H
+						set(5,&z80.H);
+						break;
+					case 0xED: //SET 5,L
+						set(5,&z80.L);
+						break;
+					case 0xEE: //SET 5,HL
+						set_hl(5);
+						break;
+					case 0xEF: //SET 5,A
+						set(5,&z80.A);
+						break;
+					case 0xF0: //SET 6,B
+						set(6,&z80.B);
+						break;
+					case 0xF1: //SET 6,C
+						set(6,&z80.C);
+						break;
+					case 0xF2: //SET 6,D
+						set(6,&z80.D);
+						break;
+					case 0xF3: //SET 6,E
+						set(6,&z80.E);
+						break;
+					case 0xF4: //SET 6,H
+						set(6,&z80.H);
+						break;
+					case 0xF5: //SET 6,L
+						set(6,&z80.L);
+						break;
+					case 0xF6: //SET 6,HL
+						set_hl(6);
+						break;
+					case 0xF7: //SET 6,A
+						set(6,&z80.A);
+						break;
+					case 0xF8: //SET 7,B
+						set(7,&z80.B);
+						break;
+					case 0xF9: //SET 7,C
+						set(7,&z80.C);
+						break;
+					case 0xFA: //SET 7,D
+						set(7,&z80.D);
+						break;
+					case 0xFB: //SET 7,E
+						set(7,&z80.E);
+						break;
+					case 0xFC: //SET 7,H
+						set(7,&z80.H);
+						break;
+					case 0xFD: //SET 7,L
+						set(7,&z80.L);
+						break;
+					case 0xFE: //SET 7,HL
+						set_hl(7);
+						break;
+					case 0xFF: //SET 7,A
+						set(7,&z80.A);
+						break;
 				}
 				break;
 			case 0xCC: //CALL Z,a16
@@ -1270,43 +1750,70 @@ void run(){
 	}
 }
 
-void or(BYTE data){
+
+static inline void set_hl(int a)
+{
+	BYTE hl = memory_read((z80.H << 8) + z80.L);
+	hl |= (1 << b);
+	memory_write((z80.H << 8) + z80.L, hl);
+}
+
+static inline void get_hl(int a)
+{
+	BYTE hl = memory_read((z80.H << 8) + z80.L);
+	hl &= ~(1 << b);
+	memory_write((z80.H << 8) + z80.L, hl);
+}
+
+//fonction SET
+static inline void set(int b, BYTE *a) 
+{
+         a |= (1 << b);
+}
+
+//fonction RES
+static inline void res(int b, BYTE *a) 
+{
+         a &= ~(1 << b);
+}
+
+static inline void or(BYTE data){
 	z80.A |= data;
 	if (z80.A == 0)	z80.F &= 0x80;
 	else z80.F &= 0x00;
 }
 
-void cp(BYTE data){
+static inline void cp(BYTE data){
 	z80.F = 0x40;
 	if (z80.A - data == 0) z80.F |= 0x80;
 	if (z80.A > 0xF && z80.A - data <= 0xF) z80.F |= 0x20;
 	if (z80.A - data < 0) z80.F |= 0x10;
 }
 
-void ret_n_cond(BYTE cond){
+static inline void ret_n_cond(BYTE cond){
 	if(!z80.F & cond){
 		z80.PC = (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP);;
 		z80.SP += 2;
 	}
 }
 
-void pop(BYTE *reg1, BYTE *reg2){
+static inline void pop(BYTE *reg1, BYTE *reg2){
 	*reg1 = memory_read(z80.SP);
 	*reg2 = memory_read(z80.SP + 1);
 	z80.SP += 2;
 }
 
-void jp_n_cond(BYTE cond){
+static inline void jp_n_cond(BYTE cond){
 	if(z80.F & cond == 0)
 		z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
 	else z80.PC += 2;
 }
 
-void jp(short addr){
+static inline void jp(short addr){
 	z80.PC = addr;
 }
 
-void call_n_cond(BYTE cond){
+static inline void call_n_cond(BYTE cond){
 	if(z80.F & cond == 0){
 		memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 		memory_write(z80.SP - 2, (z80.PC + 2) & 0xFF);
@@ -1316,13 +1823,13 @@ void call_n_cond(BYTE cond){
 	else z80.PC += 2;
 }
 
-void push(BYTE reg1, BYTE reg2){
+static inline void push(BYTE reg1, BYTE reg2){
 	memory_write(z80.SP - 1, reg1);
 	memory_write(z80.SP - 2, reg2);
 	z80.SP -= 2;
 }
 
-void add(BYTE data){
+static inline void add(BYTE data){
 	z80.F = 0;
 	if (z80.A + data == 0) z80.F |= 0x80;
 	if (z80.A + data > 0xFF) z80.F |= 0x10;
@@ -1330,21 +1837,21 @@ void add(BYTE data){
 	z80.A = z80.A + data;
 }
 
-void rst(BYTE addr){
+static inline void rst(BYTE addr){
 	memory_write(z80.SP - 1, (z80.PC & 0xFF00) >> 8);
 	memory_write(z80.SP - 2, z80.PC & 0xFF);
 	z80.PC = addr;
 	z80.SP -= 2;
 }
 
-void ret_cond(BYTE cond){
+static inline void ret_cond(BYTE cond){
 	if(z80.F & cond != 0){
 		z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
 		z80.SP += 2;
 	}
 }
 
-void ret(){
+static inline void ret(){
 	z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
 	z80.SP += 2;
 }
@@ -1355,11 +1862,11 @@ void ret(){
 		else z80.PC += 2;
 	}
 
-void jp(){
+static inline void jp(){
 	z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
 }
 
-void call_cond(BYTE cond){
+static inline void call_cond(BYTE cond){
 	if(z80.F & cond != 0){
 		memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 		memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
@@ -1369,14 +1876,14 @@ void call_cond(BYTE cond){
 	else z80.PC += 2;
 }
 
-void call(){
+static inline void call(){
 	memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 	memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
 	z80.SP -= 2;
 	z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
 }
 
-void adc(BYTE data){
+static inline void adc(BYTE data){
 	if (z80.F & 0x10) c = 1;
 	else c = 0;
 
@@ -1386,19 +1893,19 @@ void adc(BYTE data){
 	z80.A = z80.A + data + c;
 }
 
-void sub(BYTE data){
+static inline void sub(BYTE data){
 	if (z80.A - data == 0) z80.F |= 0x80;
 	if (z80.A - data < 0) z80.F |= 0x10;
 	if(z80.A >= 0xF && z80.A - data < 0xF) z80.F |= 0x20;
 	break;
 }
-void reti(){
+static inline void reti(){
 	//PLUS FLAG IF
 	z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
 	z80.SP += 2;
 }
 
-void sbc(BYTE data){
+static inline void sbc(BYTE data){
 	if (z80.F & 0x10) c = 1;
 	else c = 0;
 
@@ -1408,20 +1915,20 @@ void sbc(BYTE data){
 	z80.A = (z80.A - data - c);
 }
 
-void ld_at(short addr){
+static inline void ld_at(short addr){
 	memory_write(addr, z80.A);
 }
 
-void ld_from_a8(short addr){
+static inline void ld_from_a8(short addr){
 	z80.A = memory_read(addr);
 }
 
-void and(BYTE data){
+static inline void and(BYTE data){
 	z80.F &= 0x20;
 	z80.A &= data;
 	if (z80.A == 0) z80.F |= 0x80;
 }
-void add_sp_r8(BYTE_S data){
+static inline void add_sp_r8(BYTE_S data){
 	if(z80.SP + data > 0xFFFF || z80.SP + data < 0) z80.F |= 0x10;
 	if((z80.SP > 0xFF && z80.SP + data <= 0xFF) || (z80.SP <= 0xFF && z80.SP + data > 0xFF)) z80.F |= 0x20;
 	Z80.SP += data;
@@ -1430,7 +1937,7 @@ void add_sp_r8(BYTE_S data){
 void di(){
 
 }
-void ld_hl_sp_p_r8(){
+static inline void ld_hl_sp_p_r8(){
 	BYTE_S r8 = memory_read(z80.PC);
 	unsigned short a16 = (z80.H << 8) + z80.L;
 	if(a16 + z80.SP + r8 > 0xFFFF || a16 + z80.SP + r8 < 0) z80.F |= 0x10;
@@ -1439,15 +1946,15 @@ void ld_hl_sp_p_r8(){
 	Z80.L = ((Z80.SP + r8) & 0xFF);
 	z80.PC++;
 }
-void ld_sp_hl(){
+static inline void ld_sp_hl(){
 	z80.SP = (Z80.H << 8) + z80.L;
 }
 
-void ld_reg_data(BYTE *reg, BYTE data){
+static inline void ld_reg_data(BYTE *reg, BYTE data){
 	*reg = data;
 }
 
-void rlc(BYTE *data){
+static inline void rlc(BYTE *data){
 	if (*data & 0x80 == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data <<= 1;
@@ -1455,7 +1962,7 @@ void rlc(BYTE *data){
 	if (*data == 0) z80.F |= 0x80;
 }
 
-void rlc_hl(){
+static inline void rlc_hl(){
 	hl = memory_read((z80.H << 8) + z80.L);
 	if (hl & 0x80 == 0) z80.F = 0x00;
 	else z80.F = 0x10;
@@ -1465,7 +1972,7 @@ void rlc_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
-void rrc(BYTE *data){
+static inline void rrc(BYTE *data){
 	if (*data & 0x01 == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data >>= 1;
@@ -1473,7 +1980,7 @@ void rrc(BYTE *data){
 	if (*data == 0) z80.F |= 0x80;
 }
 
-void rrc_hl(){
+static inline void rrc_hl(){
 	hl = memory_read((z80.H << 8) + z80.L);
 	if (hl & 0x01 == 0) z80.F = 0;
 	else z80.F = 0x10;
@@ -1483,7 +1990,7 @@ void rrc_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
-void rl(BYTE *data){
+static inline void rl(BYTE *data){
 	BYTE F = z80.F & 0x10;
 	if (*data & 0x80 == 0) z80.F = 0;
 	else z80.F = 0x10;
@@ -1492,7 +1999,7 @@ void rl(BYTE *data){
 	if (*data == 0) z80.F |= 0x80;
 }
 
-void rl_hl(){
+static inline void rl_hl(){
 	hl = memory_read(z80.PC);
 	hl = memory_read((z80.H << 8) + z80.L);
 	F = z80.F;
@@ -1504,7 +2011,7 @@ void rl_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
-void rr(BYTE *data){
+static inline void rr(BYTE *data){
 	BYTE F = z80.F & 0x10;
 	if (*data & 0x01 == 0) z80.F = 0;
 	else z80.F = 0x10;
@@ -1513,7 +2020,7 @@ void rr(BYTE *data){
 	if (*data == 0) z80.F |= 0x80;
 }
 
-void rr_hl(){
+static inline void rr_hl(){
 	hl = memory_read((z80.H << 8) + z80.L);
 	F = z80.F;
 	if (hl & 0x01 == 0) z80.F = 0;
@@ -1524,14 +2031,14 @@ void rr_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
-void sla(BYTE *data){
+static inline void sla(BYTE *data){
 	if (*data & 0x80 == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data <<= 1;
 	if (*data == 0) z80.F |= 0x80;
 }
 
-void sla_hl(){
+static inline void sla_hl(){
 	hl = memory_read((z80.H << 8) + z80.L);
 	if (z80.B & 0x80 == 0) z80.F = 0;
 	else z80.F = 0x10;
@@ -1540,7 +2047,7 @@ void sla_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
-void sra(BYTE *data){
+static inline void sra(BYTE *data){
 	BYTE F = *data & 0x80;
 	if(*data & 0x01 == 0) z80.F = 0;
 	else z80.F = 0x10;
@@ -1549,7 +2056,7 @@ void sra(BYTE *data){
 	if (*data == 0) z80.F |= 0x80;
 }
 
-void sra_hl(){
+static inline void sra_hl(){
 	hl = memory_read((z80.H << 8) +z80.L);
 	F = hl & 0x80;
 	if(hl & 0x01 == 0) z80.F = 0;
@@ -1560,7 +2067,7 @@ void sra_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
-void swap(BYTE *data){
+static inline void swap(BYTE *data){
 	BYTE low_nibble = (*data & 0xF0) >> 4;
 	BYTE high_nibble = (*data & 0x0F) << 4;
 	*data = high_nibble + low_nibble;
@@ -1568,7 +2075,7 @@ void swap(BYTE *data){
 	else z80.F = 0;
 }
 
-void swap_hl(){
+static inline void swap_hl(){
 	hl = memory_read((z80.H << 8) + z80.L);
 	BYTE low_nibble = (z80.B & 0xF0) >> 4;
 	BYTE high_nibble = (z80.B & 0x0F) << 4;
@@ -1578,14 +2085,14 @@ void swap_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
-void srl(BYTE *data){
+static inline void srl(BYTE *data){
 	if(*data & 0x01 == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data >>= 1;
 	if (*data == 0) z80.F |= 0x80;
 }
 
-void srl_hl(){
+static inline void srl_hl(){
 	hl = memory_read((z80.H << 8) + z80.L);
 	if(hl & 0x01 == 0) z80.F = 0;
 	else z80.F = 0x10;
@@ -1594,35 +2101,35 @@ void srl_hl(){
 	memory_write((z80.H << 8) + z80.L);
 }
 
-void bit(BYTE bit, BYTE data){
+static inline void bit(BYTE bit, BYTE data){
 	if(z80.F & 0x10) z80.F = 0x30;
 	else z80.F = 0x20;
 	if(data & bit) z80.F |= 0x80;
 }
-void xor(BYTE data){
+static inline void xor(BYTE data){
 	z80.A ^= data;
 	if (z80.A == 0)	z80.F &= 0x80;
 	else z80.F &= 0x00;
 }
-void ld_reg(BYTE *reg1, BYTE data){
+static inline void ld_reg(BYTE *reg1, BYTE data){
 	//LD reg1, reg2
 	//LD reg1, (reg2)
 	reg1 = data;
 }
-void ld_mem(BYTE reg1, BYTE reg2){
+static inline void ld_mem(BYTE reg1, BYTE reg2){
 	//LD (reg1),reg2
 	//LD (reg1), d
 	memory_write(reg1, reg2);
 
 }
-void inc_dbl(BYTE *reg1, BYTE *reg2){
+static inline void inc_dbl(BYTE *reg1, BYTE *reg2){
 	// - - - -
 	short temp;
 	temp = (*reg1 << 8) + *reg2 + 0x01;
 	*reg1 =( 0xFF00 & data2) >> 8;
 	*reg2 =( 0x00FF & data2);
 }
-void inc_smpl(BYTE *reg1){
+static inline void inc_smpl(BYTE *reg1){
 	// Z 0 H -
 	*reg1+=0x01;
 	if(reg1 == 0x00) z80.F |= 0x80;
@@ -1631,7 +2138,7 @@ void inc_smpl(BYTE *reg1){
 	else z80.F ~(0x20);
 }
 
-void inc_at(short addr){
+static inline void inc_at(short addr){
 	// Z 0 H -
 	memory_write(addr, memory_read(addr) + 1);
 	if(memory_read(addr) == 0)
@@ -1645,7 +2152,7 @@ void inc_at(short addr){
 		z80.F &= ~(0x20);
 }
 
-void dec_at(short addr){
+static inline void dec_at(short addr){
 	// Z 1 H -
 	memory_write(addr, memory_read(addr) - 1);
 	if(memory_read(addr) == 0)
@@ -1659,17 +2166,17 @@ void dec_at(short addr){
 		z80.F &= ~(0x20);
 }
 
-void dec_sp(){
+static inline void dec_sp(){
 	// - - - -
 	z80.SP -= 1;
 }
 
-void inc_sp(){
+static inline void inc_sp(){
 	// - - - -
 	z80.SP += 1;
 }
 
-void dec_dbl(BYTE *reg1, BYTE *reg2){
+static inline void dec_dbl(BYTE *reg1, BYTE *reg2){
 	// - - - - 
 	short temp;
 	temp = (*reg1 << 8) + *reg2 - 0x01;
@@ -1677,7 +2184,7 @@ void dec_dbl(BYTE *reg1, BYTE *reg2){
 	*reg2 =( 0x00FF & data2);
 }
 
-void dec_smpl(BYTE *reg1){
+static inline void dec_smpl(BYTE *reg1){
 	// Z 1 H -
 	*reg1 -= 0x01;
 	if(reg1 == 0) z80.F |= 0x80;
@@ -1685,7 +2192,7 @@ void dec_smpl(BYTE *reg1){
 	if(reg1 > 0xF)z80.F |= 0x20;
 	else z80.F &= ~(0x20);
 }
-void rlca(){
+static inline void rlca(){
 	// 0 0 0 C
 	// bit 7 => bit 0
 	// bit 7 => carry
@@ -1710,7 +2217,7 @@ void rlca(){
 	z80.F &= ~(0x40); //N
 	z80.F &= ~(0x20); //H
 }
-void rrca(){
+static inline void rrca(){
 	// 0 0 0 C
 	// bit 0 => bit 7
 	// bit 0 => carry
@@ -1736,11 +2243,11 @@ void rrca(){
 	z80.F &= ~(0x20); //H
 
 }
-void stop(){
+static inline void stop(){
 	int i=0;
 }
 
-void rla(){
+static inline void rla(){
 	// 0 0 0 C
 	// Carry => bit 0
 	// bit 7 => carry
@@ -1765,7 +2272,7 @@ void rla(){
 	z80.F &= ~(0x20); //H
 }
 
-void rra(){
+static inline void rra(){
 	// 0 0 0 C
 	// Carry => bit 7
 	// bit 0 => carry
@@ -1789,7 +2296,7 @@ void rra(){
 	z80.F &= ~(0x40); //N
 	z80.F &= ~(0x20); //H
 }	
-void cpl(){
+static inline void cpl(){
 	// - 1 1 -
 	//Inverse tous les bits de A
 	//( == A XOR 0xFF)
@@ -1797,14 +2304,14 @@ void cpl(){
 	z80.F |= 0x40; // N
 	z80.F |= 0x20; // H
 }
-void scf(){
+static inline void scf(){
 	// - 0 0 1
 	z80.F &= ~(0x40); // N 
 	z80.F &= ~(0x20); // H
 	z80.F |= 0x10; // C
 
 }
-void ccf(){
+static inline void ccf(){
 	// - 0 0 C
 	//Inverse le Cary Flag
 	//Clear le N flag et le H flag
@@ -1812,10 +2319,8 @@ void ccf(){
 	z80.F &= ~(0x40); // N
 	z80.F &= ~(0x20); // H
 }
-void daa(){
-	//ajustement pour addition hexa????????????????????
-}
-void add_dbl(BYTE *reg1, BYTE *reg2, short data){
+
+static inline void add_dbl(BYTE *reg1, BYTE *reg2, short data){
 	// - 0 H C
 	short data2 = (*reg1 << 8) + *reg2 + data;
 	*reg1 =( 0xFF00 & data2) >> 8;
@@ -1824,24 +2329,65 @@ void add_dbl(BYTE *reg1, BYTE *reg2, short data){
 
 }
 
-void jr(BYTE_S d){
+static inline void jr(BYTE_S d){
 	// - - - -
 	//Jump Relatif
 	z80.PC += d; 
 	z80.PC++;
 }
 
-void jr_cond(BYTE cond, BYTE_S d){
+static inline void jr_cond(BYTE cond, BYTE_S d){
 	// - - - -
 	if(z80.F & cond != 0)
 		z80.PC += d;
 	else z80.PC += 1;
 }
 
-void jr_n_cond(BYTE cond, BYTE_S d){
+static inline void jr_n_cond(BYTE cond, BYTE_S d){
 	// - - - -
 	if(z80.F & cond == 0)
 		z80.PC = d;
 	else z80.PC += 1;
+}
+
+static inline void daa()
+{
+	unsigned int temp = z80.A;
+	if(z80.F & 0x40)
+	{
+		if(z80.F & (0x20))
+		{
+			temp = (temp - 6) & 0xff;
+		}
+		if(z80.F & (0x10))
+		{
+			temp -= 0x96;
+		}
+	}
+	else
+	{
+		if(z80.F & (0x20) || (temp & 0x0f) > 9)
+		{
+			temp += 6;
+		}
+		if(z80.F & (0x10) || (temp >> 4 ) > 9)
+		{
+			temp += 0x96;
+		}
+	}
+	
+	
+	if(temp & 0x100)
+	{
+		z80.F |= 0x10;
+	}
+	
+	temp &= ~(0x20);
+	
+	temp &= 0xff;
+	if(z80.A == 0) z80.F |= 0x80;
+	else z80.F &= ~(0x80);
+	
+	z80.A = temp;
 }
 
