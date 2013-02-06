@@ -531,6 +531,49 @@ switch(opcode){
 
 }
 
+
+//fonction daa
+static inline void daa()
+{
+	unsigned int temp = z80.A;
+	if(z80.F & 0x40)
+	{
+		if(z80.F & (0x20))
+		{
+			temp = (temp - 6) & 0xff;
+		}
+		if(z80.F & (0x10))
+		{
+			temp -= 0x96;
+		}
+	}
+	else
+	{
+		if(z80.F & (0x20) || (temp & 0x0f) > 9)
+		{
+			temp += 6;
+		}
+		if(z80.F & (0x10) || (temp >> 4 ) > 9)
+		{
+			temp += 0x96;
+		}
+	}
+	
+	
+	if(temp & 0x100)
+	{
+		z80.F |= 0x10;
+	}
+	
+	temp &= ~(0x20);
+	
+	temp &= 0xff;
+	if(z80.A == 0) z80.F |= 0x80;
+	else z80.F &= ~(0x80);
+	
+	z80.A = temp;
+}
+
 //fonction BIT
 static void bit(BYTE a, int b) 
 {
