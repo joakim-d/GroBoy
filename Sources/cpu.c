@@ -107,7 +107,7 @@ void run(){
 	int counter;
 	counter=interrupt_period;
 
-	char op_code;
+	BYTE op_code;
 	for(;;)
 	{
 		op_code=memory_read(z80.PC++);
@@ -686,67 +686,67 @@ void run(){
 
 			case 0x80:
 				//ADD A,B
-				add_a(z80.B);
+				add(z80.B);
 				break;
 			case 0x81:
 				//ADD A,C
-				add_a(z80.C);
+				add(z80.C);
 				break;
 			case 0x82:
 				//ADD A,D
-				add_a(z80.D);
+				add(z80.D);
 				break;
 			case 0x83:
 				//ADD A,E
-				add_a(z80.E);
+				add(z80.E);
 				break;
 			case 0x84:
 				//ADD A,H
-				add_a(z80.H);
+				add(z80.H);
 				break;
 			case 0x85:
 				//ADD A,L
-				add_a(z80.L);
+				add(z80.L);
 				break;
 			case 0x86:
 				//ADD A,(HL)
-				add_a(memory_read((z80.H << 8)+z80.L));
+				add(memory_read((z80.H << 8)+z80.L));
 				break;
 			case 0x87:
 				//ADD A,A
-				add_a(z80.A);
+				add(z80.A);
 				break;
 			case 0x88:
 				//ADC A,B
-				adc_a(z80.B);
+				adc(z80.B);
 				break;
 			case 0x89:
 				//ADC A,C
-				adc_a(z80.C);
+				adc(z80.C);
 				break;
 			case 0x8A:
 				//ADC A,D
-				adc_a(z80.D);
+				adc(z80.D);
 				break;
 			case 0x8B:
 				//ADC A,E
-				adc_a(z80.E);
+				adc(z80.E);
 				break;
 			case 0x8C:
 				//ADC A,H
-				adc_a(z80.H);
+				adc(z80.H);
 				break;
 			case 0x8D:
 				//ADC A,L
-				adc_a(z80.L);
+				adc(z80.L);
 				break;
 			case 0x8E:
 				//ADC A,(HL)
-				adc_a(memory_read((z80.H << 8)+z80.L));
+				adc(memory_read((z80.H << 8)+z80.L));
 				break;
 			case 0x8F:
 				//ADC A,A
-				adc_a(z80.A);
+				adc(z80.A);
 				break;
 			case 0x90:
 				//SUB B
@@ -946,7 +946,7 @@ void run(){
 				push(z80.B, z80.C);
 				break;
 			case 0xC6: //ADD A,d8
-				add_d8();
+				add(memory_read(z80.PC++));
 				break;
 			case 0xC7: //RST 00H
 				rst(0);
@@ -1405,8 +1405,8 @@ void cp(BYTE data){
 }
 
 void ret_n_cond(BYTE cond){
-	if(z80.F & cond == 0){
-		z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);;
+	if(!z80.F & cond){
+		z80.PC = (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP);;
 		z80.SP += 2;
 	}
 }
@@ -1417,11 +1417,11 @@ void pop(BYTE *reg1, BYTE *reg2){
 	z80.SP += 2;
 }
 
-	void jp_n_cond(BYTE cond){
-		if(z80.F & cond == 0)
-			z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
-		else z80.PC += 2;
-	}
+void jp_n_cond(BYTE cond){
+	if(z80.F & cond == 0)
+		z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
+	else z80.PC += 2;
+}
 
 void jp(short addr){
 	z80.PC = addr;
@@ -1443,14 +1443,12 @@ void push(BYTE reg1, BYTE reg2){
 	z80.SP -= 2;
 }
 
-void add_d8(){
-	BYTE d8 = memory_read(z80.PC);
+void add(BYTE data){
 	z80.F = 0;
-	if ((z80.A + d8) % 256 == 0) z80.F |= 0x80;
-	if (z80.A + d8 > 0xFF) z80.F |= 0x10;
-	if(z80.A <= 0xF && z80.A + d8 > 0xF) z80.F |= 0x20;
-	z80.A = (z80.A + d8) % 256;																
-	z80.PC++;
+	if (z80.A + data == 0) z80.F |= 0x80;
+	if (z80.A + data > 0xFF) z80.F |= 0x10;
+	if (z80.A <= 0xF && z80.A + data > 0xF) z80.F |= 0x20;
+	z80.A = z80.A + data;
 }
 
 void rst(BYTE addr){
@@ -1525,10 +1523,10 @@ void sbc(BYTE data){
 	if (z80.F & 0x10) c = 1;
 	else c = 0;
 
-	if (z80.A + data + c == 0) z80.F |= 0x80;
-	if (z80.A + data + c > 0xFF) z80.F |= 0x10;
-	if(z80.A > 0xF && z80.A + data + c <= 0xF) z80.F |= 0x20;
-	z80.A = (z80.A + data + c);
+	if (z80.A - data - c == 0) z80.F |= 0x80;
+	if (z80.A - data - c < 0) z80.F |= 0x10;
+	if(z80.A > 0xF && z80.A - data - c <= 0xF) z80.F |= 0x20;
+	z80.A = (z80.A - data - c);
 }
 
 void ld_at(short addr){
@@ -1545,8 +1543,9 @@ void and(BYTE data){
 	if (z80.A == 0) z80.F |= 0x80;
 }
 void add_sp_r8(BYTE_S data){
+	if(z80.SP + data > 0xFFFF || z80.SP + data < 0) z80.F |= 0x10;
+	if((z80.SP > 0xFF && z80.SP + data <= 0xFF) || (z80.SP <= 0xFF && z80.SP + data > 0xFF)) z80.F |= 0x20;
 	Z80.SP += data;
-	//FLAGS
 }
 
 void xor(BYTE data){
@@ -1559,11 +1558,13 @@ void di(){
 
 }
 void ld_hl_sp_p_r8(){
-	r8 = memory_read(z80.PC);
+	BYTE_S r8 = memory_read(z80.PC);
+	unsigned short a16 = (z80.H << 8) + z80.L;
+	if(a16 + z80.SP + r8 > 0xFFFF || a16 + z80.SP + r8 < 0) z80.F |= 0x10;
+	if((a16 > 0xFF && a16 + z80.SP + r8 <= 0xFF) || (a16 <= 0xFF && a16 + z80.SP + r8) > 0xFF) z80.F |= 0x20;
 	Z80.H = ((Z80.SP + r8) & 0xFF00) >> 8 ;
 	Z80.L = ((Z80.SP + r8) & 0xFF);
 	z80.PC++;
-	//FLAGS
 }
 void ld_sp_hl(){
 	z80.SP = (Z80.H << 8) + z80.L;
@@ -1734,36 +1735,6 @@ void xor(BYTE data){
 	z80.A ^= data;
 	if (z80.A == 0)	z80.F &= 0x80;
 	else z80.F &= 0x00;
-}
-void add_a(BYTE data){
-	if(z80.A > (0xFF - data)){
-		z80.F |= 0x10;
-		//carry
-		//FLAGS
-	} else {
-		z80.A += data;
-	}
-	if(z80.A == 0x00){
-		z80.F |= 0x80;
-	}
-}
-void adc_a(BYTE data){
-	BYTE carry;
-	if(z80.F & 0x10)
-		carry = 0x01;
-	else 
-		carry = 0x00;
-	if( z80.A + carry > (0xFF - data)){
-		z80.F |= 0x10;
-		//carry
-		//FLAGS
-	} else {
-		z80.A += data;
-		z80.A += carry;
-	}
-	if(z80.A == 0x00){
-		z80.F |= 0x80;
-	}
 }
 
 void sub(BYTE data){
