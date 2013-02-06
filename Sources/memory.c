@@ -21,6 +21,7 @@ void read_rom_info(char* rom_path){
 
 	printf("Game title: %s\n", rom_buffer + 0x0134);
 	printf("Cartridge type: ");	
+	cartridge_type = *(rom_buffer + 0x0147);
 	switch(*(rom_buffer + 0x0147)){
 		case 0x00: printf("ROM ONLY");break;
 		case 0x01: printf("MBC1");break;
@@ -100,9 +101,51 @@ void memory_init(){
 }
 
 BYTE memory_read(short addr){
-	return internal_ram[addr];
+	if(addr >= 0 && addr <= 0x3FFF) 		//demande de lecture dans la banque de rom 0 de la cartouche
+		return cartridge_rom_buffer[addr];
+	if(addr >= 0x4000 && addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
+		return cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
+	if(addr >= 0x8000 && addr <= 0x9FFF) 		//demande de lecture vidéo ram
+		return internal_ram[addr - 0x8000];
+	if(addr >= 0xA000 && addr <= 0xBFFF)		//demande de lecture dans la banque de ram 0..n de la cartouche
+		return cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
+	else 						//demande de lecture dans le reste de la mémoire interne
+		return internal_ram[addr - 0xA000];
 }
 
+
 void memory_write(short addr, BYTE data){
-	internal_ram[addr] = data;
+	if(addr >= 0 && <= 0x7FFF || addr >= 0xA000 && addr <= 0xBFFF){
+		if(cartridge_type >= 0x01 || cartridge_type <= 0x03){//MBC1
+			write_mbc1(addr, data);		
+		}
+	}
+	else if(addr >= 0x8000 && addr <= 0x9FFF){
+		internal_ram[addr - 0x8000] = data;	
+	}
+	else
+		internal_ram[addr - 0xA000] = data;
+
 }
+
+void write_mbc1(short addr, BYTE data){
+	if(addr >= 0 && addr <= 0x1FFF){
+		if((data & 0x0A) == 0x0A) enable_ram = 1;
+		else enable_ram = 0;
+	}
+	else if(addr >= 0x2000 && addr <= 0x3FFF){
+		rom_selector = data & 0x1F;
+		if(rom_selector == 0 || rom_selector == 0x20 || rom_selector == 0x40 || rom_selector == 0x60) rom_selector++;
+	}
+	else if(addr >= 0x4000 && addr <= 0x5FFF){
+		ram_selector = (data & 0x60) >> 5; //sélection ram
+	}
+	else if(addr >= 0x6000 && addr <= 0x7FFF){
+		if(data == 0) rom_mode = 1; //rom mode enabled
+		else rom_mode = 0; // ram mode enabled
+	}
+	else
+		cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000] = data;
+}
+
+

@@ -2,7 +2,10 @@
 #define MEMORY_H
 #include <stdlib.h>
 #include "def.h"
-BYTE bank_selector;				//Permet de savoir quelle banque de rom est sélectionnée
+BYTE cartridge_type;
+BYTE enable_ram;
+BYTE rom_mode;
+BYTE rom_selector;				//Permet de savoir quelle banque de rom est sélectionnée
 BYTE ram_selector;				//Permet de savoir quelle banque de ram est sélectionnée
 BYTE *cartridge_rom_buffer;			//Le buffer qui contient toutes les données d'une rom (représentant toutes les banques alignées)
 						//chaque banque contient 0x4000 octets (16384)
