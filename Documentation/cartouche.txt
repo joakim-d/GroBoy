@@ -1,0 +1,14 @@
+MBC1:
+établir ram -> ecrire dans 0000-1FFF 0Ah activation sinon désactivation
+changer rom -> ecrire dans 2000-3FFF (5 petits bits correspond n°rom banque)
+banque 0x20 0x40 0x60 non supportées
+changer ram -> ecrire dans 4000-5FFF (bit 5 et 6 désigne n° banque)
+selection mode ram/rom -> ecrire dans 6000 7FFF (00 ROM mode - 01 RAM mode)
+
+MBC2:
+etablir ram -> ecrire dans 0000-1FFF moins toutes les adresses ayant l'octet de poids fort ayant le bit de poids faible activé
+choisir rom -> ecrire dans 2000-3FFF on prend les 4 derniers bit pour le n° de banque
+l'adresse doit comporter le bit de poids faible activé dans son octet de poids fort
+
+MBC3:
+
