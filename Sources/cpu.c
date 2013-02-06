@@ -71,10 +71,8 @@ void run(){
 				break;
 			case 0x09:
 				//ADD HL,BC
-				add(z80.H, z80.B);
-				add(z80.L, z80.C);
+				add_dbl(z80.H,z80.L, (z80.B << 8) + z80.C);
 				break;
-				//FLAGS =================================================================================================
 			case 0x0A:
 				//LD A,(BC)
 				ld_reg(z80.A, memory_read((z80.B << 8)+z80.C));
@@ -101,7 +99,7 @@ void run(){
 				rrca();
 				break;
 			case 0x10:
-				//STOP
+				//STOP 0
 				stop();
 				break;
 			case 0x11:
@@ -137,9 +135,7 @@ void run(){
 				break;
 			case 0x18:
 				//JR r8
-				r8 = memory_read(z80.PC);
-				z80.PC += r8; 
-				z80.PC++;
+				jr((BYTE_S)memory_read(z80.PC));
 				break;
 			case 0x19:
 				//ADD HL,DE
@@ -172,12 +168,7 @@ void run(){
 				break;
 			case 0x20:
 				//JR NZ, R8
-				r8 = memory_read(z80.PC);
-				if(z80.F & 0x80 == 0){
-					z80.PC += r8;
-					z80.PC++;
-				}
-				else z80.PC++;
+				jr_n_cond(0x80,memory_read(z80.PC));
 				break;
 			case 0x21:
 				//LD HL, d16
@@ -213,11 +204,7 @@ void run(){
 				break;
 			case 0x28:
 				//JR Z,r8
-				r8 = memory_read(z80.PC);
-				if(z80.F & 0x80 != 0)
-					z80.PC = r8;
-				else 
-					z80.PC += 1;
+				jr_cond(0x80,memory_read(z80.PC));
 				break;
 			case 0x29:
 				//ADD HL,HL
@@ -250,13 +237,7 @@ void run(){
 				break;
 			case 0x30:
 				//JR NC,r8
-				r8 = memory_read(z80.PC);
-				if(z80.F & 0x10 == 0){
-					z80.PC = r8;
-				} else {
-					z80.PC ++;
-				}
-
+				jr_n_cond(0x10,memory_read(z80.PC));
 				break;
 			case 0x31:
 				//LD SP,d16
@@ -270,15 +251,11 @@ void run(){
 				break;
 			case 0x33:
 				//INC SP
-				z80.SP += 1;
-				if(z80.SP == 0xFF)
-					z80.SP = 0;
+				inc_sp();
 				break;
-				// ===========================================================================================
 			case 0x34:
 				//INC (HL)
-				memory_write((z80.H << 8) + z80.L, (z80.H << 8)+z80.L + 1);
-				//FLAGS ========================================================================================
+				inc_at((z80.H << 8) + z80.L);
 				break;
 			case 0x35:
 				//DEC (HL)
@@ -296,21 +273,12 @@ void run(){
 				break;
 			case 0x38:
 				//JR C,r8
-				r8 = memory_read(z80.PC);
-				if(z80.F & 0x10 != 0){
-					z80.PC = r8;
-				} else {
-					z80.PC ++;
-				}
+				jr_cond(0x10,memory_read(z80.PC));
 				break;
 			case 0x39:
 				//ADD HL,SP
-				BYTE res = (z80.H << 8) + z80.L;
-				res += SP;
-				z80.H = res & 0xF0;
-				z80.L = res & 0x0F;
+				add_dbl(z80.H,z80.L, z80.SP);
 				break;
-				//FLAGS ==================================================================================
 			case 0x3A:
 				//LD A,(HL-)
 				ld_reg(z80.A, memory_read((z80.H << 8)+z80.L));
@@ -318,9 +286,8 @@ void run(){
 				break;
 			case 0x3B:
 				//DEC SP
-				z80.SP -= 0x01;
+				dec_sp();
 				break;
-				// =======================================================================================
 			case 0x3C:
 				//INC A
 				inc_smpl(z80.A);
@@ -1329,11 +1296,11 @@ void pop(BYTE *reg1, BYTE *reg2){
 	z80.SP += 2;
 }
 
-	void jp_n_cond(BYTE cond){
-		if(z80.F & cond == 0)
-			z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
-		else z80.PC += 2;
-	}
+void jp_n_cond(BYTE cond){
+	if(z80.F & cond == 0)
+		z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
+	else z80.PC += 2;
+}
 
 void jp(short addr){
 	z80.PC = addr;
@@ -1664,6 +1631,44 @@ void inc_smpl(BYTE *reg1){
 	else z80.F ~(0x20);
 }
 
+void inc_at(short addr){
+	// Z 0 H -
+	memory_write(addr, memory_read(addr) + 1);
+	if(memory_read(addr) == 0)
+		z80.F |= 0x80;
+	else 
+		z80.F &= ~(0x80);
+	z80.F &= ~(0x40);
+	if(memory_read(addr) > 0xF)
+		z80.F |= 0x20;
+	else
+		z80.F &= ~(0x20);
+}
+
+void dec_at(short addr){
+	// Z 1 H -
+	memory_write(addr, memory_read(addr) - 1);
+	if(memory_read(addr) == 0)
+		z80.F |= 0x80;
+	else 
+		z80.F &= ~(0x80);
+	z80.F |= 0x40;
+	if(memory_read(addr) > 0xF)
+		z80.F |= 0x20;
+	else
+		z80.F &= ~(0x20);
+}
+
+void dec_sp(){
+	// - - - -
+	z80.SP -= 1;
+}
+
+void inc_sp(){
+	// - - - -
+	z80.SP += 1;
+}
+
 void dec_dbl(BYTE *reg1, BYTE *reg2){
 	// - - - - 
 	short temp;
@@ -1818,3 +1823,25 @@ void add_dbl(BYTE *reg1, BYTE *reg2, short data){
 	z80.F &= ~(0x40); // N	
 
 }
+
+void jr(BYTE_S d){
+	// - - - -
+	//Jump Relatif
+	z80.PC += d; 
+	z80.PC++;
+}
+
+void jr_cond(BYTE cond, BYTE_S d){
+	// - - - -
+	if(z80.F & cond != 0)
+		z80.PC += d;
+	else z80.PC += 1;
+}
+
+void jr_n_cond(BYTE cond, BYTE_S d){
+	// - - - -
+	if(z80.F & cond == 0)
+		z80.PC = d;
+	else z80.PC += 1;
+}
+
