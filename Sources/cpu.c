@@ -782,35 +782,35 @@ void run(){
 				break;
 			case 0x98:
 				//SBC A,B
-				sbc_a(z80.B);
+				sbc(z80.B);
 				break;
 			case 0x99:
 				//SBC A,C
-				sbc_a(z80.C);
+				sbc(z80.C);
 				break;
 			case 0x9A:
 				//SBC A,D
-				sbc_a(z80.D);
+				sbc(z80.D);
 				break;
 			case 0x9B:
 				//SBC A,E
-				sbc_a(z80.E);
+				sbc(z80.E);
 				break;
 			case 0x9C:
 				//SBC A,H
-				sbc_a(z80.H);
+				sbc(z80.H);
 				break;
 			case 0x9D:
 				//SBC A,L
-				sbc_a(z80.L);
+				sbc(z80.L);
 				break;
 			case 0x9E:
 				//SBC A,(HL)
-				sbc_a(memory_read((z80.H << 8)+z80.L));
+				sbc(memory_read((z80.H << 8)+z80.L));
 				break;
 			case 0x9F:
 				//SBC A,A
-				sbc_a(z80.A);
+				sbc(z80.A);
 				break;
 			case 0xA0:
 				//AND B
@@ -1417,11 +1417,11 @@ void pop(BYTE *reg1, BYTE *reg2){
 	z80.SP += 2;
 }
 
-void jp_n_cond(BYTE cond){
-	if(z80.F & cond == 0)
-		z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
-	else z80.PC += 2;
-}
+	void jp_n_cond(BYTE cond){
+		if(z80.F & cond == 0)
+			z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
+		else z80.PC += 2;
+	}
 
 void jp(short addr){
 	z80.PC = addr;
@@ -1504,7 +1504,7 @@ void adc(BYTE data){
 	if ((z80.A + data + c) % 256 == 0) z80.F |= 0x80;
 	if (z80.A + data + c > 0xFF) z80.F |= 0x10;
 	if(z80.A <= 0xF && z80.A + data + c > 0xF) z80.F |= 0x20;
-	z80.A = (z80.A + data + c) % 256;
+	z80.A = z80.A + data + c;
 }
 
 void sub(BYTE data){
@@ -1546,12 +1546,6 @@ void add_sp_r8(BYTE_S data){
 	if(z80.SP + data > 0xFFFF || z80.SP + data < 0) z80.F |= 0x10;
 	if((z80.SP > 0xFF && z80.SP + data <= 0xFF) || (z80.SP <= 0xFF && z80.SP + data > 0xFF)) z80.F |= 0x20;
 	Z80.SP += data;
-}
-
-void xor(BYTE data){
-	z80.A ^= data;
-	if(z80.A == 0) z80.F &= 0x80;
-	else z80.F = 0;
 }
 
 void di(){
@@ -1726,34 +1720,10 @@ void bit(BYTE bit, BYTE data){
 	else z80.F = 0x20;
 	if(data & bit) z80.F |= 0x80;
 }
-void and(BYTE data){
-	z80.A &= data;
-	if (z80.A == 0)	z80.F &= 0x80;
-	else z80.F &= 0x00;
-}
 void xor(BYTE data){
 	z80.A ^= data;
 	if (z80.A == 0)	z80.F &= 0x80;
 	else z80.F &= 0x00;
-}
-
-void sub(BYTE data){
-	z80.A -= data;
-	//FLAGS
-	if(z80.A == 0x00){
-		z80.F |= 0x80;
-	}
-}
-
-void sbc_a(BYTE data){
-	BYTE carry;
-	if(z80.F & 0x10)
-		carry = 0x01;
-	else 
-		carry = 0x00;
-	z80.A -= data;
-	z80.A -= carry;
-	//FLAGS
 }
 void ld_reg(BYTE *reg1, BYTE data){
 	//LD reg1, reg2
@@ -1767,56 +1737,86 @@ void ld_mem(BYTE reg1, BYTE reg2){
 
 }
 void inc_dbl(BYTE *reg1, BYTE *reg2){
-	if(reg2 == 0xff){
-		if(reg1 == 0xff){
-			reg1 = 0x00;
-			reg2 = 0x00;
-		} else {
-			reg1 += 0x01;
-		}
-	} else {
-		reg2 += 0x01;
-	}
+	// - - - -
+	short temp;
+	temp = (*reg1 << 8) + *reg2 + 0x01;
+	*reg1 =( 0xFF00 & data2) >> 8;
+	*reg2 =( 0x00FF & data2);
 }
 void inc_smpl(BYTE *reg1){
-	reg1+=0x01;
-	z80.F &= 0x40;
+	// Z 0 H -
+	*reg1+=0x01;
 	if(reg1 == 0x00) z80.F |= 0x80;
-	//FLAGS
+	z80.F &= ~(0x40);
+	if(reg1 > 0xF) z80.F |= 0x20;
+	else z80.F ~(0x20);
 }
 
 void dec_dbl(BYTE *reg1, BYTE *reg2){
-	//FLAGS
-	if(reg2 == 0x00){
-		if(reg1 == 0x00){
-			reg1 = 0xFF;
-			reg2 = 0xFF;
-		} else {
-			reg1 -= 0x01;
-		}
-	} else {
-		reg2 -= 0x01;
-	}
+	// - - - - 
+	short temp;
+	temp = (*reg1 << 8) + *reg2 - 0x01;
+	*reg1 =( 0xFF00 & data2) >> 8;
+	*reg2 =( 0x00FF & data2);
 }
 
 void dec_smpl(BYTE *reg1){
-	reg1 -= 0x01;
-	z80.F |= 0x40;
+	// Z 1 H -
+	*reg1 -= 0x01;
 	if(reg1 == 0) z80.F |= 0x80;
-	//FLAGS
+	z80.F |= 0x40;
+	if(reg1 > 0xF)z80.F |= 0x20;
+	else z80.F &= ~(0x20);
 }
 void rlca(){
 	// 0 0 0 C
+	// bit 7 => bit 0
+	// bit 7 => carry
+	BYTE bit7;
+	if(z80.A & 0x80){
+		bit7 = 0x01;
+	}
+	else  {
+		bit7 = 0x00;
+	}
 	z80.A << 1;
-	z80.F &= 0x80;
-	z80.F &= 0x40;
-	z80.F &= 0x20;
-	//FLAGS
+	if(bit7 == 0x01){
+		z80.A |= 0x01;
+		z80.F |= 0x10;
+		}
+	else {
+		z80.A &= ~(0x01);
+		z80.F &= ~(0x10);
+
+		}
+	z80.F &= ~(0x80); //Z
+	z80.F &= ~(0x40); //N
+	z80.F &= ~(0x20); //H
 }
 void rrca(){
 	// 0 0 0 C
+	// bit 0 => bit 7
+	// bit 0 => carry
+	BYTE bit0;
+	if(z80.A & 0x80){
+		bit0 = 0x01;
+	}
+	else  {
+		bit0 = 0x00;
+	}
 	z80.A >> 1;
-	//FLAGS
+	if(bit0 == 0x01){
+		z80.A |= 0x80;
+		z80.F |= 0x10;
+		}
+	else {
+		z80.A &= ~(0x80);
+		z80.F &= ~(0x10);
+
+		}
+	z80.F &= ~(0x80); //Z
+	z80.F &= ~(0x40); //N
+	z80.F &= ~(0x20); //H
 
 }
 void stop(){
@@ -1825,8 +1825,27 @@ void stop(){
 
 void rla(){
 	// 0 0 0 C
+	// Carry => bit 0
+	// bit 7 => carry
+	BYTE carry;
+	if(z80.F & 0x10){
+		carry = 0x01;
+	}
+	else  {
+		carry = 0x00;
+	}
 	z80.A << 1;
-	//FLAGS
+	if(carry == 0x01)
+		z80.A |= 0x01;
+	else 
+		z80.A &= ~(0x01);
+	if(z80.A & 0x80)
+		z80.F |= 0x10;
+	else
+		z80.F &= ~(0x10);
+	z80.F &= ~(0x80); //Z
+	z80.F &= ~(0x40); //N
+	z80.F &= ~(0x20); //H
 }
 
 void rra(){
@@ -1836,10 +1855,10 @@ void rra(){
 	BYTE carry;
 	if(z80.F & 0x10){
 		carry = 0x01;
-		}
+	}
 	else  {
 		carry = 0x00;
-		}
+	}
 	z80.A >> 1;
 	if(carry == 0x01)
 		z80.A |= 0x80;
@@ -1849,6 +1868,9 @@ void rra(){
 		z80.F |= 0x10;
 	else
 		z80.F &= ~(0x10);
+	z80.F &= ~(0x80); //Z
+	z80.F &= ~(0x40); //N
+	z80.F &= ~(0x20); //H
 }	
 void cpl(){
 	// - 1 1 -
@@ -1882,5 +1904,5 @@ void add_dbl(BYTE *reg1, BYTE *reg2, short data){
 	*reg1 =( 0xFF00 & data2) >> 8;
 	*reg2 =( 0x00FF & data2);
 	z80.F &= ~(0x40); // N	
-		
+
 }
