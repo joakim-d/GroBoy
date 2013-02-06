@@ -12,16 +12,6 @@ void init(){
 	z80.E = 0;
 	z80.H = 0;
 	z80.L = 0;
-	z80.A2 = 0;
-	z80.F2 = 0;
-	z80.B2 = 0;
-	z80.C2 = 0;
-	z80.D2 = 0;
-	z80.E2 = 0;
-	z80.H2 = 0;
-	z80.L2 = 0;
-	z80.I = 0;
-	z80.R = 0;
 }
 
 void read_rom_info(char* rom_path){
@@ -32,7 +22,7 @@ void read_rom_info(char* rom_path){
 	file_d = open(rom_path, O_RDONLY);
 	fstat(file_d, &file_stat);
 	
-	rom_buffer = (char *) malloc(file_stat.st_size);
+	rom_buffer = (BYTE *) malloc(file_stat.st_size);
 	
 	read(file_d, rom_buffer, file_stat.st_size);
 	close(file_d);
@@ -78,21 +68,20 @@ void read_rom_info(char* rom_path){
 	switch(*(rom_buffer + 0x014B)){
 		case 0x33: printf("Nintendo or extended");break;
 		case 0x79: printf("Accolade");break;
-		case (char)0xA4: printf("Konami");break;
+		case 0xA4: printf("Konami");break;
 	}
-	printf("\nVersion number %d\n", rom_buffer + 0x014C);
+	printf("\nVersion number %d\n", rom_buffer[0x014C]);
 }
 
 void run(){
 	int interrupt_period;
 	int counter;
-	addr = (char*)malloc(49152 * sizeof(char));
 	counter=interrupt_period;
 
 	char op_code;
 	for(;;)
 	{
-		op_code=rom_buffer[z80.PC++];
+		op_code=memory_read(z80.PC++);
 		//counter-=cycles[op_code];
 
 		switch(op_code){
