@@ -2381,7 +2381,7 @@ static inline void daa()
 	{
 		z80.F |= 0x10;
 	}
-	
+
 	temp &= ~(0x20);
 	
 	temp &= 0xff;
