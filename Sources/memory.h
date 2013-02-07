@@ -8,7 +8,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-
 #include "def.h"
 BYTE cartridge_type;
 BYTE enable_ram;
