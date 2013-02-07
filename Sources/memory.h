@@ -1,6 +1,14 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
+
 #include "def.h"
 BYTE cartridge_type;
 BYTE enable_ram;
@@ -14,4 +22,5 @@ BYTE internal_ram[32768];			//Mémoire interne de la GB (n'étant pas en rapport
 void memory_init();				//Méthode initialisant les buffers cartridge_rom_buffer et cartrigde_ram_buffer
 BYTE memory_read(short addr);	
 void memory_write(short addr, BYTE data);
+void write_mbc1(short addr, BYTE data);
 #endif

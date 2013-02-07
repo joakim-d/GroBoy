@@ -3,26 +3,24 @@
 void read_rom_info(char* rom_path){
 	int file_d;
 	struct stat file_stat;
-	char buffer[1024];
 
 	file_d = open(rom_path, O_RDONLY);
 	fstat(file_d, &file_stat);
 
-	rom_buffer = (BYTE *) malloc(file_stat.st_size);
+	cartridge_rom_buffer = (BYTE *) malloc(file_stat.st_size);
 
-	read(file_d, rom_buffer, file_stat.st_size);
+	read(file_d, cartridge_rom_buffer, file_stat.st_size);
 	close(file_d);
 
-	if(memcmp(rom_buffer + 0x0100, "\x00\xC3", 2) != 0){ //On vérifie si la rom est bien un fichier gb
+	if(memcmp(cartridge_rom_buffer + 0x0100, "\x00\xC3", 2) != 0){ //On vérifie si la rom est bien un fichier gb
 		printf("Error reading rom magic code\n");
 		exit(-1);
 	}
-	memcpy(&z80.PC, rom_buffer + 0x0102, 2); //On stocke le début du programme dans le registre PC
 
-	printf("Game title: %s\n", rom_buffer + 0x0134);
+	printf("Game title: %s\n", cartridge_rom_buffer + 0x0134);
 	printf("Cartridge type: ");	
-	cartridge_type = *(rom_buffer + 0x0147);
-	switch(*(rom_buffer + 0x0147)){
+	cartridge_type = *(cartridge_rom_buffer + 0x0147);
+	switch(*(cartridge_rom_buffer + 0x0147)){
 		case 0x00: printf("ROM ONLY");break;
 		case 0x01: printf("MBC1");break;
 		case 0x02: printf("MBC1+RAM");break;
@@ -55,7 +53,7 @@ void read_rom_info(char* rom_path){
 		default: printf("UNKNOWN");break;
 	}
 	printf("\nRom Size ");
-	switch(*(rom_buffer + 0x0148)){
+	switch(*(cartridge_rom_buffer + 0x0148)){
 		case 0x00: printf("32KB: 2 Banks");break;
 		case 0x01: printf("64KB: 4 Banks");break;
 		case 0x02: printf("128KB: 8 Banks");break;
@@ -69,29 +67,29 @@ void read_rom_info(char* rom_path){
 		case 0x54: printf("1.5MB: 96 Banks");break;
 	}
 	printf("\nRam Size ");
-	switch(*(rom_buffer + 0x0149)){
+	switch(*(cartridge_rom_buffer + 0x0149)){
 		case 0: printf("None");break;
 		case 1: printf("2KB: 1 Bank");break;
 		case 2: printf("8KB: 1 Bank");break;
 		case 3: printf("32KB: 4 Banks");break;
 	}
 	printf("\nLanguage ");
-	switch(*(rom_buffer + 0x014A)){
+	switch(*(cartridge_rom_buffer + 0x014A)){
 		case 0: printf("Japanese Game");break;
 		case 1: printf("English Game");break;
 	}
 	printf("\nManufacturer");
-	switch(*(rom_buffer + 0x014B)){
+	switch(*(cartridge_rom_buffer + 0x014B)){
 		case 0x33: printf("Nintendo or extended");break;
 		case 0x79: printf("Accolade");break;
 		case 0xA4: printf("Konami");break;
 	}
-	printf("\nVersion number %d\n", rom_buffer[0x014C]);
+	printf("\nVersion number %d\n", cartridge_rom_buffer[0x014C]);
 }
 
 void memory_init(){
 	int i;
-	bank_selector = 0;
+	rom_selector = 0;
 	ram_selector = 0;
 	cartridge_rom_buffer = (BYTE *) malloc(256);
 	cartridge_ram_buffer = (BYTE *) malloc(256);
@@ -115,7 +113,7 @@ BYTE memory_read(short addr){
 
 
 void memory_write(short addr, BYTE data){
-	if(addr >= 0 && <= 0x7FFF || addr >= 0xA000 && addr <= 0xBFFF){
+	if((addr >= 0 && addr <= 0x7FFF) || (addr >= 0xA000 && addr <= 0xBFFF)){
 		if(cartridge_type >= 0x01 || cartridge_type <= 0x03){//MBC1
 			write_mbc1(addr, data);		
 		}
