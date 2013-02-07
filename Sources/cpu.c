@@ -15,9 +15,9 @@ void init(){
 }
 
 void run(){
-	int interrupt_period;
-	int counter;
-	counter=interrupt_period;
+	//int interrupt_period;
+	//int counter;
+	//counter=interrupt_period;
 
 	BYTE op_code;
 	for(;;)
@@ -801,7 +801,8 @@ void run(){
 				jp_n_cond(FLAG_Z);
 				break;
 			case 0xC3: //JP a16
-				jp((memory_read(z80.PC) << 8) + memory_read(++z80.PC));
+				jp((memory_read(z80.PC) << 8) + memory_read(z80.PC + 1));
+				z80.PC +=2;
 				break;
 			case 0xC4: //CALL NZ,a16
 				call_n_cond(0x80);
@@ -1673,7 +1674,8 @@ void run(){
 				jp(memory_read((z80.H << 8) + z80.L));	
 				break;
 			case 0xEA: //LD (a16),A
-				ld_at((memory_read(z80.PC++) << 8) + memory_read(z80.PC++));
+				ld_at((memory_read(z80.PC) << 8) + memory_read(z80.PC + 1));
+				z80.PC += 2;
 				break;
 			case 0xEE: //XOR d8
 				xor(z80.PC++);
@@ -1710,7 +1712,8 @@ void run(){
 				ld_sp((z80.H << 8) + z80.L);
 				break;
 			case 0xFA: //LD A,(a16)
-				ld_reg(&z80.A, memory_read(memory_read(z80.PC++) << 8 + memory_read(z80.PC++)));
+				ld_reg(&z80.A, memory_read((memory_read(z80.PC) << 8) + memory_read(z80.PC+1)));
+				z80.PC +=2;
 				break;
 			case 0xFB: //EI
 
@@ -1747,7 +1750,7 @@ static inline void halt(){
 
 }
 static inline void stop(){
-	int i=0;
+
 }
 //----------Jumps/calls--------------------------------
 
@@ -1755,7 +1758,7 @@ static inline void call(){
 	memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 	memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
 	z80.SP -= 2;
-	z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
+	z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1);
 }
 
 static inline void call_cond(BYTE cond){
@@ -1763,7 +1766,7 @@ static inline void call_cond(BYTE cond){
 		memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 		memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
 		z80.SP -= 2;
-		z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
+		z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1); 
 	}
 	else z80.PC += 2;
 }
@@ -1773,7 +1776,7 @@ static inline void call_n_cond(BYTE cond){
 		memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 		memory_write(z80.SP - 2, (z80.PC + 2) & 0xFF);
 		z80.SP -= 2;
-		z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1); 
+		z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1); 
 	}
 	else z80.PC += 2;
 }
@@ -1789,8 +1792,8 @@ static inline void jp_cond(BYTE cond){
 }
 
 static inline void jp_n_cond(BYTE cond){
-	if(z80.F & cond == 0)
-		z80.PC = memory_read(z80.PC) << 8 + memory_read(z80.PC + 1);
+	if((z80.F & cond) == 0)
+		z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1);
 	else z80.PC += 2;
 }
 
@@ -1815,13 +1818,13 @@ static inline void jr_n_cond(BYTE cond, BYTE_S d){
 }
 
 static inline void ret(){
-	z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
+	z80.PC = (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP);
 	z80.SP += 2;
 }
 
 static inline void ret_cond(BYTE cond){
 	if(z80.F & cond){
-		z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
+		z80.PC = (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP);
 		z80.SP += 2;
 	}
 }
@@ -1835,7 +1838,7 @@ static inline void ret_n_cond(BYTE cond){
 
 static inline void reti(){
 	//PLUS FLAG IF
-	z80.PC = memory_read(z80.SP + 1) << 8 + memory_read(z80.SP);
+	z80.PC = (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP);
 	z80.SP += 2;
 }
 
@@ -2130,7 +2133,7 @@ static inline void res_hl(BYTE b)
 
 static inline void rl(BYTE *data){
 	BYTE F = z80.F & 0x10;
-	if (*data & 0x80 == 0) z80.F = 0;
+	if ((*data & 0x80) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data <<= 1;
 	if(F) *data |= 1;
@@ -2140,7 +2143,7 @@ static inline void rl(BYTE *data){
 static inline void rl_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
 	BYTE F = z80.F;
-	if (hl & 0x80 == 0) z80.F = 0;
+	if ((hl & 0x80) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	hl <<= 1;
 	if(F & 0x10) hl |= 1;
@@ -2159,7 +2162,7 @@ static inline void rla(){
 	else  {
 		carry = 0x00;
 	}
-	z80.A << 1;
+	z80.A <<= 1;
 	if(carry == 0x01)
 		z80.A |= 0x01;
 	else 
@@ -2174,7 +2177,7 @@ static inline void rla(){
 }
 
 static inline void rlc(BYTE *data){
-	if (*data & 0x80 == 0) z80.F = 0;
+	if ((*data & 0x80) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data <<= 1;
 	if(z80.F & 0x10) *data |= 1;
@@ -2183,7 +2186,7 @@ static inline void rlc(BYTE *data){
 
 static inline void rlc_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if (hl & 0x80 == 0) z80.F = 0x00;
+	if ((hl & 0x80) == 0) z80.F = 0x00;
 	else z80.F = 0x10;
 	hl <<= 1;
 	if(z80.F & 0x10) hl |= 1;
@@ -2201,7 +2204,7 @@ static inline void rlca(){
 	else  {
 		bit7 = 0x00;
 	}
-	z80.A << 1;
+	z80.A <<= 1;
 	if(bit7 == 0x01){
 		z80.A |= 0x01;
 		z80.F |= 0x10;
@@ -2217,7 +2220,7 @@ static inline void rlca(){
 }
 static inline void rr(BYTE *data){
 	BYTE F = z80.F & 0x10;
-	if (*data & 0x01 == 0) z80.F = 0;
+	if ((*data & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data >>= 1;
 	if(F) *data |= 0x80;
@@ -2227,7 +2230,7 @@ static inline void rr(BYTE *data){
 static inline void rr_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
 	BYTE F = z80.F;
-	if (hl & 0x01 == 0) z80.F = 0;
+	if ((hl & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	hl >>= 1;
 	if(F & 0x10) hl |= 0x80;
@@ -2261,7 +2264,7 @@ static inline void rra(){
 }	
 
 static inline void rrc(BYTE *data){
-	if (*data & 0x01 == 0) z80.F = 0;
+	if ((*data & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data >>= 1;
 	if(z80.F & 0x10) *data |= 0x80;
@@ -2270,7 +2273,7 @@ static inline void rrc(BYTE *data){
 
 static inline void rrc_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if (hl & 0x01 == 0) z80.F = 0;
+	if ((hl & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	hl >>= 1;
 	if(z80.F & 0x10) hl |= 0x80;
@@ -2319,7 +2322,7 @@ static inline void set_hl(BYTE b)
 }
 
 static inline void srl(BYTE *data){
-	if(*data & 0x01 == 0) z80.F = 0;
+	if((*data & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data >>= 1;
 	if (*data == 0) z80.F |= 0x80;
@@ -2327,7 +2330,7 @@ static inline void srl(BYTE *data){
 
 static inline void srl_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if(hl & 0x01 == 0) z80.F = 0;
+	if((hl & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	hl >>= 1;
 	if (hl == 0) z80.F |= 0x80;
@@ -2335,7 +2338,7 @@ static inline void srl_hl(){
 }
 
 static inline void sla(BYTE *data){
-	if (*data & 0x80 == 0) z80.F = 0;
+	if ((*data & 0x80) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data <<= 1;
 	if (*data == 0) z80.F |= 0x80;
@@ -2343,7 +2346,7 @@ static inline void sla(BYTE *data){
 
 static inline void sla_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if (z80.B & 0x80 == 0) z80.F = 0;
+	if ((z80.B & 0x80) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	z80.B <<= 1;
 	if (z80.B == 0) z80.F |= 0x80;
@@ -2352,7 +2355,7 @@ static inline void sla_hl(){
 
 static inline void sra(BYTE *data){
 	BYTE F = *data & 0x80;
-	if(*data & 0x01 == 0) z80.F = 0;
+	if((*data & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	*data >>= 1;
 	if (F) z80.B |= 0x80;
@@ -2362,7 +2365,7 @@ static inline void sra(BYTE *data){
 static inline void sra_hl(){
 	BYTE hl = memory_read((z80.H << 8) +z80.L);
 	BYTE F = hl & 0x80;
-	if(hl & 0x01 == 0) z80.F = 0;
+	if((hl & 0x01) == 0) z80.F = 0;
 	else z80.F = 0x10;
 	hl >>= 1;
 	if (F) hl |= 0x80;
