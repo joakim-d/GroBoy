@@ -72,7 +72,7 @@ static inline void call_n_cond(BYTE cond);
 static inline void call_cond(BYTE cond);
 static inline void call();
 static inline void jp_n_cond(BYTE cond);
-static inline void jp(short addr);
+static inline void jp(unsigned short addr);
 static inline void jp_cond(BYTE cond);
 static inline void jr(BYTE_S d);
 static inline void jr_cond(BYTE cond, BYTE_S d);
@@ -83,14 +83,14 @@ static inline void ret_n_cond(BYTE cond);
 static inline void reti();
 static inline void rst(BYTE addr);
 //8bit load/store/move instructions
-static inline void ld_reg_data(BYTE *reg, BYTE data);
-static inline void ld_reg(BYTE *reg1, BYTE data);
-static inline void ld_mem(BYTE reg1, BYTE reg2);
+static inline void ld_reg(BYTE *reg, BYTE data);
+static inline void ld_mem(unsigned short addr, BYTE data);
 //16bit load/store/move instructions
-static inline void ld_at(short addr);
-static inline void ld_from_a8(short addr);
+static inline void ld_a16_sp();
+static inline void ld_at(unsigned short addr);
+static inline void ld_from_a8(unsigned short addr);
 static inline void ld_hl_sp_p_r8();
-static inline void ld_sp_hl();
+static inline void ld_sp(unsigned short data);
 static inline void pop(BYTE *reg1, BYTE *reg2);
 static inline void push(BYTE reg1, BYTE reg2);
 
@@ -102,10 +102,10 @@ static inline void ccf();
 static inline void cp(BYTE data);
 static inline void cpl();
 static inline void daa();
-static inline void dec_at(short addr);
+static inline void dec_at(unsigned short addr);
 static inline void dec_smpl(BYTE *reg1);
 static inline void dec_sp();
-static inline void inc_at(short addr);
+static inline void inc_at(unsigned short addr);
 static inline void inc_smpl(BYTE *reg1);
 static inline void inc_sp();
 static inline void sbc(BYTE data);
@@ -115,7 +115,7 @@ static inline void or(BYTE data);
 static inline void xor(BYTE data);
 
 //16 bit arithmetic/logical instructions
-static inline void add_dbl(BYTE *reg1, BYTE *reg2, short data);
+static inline void add_dbl(BYTE *reg1, BYTE *reg2, unsigned short data);
 static inline void add_sp_r8(BYTE_S data);
 static inline void dec_dbl(BYTE *reg1, BYTE *reg2);
 static inline void inc_dbl(BYTE *reg1, BYTE *reg2);
