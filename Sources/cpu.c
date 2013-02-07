@@ -2152,28 +2152,11 @@ static inline void rl_hl(){
 }
 
 static inline void rla(){
-	// 0 0 0 C
-	// Carry => bit 0
-	// bit 7 => carry
-	BYTE carry;
-	if(z80.F & 0x10){
-		carry = 0x01;
-	}
-	else  {
-		carry = 0x00;
-	}
+	BYTE F = z80.F;
+	if(z80.A & 0x80) z80.F |= 0x10;
+	else z80.F = 0;
 	z80.A <<= 1;
-	if(carry == 0x01)
-		z80.A |= 0x01;
-	else 
-		z80.A &= ~(0x01);
-	if(z80.A & 0x80)
-		z80.F |= 0x10;
-	else
-		z80.F &= ~(0x10);
-	z80.F &= ~(0x80); //Z
-	z80.F &= ~(0x40); //N
-	z80.F &= ~(0x20); //H
+	if(F & 0x10) z80.A |= 1;
 }
 
 static inline void rlc(BYTE *data){
@@ -2194,29 +2177,13 @@ static inline void rlc_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 static inline void rlca(){
-	// 0 0 0 C
-	// bit 7 => bit 0
-	// bit 7 => carry
-	BYTE bit7;
-	if(z80.A & 0x80){
-		bit7 = 0x01;
-	}
-	else  {
-		bit7 = 0x00;
-	}
+	BYTE bit7 = z80.A & 0x80;
 	z80.A <<= 1;
-	if(bit7 == 0x01){
-		z80.A |= 0x01;
+	if(bit7){
+		z80.A |= 1;
 		z80.F |= 0x10;
 	}
-	else {
-		z80.A &= ~(0x01);
-		z80.F &= ~(0x10);
-
-	}
-	z80.F &= ~(0x80); //Z
-	z80.F &= ~(0x40); //N
-	z80.F &= ~(0x20); //H
+	else z80.F = 0;
 }
 static inline void rr(BYTE *data){
 	BYTE F = z80.F & 0x10;
@@ -2239,28 +2206,11 @@ static inline void rr_hl(){
 }
 
 static inline void rra(){
-	// 0 0 0 C
-	// Carry => bit 7
-	// bit 0 => carry
-	BYTE carry;
-	if(z80.F & 0x10){
-		carry = 0x01;
-	}
-	else  {
-		carry = 0x00;
-	}
-	z80.A >> 1;
-	if(carry == 0x01)
-		z80.A |= 0x80;
-	else 
-		z80.A &= ~(0x80);
-	if(z80.A & 0x01)
-		z80.F |= 0x10;
-	else
-		z80.F &= ~(0x10);
-	z80.F &= ~(0x80); //Z
-	z80.F &= ~(0x40); //N
-	z80.F &= ~(0x20); //H
+	BYTE F = z80.F;
+	if(z80.A & 0x01) z80.F |= 0x10;
+	else z80.F = 0;
+	z80.A >>= 1;
+	if(F & 0x10) z80.A |= 0x80;
 }	
 
 static inline void rrc(BYTE *data){
@@ -2283,30 +2233,13 @@ static inline void rrc_hl(){
 
 
 static inline void rrca(){
-	// 0 0 0 C
-	// bit 0 => bit 7
-	// bit 0 => carry
-	BYTE bit0;
-	if(z80.A & 0x80){
-		bit0 = 0x01;
-	}
-	else  {
-		bit0 = 0x00;
-	}
-	z80.A >> 1;
-	if(bit0 == 0x01){
+	BYTE bit0 = z80.A & 0x01;
+	z80.A >>= 1;
+	if(bit0){
 		z80.A |= 0x80;
 		z80.F |= 0x10;
 	}
-	else {
-		z80.A &= ~(0x80);
-		z80.F &= ~(0x10);
-
-	}
-	z80.F &= ~(0x80); //Z
-	z80.F &= ~(0x40); //N
-	z80.F &= ~(0x20); //H
-
+	else z80.F = 0;
 }
 
 static inline void set(BYTE b, BYTE *a) 
