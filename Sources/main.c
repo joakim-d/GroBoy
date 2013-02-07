@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "cpu.h"
 #include "memory.h"
-
 int main(int argc, char * argv[]){
-	memory_init();
-	read_rom_info(argv[1]);
+	unsigned short pc_addr;
+	pc_addr = memory_init(argv[1]);
+	cpu_init(pc_addr);
 	
 	return 0;
 }

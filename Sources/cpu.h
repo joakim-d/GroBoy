@@ -10,7 +10,7 @@
 #include "def.h"
 #include "memory.h"
 void run();
-void init();
+void cpu_init(unsigned short pc_addr);
 unsigned char *rom_buffer;
 typedef struct {
 	unsigned short PC;

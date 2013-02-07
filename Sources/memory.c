@@ -54,24 +54,24 @@ void read_rom_info(char* rom_path){
 	}
 	printf("\nRom Size ");
 	switch(*(cartridge_rom_buffer + 0x0148)){
-		case 0x00: printf("32KB: 2 Banks");break;
-		case 0x01: printf("64KB: 4 Banks");break;
-		case 0x02: printf("128KB: 8 Banks");break;
-		case 0x03: printf("256KB: 16 Banks");break;
-		case 0x04: printf("512KB: 32 Banks");break;
-		case 0x05: printf("1MB: 64 Banks");break;
-		case 0x06: printf("2MB: 128 Banks");break;
-		case 0x07: printf("4MB: 256 Banks");break;
-		case 0x52: printf("1.1MB: 72 Banks");break;
-		case 0x53: printf("1.2MB: 80 Banks");break;
-		case 0x54: printf("1.5MB: 96 Banks");break;
+		case 0x00: printf("32KB: 2 Banks");alloc_rom_mem(0x8000);break;
+		case 0x01: printf("64KB: 4 Banks");alloc_rom_mem(0x10000);break;
+		case 0x02: printf("128KB: 8 Banks");alloc_rom_mem(0x20000);break;
+		case 0x03: printf("256KB: 16 Banks");alloc_rom_mem(0x40000);break;
+		case 0x04: printf("512KB: 32 Banks");alloc_rom_mem(0x80000);break;
+		case 0x05: printf("1MB: 64 Banks");alloc_rom_mem(0x100000);break;
+		case 0x06: printf("2MB: 128 Banks");alloc_rom_mem(0x200000);break;
+		case 0x07: printf("4MB: 256 Banks");alloc_rom_mem(0x400000);break;
+		case 0x52: printf("1.1MB: 72 Banks");alloc_rom_mem(0x120000);break;
+		case 0x53: printf("1.2MB: 80 Banks");alloc_rom_mem(0x140000);break;
+		case 0x54: printf("1.5MB: 96 Banks");alloc_rom_mem(0x180000);break;
 	}
 	printf("\nRam Size ");
 	switch(*(cartridge_rom_buffer + 0x0149)){
 		case 0: printf("None");break;
-		case 1: printf("2KB: 1 Bank");break;
-		case 2: printf("8KB: 1 Bank");break;
-		case 3: printf("32KB: 4 Banks");break;
+		case 1: printf("2KB: 1 Bank");alloc_ram_mem(0x100);break;
+		case 2: printf("8KB: 1 Bank");alloc_ram_mem(0x2000);break;
+		case 3: printf("32KB: 4 Banks");alloc_ram_mem(0x8000);break;
 	}
 	printf("\nLanguage ");
 	switch(*(cartridge_rom_buffer + 0x014A)){
@@ -87,33 +87,68 @@ void read_rom_info(char* rom_path){
 	printf("\nVersion number %d\n", cartridge_rom_buffer[0x014C]);
 }
 
-void memory_init(){
-	int i;
-	rom_selector = 0;
+unsigned short memory_init(char *rom_path){
+	read_rom_info(rom_path);
+	rom_selector = 1;
 	ram_selector = 0;
-	cartridge_rom_buffer = (BYTE *) malloc(256);
-	cartridge_ram_buffer = (BYTE *) malloc(256);
-	for(i = 0; i < 24576; i++){
-		internal_ram[i] = 0;
+	memory_write(0xFF05,0x00);
+	memory_write(0xFF06,0x00);
+	memory_write(0xFF07,0x00);
+	memory_write(0xFF10,0x80);
+	memory_write(0xFF11,0xBF);
+	memory_write(0xFF12,0xF3);
+	memory_write(0xFF14,0xBF);
+	memory_write(0xFF16,0x3F);
+	memory_write(0xFF17,0x00);
+	memory_write(0xFF19,0xBF);
+	memory_write(0xFF1A,0x7F);
+	memory_write(0xFF1B,0xFF);
+	memory_write(0xFF1C,0x00);
+	memory_write(0xFF1E,0x00);
+	memory_write(0xFF20,0xFF);
+	memory_write(0xFF21,0x00);
+	memory_write(0xFF22,0x00);
+	memory_write(0xFF23,0xBF);
+	memory_write(0xFF24,0x77);
+	memory_write(0xFF25,0xF3);
+	memory_write(0xFF26,0xF1);
+	memory_write(0xFF40,0x91);
+	memory_write(0xFF42,0x00);
+	memory_write(0xFF43,0x00);
+	memory_write(0xFF45,0x00);
+	memory_write(0xFF47,0xFC);
+	memory_write(0xFF48,0xFF);
+	memory_write(0xFF49,0xFF);
+	memory_write(0xFF4A,0x00);
+	memory_write(0xFF4B,0x00);
+	memory_write(0xFFFF,0x00);
+	return *(cartridge_rom_buffer + 0x0102);
+}
+
+
+
+	BYTE memory_read(unsigned short addr){
+		if(addr <= 0x3FFF) 		//demande de lecture dans la banque de rom 0 de la cartouche
+			return cartridge_rom_buffer[addr];
+		if(addr >= 0x4000 && addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
+			return cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
+		if(addr >= 0x8000 && addr <= 0x9FFF) 		//demande de lecture vidéo ram
+			return internal_ram[addr - 0x8000];
+		if(addr >= 0xA000 && addr <= 0xBFFF)		//demande de lecture dans la banque de ram 0..n de la cartouche
+			return cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
+		else 						//demande de lecture dans le reste de la mémoire interne
+			return internal_ram[addr - 0xA000];
 	}
+
+void alloc_rom_mem(size_t size){
+	cartridge_rom_buffer = (BYTE *) malloc(size);
+}
+void alloc_ram_mem(size_t size){
+	cartridge_ram_buffer = (BYTE *) malloc(size);
 }
 
-BYTE memory_read(short addr){
-	if(addr >= 0 && addr <= 0x3FFF) 		//demande de lecture dans la banque de rom 0 de la cartouche
-		return cartridge_rom_buffer[addr];
-	if(addr >= 0x4000 && addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
-		return cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
-	if(addr >= 0x8000 && addr <= 0x9FFF) 		//demande de lecture vidéo ram
-		return internal_ram[addr - 0x8000];
-	if(addr >= 0xA000 && addr <= 0xBFFF)		//demande de lecture dans la banque de ram 0..n de la cartouche
-		return cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
-	else 						//demande de lecture dans le reste de la mémoire interne
-		return internal_ram[addr - 0xA000];
-}
-
-
-void memory_write(short addr, BYTE data){
-	if((addr >= 0 && addr <= 0x7FFF) || (addr >= 0xA000 && addr <= 0xBFFF)){
+void memory_write(unsigned short addr, BYTE data){
+	if((addr <= 0x7FFF) || (addr >= 0xA000 && addr <= 0xBFFF)){
 		if(cartridge_type >= 0x01 || cartridge_type <= 0x03){//MBC1
 			write_mbc1(addr, data);		
 		}
@@ -126,8 +161,8 @@ void memory_write(short addr, BYTE data){
 
 }
 
-void write_mbc1(short addr, BYTE data){
-	if(addr >= 0 && addr <= 0x1FFF){
+void write_mbc1(unsigned short addr, BYTE data){
+	if(addr <= 0x1FFF){
 		if((data & 0x0A) == 0x0A) enable_ram = 1;
 		else enable_ram = 0;
 	}

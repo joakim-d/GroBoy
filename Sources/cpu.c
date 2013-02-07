@@ -1,17 +1,17 @@
 #include "cpu.h"
 
 z80_t z80;
-void init(){
-	z80.PC = 0;
-	z80.SP = 0;
-	z80.A = 0;
-	z80.F = 0;
-	z80.B = 0;
-	z80.C = 0;
-	z80.D = 0;
-	z80.E = 0;
-	z80.H = 0;
-	z80.L = 0;
+void init(unsigned short pc_addr){
+	z80.PC = pc_addr;
+	z80.SP = 0xFFFE;
+	z80.A = 0x01;
+	z80.F = 0xB0;
+	z80.B = 0x00;
+	z80.C = 0x13;
+	z80.D = 0x00;
+	z80.E = 0xD8;
+	z80.H = 0x01;
+	z80.L = 0x4D;
 }
 
 void run(){
