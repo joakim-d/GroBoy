@@ -54,17 +54,17 @@ void read_rom_info(char* rom_path){
 	}
 	printf("\nRom Size ");
 	switch(*(cartridge_rom_buffer + 0x0148)){
-		case 0x00: printf("32KB: 2 Banks");alloc_rom_mem(0x8000);break;
-		case 0x01: printf("64KB: 4 Banks");alloc_rom_mem(0x10000);break;
-		case 0x02: printf("128KB: 8 Banks");alloc_rom_mem(0x20000);break;
-		case 0x03: printf("256KB: 16 Banks");alloc_rom_mem(0x40000);break;
-		case 0x04: printf("512KB: 32 Banks");alloc_rom_mem(0x80000);break;
-		case 0x05: printf("1MB: 64 Banks");alloc_rom_mem(0x100000);break;
-		case 0x06: printf("2MB: 128 Banks");alloc_rom_mem(0x200000);break;
-		case 0x07: printf("4MB: 256 Banks");alloc_rom_mem(0x400000);break;
-		case 0x52: printf("1.1MB: 72 Banks");alloc_rom_mem(0x120000);break;
-		case 0x53: printf("1.2MB: 80 Banks");alloc_rom_mem(0x140000);break;
-		case 0x54: printf("1.5MB: 96 Banks");alloc_rom_mem(0x180000);break;
+		case 0x00: printf("32KB: 2 Banks");break;
+		case 0x01: printf("64KB: 4 Banks");break;
+		case 0x02: printf("128KB: 8 Banks");break;
+		case 0x03: printf("256KB: 16 Banks");break;
+		case 0x04: printf("512KB: 32 Banks");break;
+		case 0x05: printf("1MB: 64 Banks");break;
+		case 0x06: printf("2MB: 128 Banks");break;
+		case 0x07: printf("4MB: 256 Banks");break;
+		case 0x52: printf("1.1MB: 72 Banks");break;
+		case 0x53: printf("1.2MB: 80 Banks");break;
+		case 0x54: printf("1.5MB: 96 Banks");break;
 	}
 	printf("\nRam Size ");
 	switch(*(cartridge_rom_buffer + 0x0149)){
@@ -122,7 +122,7 @@ unsigned short memory_init(char *rom_path){
 	memory_write(0xFF4A,0x00);
 	memory_write(0xFF4B,0x00);
 	memory_write(0xFFFF,0x00);
-	return *(cartridge_rom_buffer + 0x0102);
+	return (*(cartridge_rom_buffer + 0x0102) << 8) + *(cartridge_rom_buffer + 0x0103);
 }
 
 
