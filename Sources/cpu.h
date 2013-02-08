@@ -11,7 +11,7 @@
 #include "memory.h"
 
 void run();
-void cpu_init(unsigned short pc_addr);
+void cpu_init();
 unsigned char *rom_buffer;
 typedef struct {
 	unsigned short PC;

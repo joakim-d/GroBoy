@@ -87,7 +87,7 @@ void read_rom_info(char* rom_path){
 	printf("\nVersion number %d\n", cartridge_rom_buffer[0x014C]);
 }
 
-unsigned short memory_init(char *rom_path){
+void memory_init(char *rom_path){
 	read_rom_info(rom_path);
 	rom_selector = 1;
 	ram_selector = 0;
@@ -122,7 +122,6 @@ unsigned short memory_init(char *rom_path){
 	memory_write(0xFF4A,0x00);
 	memory_write(0xFF4B,0x00);
 	memory_write(0xFFFF,0x00);
-	return (*(cartridge_rom_buffer + 0x0102) << 8) + *(cartridge_rom_buffer + 0x0103);
 }
 
 

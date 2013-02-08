@@ -37,8 +37,8 @@ BYTE z80_cb_cycles[0x100] = {
 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8
 };
 z80_t z80;
-void cpu_init(unsigned short pc_addr){
-	z80.PC = pc_addr;
+void cpu_init(){
+	z80.PC = 0x0100;
 	z80.SP = 0xFFFE;
 	z80.A = 0x01;
 	z80.F = 0xB0;
@@ -58,9 +58,17 @@ void run(){
 	BYTE op_code;
 	for(;;)
 	{
-		op_code=memory_read(z80.PC++);
+		op_code=memory_read(z80.PC);
 		//counter-=cycles[op_code];
-
+		printf("PC: %x\n", z80.PC);
+		printf("Opcode :%x\n",op_code);
+		printf("AF: %x\n", (z80.A << 8) + z80.F);
+		printf("BC: %x\n", (z80.B << 8) + z80.C);
+		printf("DE: %x\n", (z80.D << 8) + z80.E);
+		printf("HL: %x\n", (z80.H << 8) + z80.L);
+		printf("SP: %x\n", z80.SP);
+		printf("Flag Z: %d, Flag N: %d, Flag H: %d, Flag C: %d\n\n", z80.F & FLAG_Z, z80.F & FLAG_N, z80.F & FLAG_H, z80.F & FLAG_C);
+		z80.PC++;
 		switch(op_code){
 			//Maxi table d'instructions
 
@@ -1794,7 +1802,7 @@ static inline void call(){
 	memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 	memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
 	z80.SP -= 2;
-	z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1);
+	z80.PC = (memory_read(z80.PC + 1) << 8) + memory_read(z80.PC);
 }
 
 static inline void call_cond(BYTE cond){
