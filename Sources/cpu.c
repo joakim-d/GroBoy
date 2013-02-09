@@ -55,11 +55,13 @@ void run(){
 	//int counter;
 	//counter=interrupt_period;
 
+	int i = 0;
 	BYTE op_code;
 	for(;;)
 	{
 		op_code=memory_read(z80.PC);
 		//counter-=cycles[op_code];
+		printf("instruction : %d\n", i++);
 		printf("PC: %x\n", z80.PC);
 		printf("Opcode :%x\n",op_code);
 		printf("AF: %x\n", (z80.A << 8) + z80.F);
@@ -67,7 +69,8 @@ void run(){
 		printf("DE: %x\n", (z80.D << 8) + z80.E);
 		printf("HL: %x\n", (z80.H << 8) + z80.L);
 		printf("SP: %x\n", z80.SP);
-		printf("Flag Z: %d, Flag N: %d, Flag H: %d, Flag C: %d\n\n", z80.F & FLAG_Z, z80.F & FLAG_N, z80.F & FLAG_H, z80.F & FLAG_C);
+		printf("Top of the stack: %x\n\n", (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP));
+		//printf("Flag Z: %d, Flag N: %d, Flag H: %d, Flag C: %d\n\n", z80.F & FLAG_Z, z80.F & FLAG_N, z80.F & FLAG_H, z80.F & FLAG_C);
 		z80.PC++;
 		switch(op_code){
 			//Maxi table d'instructions
@@ -276,7 +279,7 @@ void run(){
 				break;
 			case 0x31:
 				//LD SP,d16
-				ld_sp((memory_read(z80.PC) << 8)+memory_read(z80.PC+1));
+				ld_sp((memory_read(z80.PC + 1) << 8)+memory_read(z80.PC));
 				z80.PC+=2;
 				break;
 			case 0x32:
@@ -845,8 +848,7 @@ void run(){
 				jp_n_cond(FLAG_Z);
 				break;
 			case 0xC3: //JP a16
-				jp((memory_read(z80.PC) << 8) + memory_read(z80.PC + 1));
-				z80.PC +=2;
+				jp((memory_read(z80.PC + 1) << 8) + memory_read(z80.PC));
 				break;
 			case 0xC4: //CALL NZ,a16
 				call_n_cond(0x80);
@@ -1718,7 +1720,7 @@ void run(){
 				jp(memory_read((z80.H << 8) + z80.L));	
 				break;
 			case 0xEA: //LD (a16),A
-				ld_at((memory_read(z80.PC) << 8) + memory_read(z80.PC + 1));
+				ld_at((memory_read(z80.PC + 1) << 8) + memory_read(z80.PC));
 				z80.PC += 2;
 				break;
 			case 0xEE: //XOR d8
@@ -1728,7 +1730,7 @@ void run(){
 				rst(0x28);
 				break;
 			case 0xF0: //LDH A,(a8)
-				ld_reg(&z80.A, memory_read(0xFF00 + z80.PC++));
+				ld_reg(&z80.A, memory_read(0xFF00 + memory_read(z80.PC++)));
 				break;
 			case 0xF1: //POP AF
 				pop(&z80.A, &z80.F);
@@ -1756,7 +1758,7 @@ void run(){
 				ld_sp((z80.H << 8) + z80.L);
 				break;
 			case 0xFA: //LD A,(a16)
-				ld_reg(&z80.A, memory_read((memory_read(z80.PC) << 8) + memory_read(z80.PC+1)));
+				ld_reg(&z80.A, memory_read((memory_read(z80.PC + 1) << 8) + memory_read(z80.PC)));
 				z80.PC +=2;
 				break;
 			case 0xFB: //EI
@@ -1810,7 +1812,7 @@ static inline void call_cond(BYTE cond){
 		memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 		memory_write(z80.SP - 2, (z80.PC + 2) & 0x00FF);
 		z80.SP -= 2;
-		z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1); 
+		z80.PC = (memory_read(z80.PC + 1) << 8) + memory_read(z80.PC); 
 	}
 	else z80.PC += 2;
 }
@@ -1820,7 +1822,7 @@ static inline void call_n_cond(BYTE cond){
 		memory_write(z80.SP - 1, ((z80.PC + 2) & 0xFF00) >> 8);
 		memory_write(z80.SP - 2, (z80.PC + 2) & 0xFF);
 		z80.SP -= 2;
-		z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1); 
+		z80.PC = (memory_read(z80.PC + 1) << 8) + memory_read(z80.PC); 
 	}
 	else z80.PC += 2;
 }
@@ -1831,13 +1833,13 @@ static inline void jp(unsigned short addr){
 
 static inline void jp_cond(BYTE cond){
 	if(z80.F & cond)
-		z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1);
+		z80.PC = (memory_read(z80.PC + 1) << 8) + memory_read(z80.PC);
 	else z80.PC += 2;
 }
 
 static inline void jp_n_cond(BYTE cond){
 	if((z80.F & cond) == 0)
-		z80.PC = (memory_read(z80.PC) << 8) + memory_read(z80.PC + 1);
+		z80.PC = (memory_read(z80.PC + 1) << 8) + memory_read(z80.PC);
 	else z80.PC += 2;
 }
 
@@ -1851,14 +1853,12 @@ static inline void jr_cond(BYTE cond, BYTE_S d){
 	// - - - -
 	if(z80.F & cond)
 		z80.PC += d;
-	else z80.PC += 1;
 }
 
 static inline void jr_n_cond(BYTE cond, BYTE_S d){
 	// - - - -
 	if(!(z80.F & cond))
 		z80.PC += d;
-	else z80.PC += 1;
 }
 
 static inline void ret(){
@@ -1907,7 +1907,7 @@ static inline void ld_mem(unsigned short addr, BYTE data){
 //--------16bit load/store/move instructions
 
 static inline void ld_a16_sp(){
-	unsigned short addr = (memory_read(z80.PC) << 8) + memory_read(z80.PC);
+	unsigned short addr = (memory_read(z80.PC + 1) << 8) + memory_read(z80.PC);
 	memory_write(addr, (z80.SP & 0xFF00) >> 8);
 	memory_write(addr, (z80.SP & 0x00FF));
 	z80.PC += 2;
@@ -1923,11 +1923,11 @@ static inline void ld_from_a8(unsigned short addr){
 
 static inline void ld_hl_sp_p_r8(){
 	BYTE_S r8 = memory_read(z80.PC);
-	unsigned short a16 = (z80.H << 8) + z80.L;
-	if(a16 + z80.SP + r8 > 0xFFFF || a16 + z80.SP + r8 < 0) z80.F |= 0x10;
-	if((a16 > 0xFF && a16 + z80.SP + r8 <= 0xFF) || (a16 <= 0xFF && a16 + z80.SP + r8) > 0xFF) z80.F |= 0x20;
-	z80.H = ((z80.SP + r8) & 0xFF00) >> 8 ;
-	z80.L = ((z80.SP + r8) & 0xFF);
+	unsigned short a16 = z80.SP + r8;
+	if(z80.SP + r8 > 0xFFFF || z80.SP + r8 < 0) z80.F |= 0x10;
+	if((z80.SP > 0xFF && a16 <= 0xFF) || (z80.SP <= 0xFF && a16 > 0xFF)) z80.F |= 0x20;
+	z80.H = (a16 & 0xFF00) >> 8 ;
+	z80.L = (a16 & 0xFF);
 	z80.PC++;
 }
 
@@ -1952,25 +1952,28 @@ static inline void push(BYTE reg1, BYTE reg2){
 
 static inline void adc(BYTE data){
 	BYTE c;
+	BYTE op;
 	if (z80.F & 0x10) c = 1;
 	else c = 0;
+	op = z80.A + data + c;
 
-	if (z80.A + data + c == 0) z80.F |= 0x80;
-	else if (z80.A + data + c > 0xFF) z80.F |= 0x10;
-	if (z80.A <= 0xF && z80.A + data + c > 0xF) z80.F |= 0x20;
+	if (op == 0) z80.F |= 0x80;
+	if (z80.A + data + c > 0xFF) z80.F |= 0x10;
+	if (z80.A <= 0xF && op > 0xF || z80.A > 0xF && op <= 0xF) z80.F |= 0x20;
 	z80.A = z80.A + data + c;
 }
 
 static inline void add(BYTE data){
+	BYTE op = z80.A + data;
 	z80.F = 0;
-	if (z80.A + data == 0) z80.F |= 0x80;
-	else if (z80.A + data > 0xFF) z80.F |= 0x10;
-	if (z80.A <= 0xF && z80.A + data > 0xF) z80.F |= 0x20;
-	z80.A += data;
+	if (op == 0) z80.F |= 0x80;
+	if (op < z80.A) z80.F |= 0x10;
+	if (z80.A <= 0xF && op > 0xF || z80.A > 0xF && op <= 0xF) z80.F |= 0x20;
+	z80.A = op;
 }
 
 static inline void and(BYTE data){
-	z80.F &= 0x20;
+	z80.F = 0x20;
 	z80.A &= data;
 	if (z80.A == 0) z80.F |= 0x80;
 }
@@ -1985,10 +1988,11 @@ static inline void ccf(){
 }
 
 static inline void cp(BYTE data){
+	BYTE op = z80.A - data;
 	z80.F = 0x40;
-	if (z80.A - data == 0) z80.F |= 0x80;
-	else if (z80.A - data < 0) z80.F |= 0x10;
-	if (z80.A > 0xF && z80.A - data <= 0xF) z80.F |= 0x20;
+	if (op == 0) z80.F |= 0x80;
+	if (op > z80.A) z80.F |= 0x10;
+	if ((z80.A > 0xF && op <= 0xF) || (z80.A <= 0xF && op > 0xF)) z80.F |= 0x20;
 }
 
 static inline void cpl(){
@@ -2056,7 +2060,7 @@ static inline void dec_sp(){
 
 static inline void dec_smpl(BYTE *reg1){
 	// Z 1 H -
-	*reg1 -= 0x01;
+	*reg1--;
 	if(z80.F & FLAG_C) z80.F = 0x50;
 	else z80.F = 0x40;
 	if(*reg1 == 0) z80.F |= FLAG_Z;
@@ -2089,12 +2093,13 @@ static inline void inc_sp(){
 }
 static inline void sbc(BYTE data){
 	BYTE c;
+	BYTE op;
 	if (z80.F & 0x10) c = 1;
 	else c = 0;
-
-	if (z80.A - data - c == 0) z80.F |= 0x80;
-	else if (z80.A - data - c < 0) z80.F |= 0x10;
-	if(z80.A > 0xF && z80.A - data - c <= 0xF) z80.F |= 0x20;
+	op = z80.A - data - c;
+	if (op == 0) z80.F |= 0x80;
+	if (op > z80.A) z80.F |= 0x10;
+	if ((z80.A > 0xF && op <= 0xF) || (z80.A <= 0xF && op > 0xF)) z80.F |= 0x20;
 	z80.A = (z80.A - data - c);
 }
 
@@ -2105,38 +2110,44 @@ static inline void scf(){
 }
 
 static inline void sub(BYTE data){
-	if (z80.A - data == 0) z80.F |= 0x80;
-	else if (z80.A - data < 0) z80.F |= 0x10;
-	if(z80.A >= 0xF && z80.A - data < 0xF) z80.F |= 0x20;
+	BYTE op = z80.A - data;
+	if (op == 0) z80.F |= 0x80;
+	if (op > z80.A) z80.F |= 0x10;
+	if ((z80.A > 0xF && op <= 0xF) || (z80.A <= 0xF && op > 0xF)) z80.F |= 0x20;
 	z80.A -= data;
 }
 
 static inline void or(BYTE data){
 	z80.A |= data;
-	if (z80.A == 0)	z80.F &= 0x80;
-	else z80.F &= 0x00;
+	if (z80.A == 0)	z80.F = 0x80;
+	else z80.F = 0x00;
 }
 
 static inline void xor(BYTE data){
 	z80.A ^= data;
-	if (z80.A == 0)	z80.F &= 0x80;
-	else z80.F &= 0x00;
+	if (z80.A == 0)	z80.F = 0x80;
+	else z80.F = 0x00;
 }
 
 //--------16bit arithmetic/logical instructions
 
 static inline void add_dbl(BYTE *reg1, BYTE *reg2, unsigned short data){
 	// - 0 H C
-	unsigned short data2 = (*reg1 << 8) + *reg2 + data;
-	*reg1 =( 0xFF00 & data2) >> 8;
-	*reg2 =( 0x00FF & data2);
-	z80.F &= ~(0x40); // N	
+	unsigned short r1r2 = (*reg1 << 8) + *reg2;
+	unsigned short op = r1r2 + data;
+	if(z80.F & FLAG_Z) z80.F = 0x80;
+	else z80.F = 0;
+	if (data < r1r2) z80.F |= 0x10;
+	if ((r1r2 > 0xFF && op <= 0xFF) || (r1r2 <= 0xFF && op > 0xFF)) z80.F |= 0x20;
+	*reg1 =( 0xFF00 & op) >> 8;
+	*reg2 =( 0x00FF & op);
 }
 
 static inline void add_sp_r8(BYTE_S data){
+	unsigned short op = z80.SP + data;
 	if(z80.SP + data > 0xFFFF || z80.SP + data < 0) z80.F |= 0x10;
-	if((z80.SP > 0xFF && z80.SP + data <= 0xFF) || (z80.SP <= 0xFF && z80.SP + data > 0xFF)) z80.F |= 0x20;
-	z80.SP += data;
+	if((z80.SP > 0xFF && op <= 0xFF) || (z80.SP <= 0xFF && op > 0xFF)) z80.F |= 0x20;
+	z80.SP = op;
 }
 
 static inline void dec_dbl(BYTE *reg1, BYTE *reg2){

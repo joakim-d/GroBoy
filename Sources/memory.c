@@ -88,9 +88,13 @@ void read_rom_info(char* rom_path){
 }
 
 void memory_init(char *rom_path){
+	int i;
 	read_rom_info(rom_path);
 	rom_selector = 1;
 	ram_selector = 0;
+	for(i = 0; i < 32768; i++){
+		internal_ram[i] = 0;
+	}
 	memory_write(0xFF05,0x00);
 	memory_write(0xFF06,0x00);
 	memory_write(0xFF07,0x00);
