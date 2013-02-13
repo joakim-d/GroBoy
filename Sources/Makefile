@@ -1,6 +1,6 @@
 SRC= cpu.c memory.c main.c interrupts.c
 CC=gcc
-CFLAGS = -std=c99 -Wall
+CFLAGS = -std=c99 
 EXEC= groboy
 OBJ= $(SRC: .c=.o)
 
