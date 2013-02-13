@@ -1,4 +1,4 @@
-SRC= cpu.c memory.c main.c interrupts.c
+SRC= cpu.c memory.c main.c interrupts.c timer.c
 CC=gcc
 CFLAGS = -std=c99 
 EXEC= groboy
