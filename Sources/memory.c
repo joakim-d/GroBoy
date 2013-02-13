@@ -25,8 +25,8 @@ void read_rom_info(char* rom_path){
 		case 0x01: printf("MBC1");break;
 		case 0x02: printf("MBC1+RAM");break;
 		case 0x03: printf("MBC1+RAM+BATTERY");break;
-		case 0x05: printf("MBC2");break;
-		case 0x06: printf("MBC2+BATTERY");break;
+		case 0x05: printf("MBC2");alloc_ram_mem(0x200);break;
+		case 0x06: printf("MBC2+BATTERY");alloc_ram_mem(0x200);break;
 		case 0x08: printf("ROM+RAM");break;
 		case 0x09: printf("ROM+RAM+BATTERY");break;
 		case 0x0B: printf("MMM01");break;
@@ -155,6 +155,11 @@ void memory_write(unsigned short addr, BYTE data){
 		if(cartridge_type >= 0x01 || cartridge_type <= 0x03){//MBC1
 			write_mbc1(addr, data);		
 		}
+		if(cartridge_type == 0x05 || cartridge_type == 0x06)//MBC2
+		{
+			write_mbc2(addr,data);
+		}
+		
 	}
 	else if(addr >= 0x8000 && addr <= 0x9FFF){
 		internal_ram[addr - 0x8000] = data;	
@@ -162,6 +167,19 @@ void memory_write(unsigned short addr, BYTE data){
 	else
 		internal_ram[addr - 0xA000] = data;
 
+}
+
+void write_mbc2(unsigned short addr, BYTE data){
+	if(addr <= 0x1FFF){
+		if((data & 0x100) == 0) enable_ram = 1;
+		else enable_ram = 0;
+	}
+	else if(addr >= 0x2000 && addr <= 0x3FFF){
+		rom_selector = data & 0x0F;
+		if(rom_selector == 0) rom_selector++;
+	}
+	else
+		cartridge_ram_buffer[addr - 0xA000] = data;
 }
 
 void write_mbc1(unsigned short addr, BYTE data){
