@@ -1,6 +1,14 @@
-
+SRC= cpu.c memory.c main.c interrupts.c
+CC=gcc
+CFLAGS = -std=c99 -Wall
+EXEC= groboy
+OBJ= $(SRC: .c=.o)
 
 all:
-	gcc -o groboy cpu.c memory.c main.c interrupts.c -g
-rm:
+	echo "make, trois options possibles : groboy, debug et clean"
+groboy:
+	$(CC) -o $(EXEC) $(SRC) $(CFLAGS)
+debug: 
+	$(CC) -o $(EXEC) $(SRC) $(CFLAGS) -g
+clean:
 	rm groboy
