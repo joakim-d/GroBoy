@@ -12,6 +12,6 @@ BYTE IME; // Interrupt Master Enable Flag (Si flag = 0 -> aucune interruption to
 void set_IME();
 void reset_IME();
 void handle_interrupts(BYTE cycles);
-void execute_interrupt(z80_t *z80, BYTE type);
+void execute_interrupt(BYTE type);
 void make_request(BYTE type);
 #endif

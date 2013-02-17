@@ -30,14 +30,14 @@ void make_request(BYTE type){
 	}
 }
 
-void execute_interrupt(z80_t *z80, BYTE type){
+void execute_interrupt(BYTE type){
 	BYTE IE;
 	BYTE IF;
 	
 	IME = 0;
 	IE = memory_read(0xFFFF);
 	IF = memory_read(0xFF0F);
-	
+	/*	
 	memory_write(z80->SP - 1, (z80->PC & 0xFF00) >> 8);
 	memory_write(z80->SP - 2, (z80->PC & 0x00FF));
 	z80->SP -= 2;
@@ -69,5 +69,5 @@ void execute_interrupt(z80_t *z80, BYTE type){
 				z80->PC = 0x60;
 			}
 		break;
-	}
+	}*/
 }
