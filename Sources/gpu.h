@@ -10,10 +10,11 @@ int line_counter;//line counter permet de savoir où en est le GPU sur la ligne 
 BYTE current_mode;
 BYTE current_line;
 BYTE gpu_counter;
+BYTE gpu_screen[144][160];
 void gpu_init();
 void gpu_update(int cycles);
 void gpu_update_line();
 void gpu_update_stat();
-void gpu_drawline();
+void gpu_drawline(BYTE current);
 
 #endif

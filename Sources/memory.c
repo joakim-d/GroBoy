@@ -164,8 +164,15 @@ void memory_write(unsigned short addr, BYTE data){
 	else if(addr >= 0x8000 && addr <= 0x9FFF){
 		internal_ram[addr - 0x8000] = data;	
 	}
-	else
-		internal_ram[addr - 0xA000] = data;
+	else if(addr == 0xFF46)
+		dma_transfer(data);
+	else{
+		switch(addr){
+			case 0xFF44: internal_ram[0x5F44] = 0;break;
+			case 0xFF46: dma_transfer(data);break;
+			default: internal_ram[addr - 0xA000] = data;break;	
+		}
+	}
 
 }
 
@@ -202,4 +209,10 @@ void write_mbc1(unsigned short addr, BYTE data){
 		cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000] = data;
 }
 
-
+void dma_transfer(BYTE data){
+	int i;
+	unsigned short source = data << 8;
+	for(i = 0; i < 0x9F; i++){
+		memory_write(0xFE00 + i, memory_read(source + i));
+	}
+}

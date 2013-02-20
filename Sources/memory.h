@@ -26,4 +26,5 @@ void write_mbc2(unsigned short addr, BYTE data);
 void alloc_rom_mem(size_t size);
 void alloc_ram_mem(size_t size);
 void read_rom_info(char* rom_path);
+void dma_transfer(BYTE data);
 #endif
