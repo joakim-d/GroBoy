@@ -41,13 +41,17 @@ typedef struct{
 typedef struct{
 	
 	//Registres du Canal de son 1
-	BYTE NR21;
-	BYTE NR22;
-	BYTE NR23;
-	BYTE NR24;
+	BYTE NR10;//FF10 Registre de balayage (R/W)
+	BYTE NR11;//FF11 Longueur de son et duty d'une forme d'onde (R/W)
+	BYTE NR12;//FF12 Enveloppe de volume (R/W)
+	BYTE NR13;//FF13 Composantes basses de fréquence (W)
+	BYTE NR14;//FF14 Composantes hautes de fréquence (R/W)
 
 	//Registres du Canal de son 2
-	
+	BYTE NR21;//FF16 Idem NR11 avec b6 NR24
+	BYTE NR22;//FF17 Idem NR12
+	BYTE NR23;//FF18 Idem NR13 
+	BYTE NR24;//FF19 Idem NR14
 
 	//Registres du Canal de son 3
 	BYTE NR30;//FF1A Son on-off (R/W)
