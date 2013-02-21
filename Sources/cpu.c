@@ -1737,7 +1737,9 @@ void run(){
 				rst(0x38);
 				break;
 		}
+	gpu_update(cycles);	
 	handle_interrupts(cycles);
+
 		/*if(Counter<=0)
 		  {
 		// Check for interrupts and do other
@@ -1752,10 +1754,10 @@ void run(){
 //-----------Misc/control instructions------------------
 
 static inline void di(){
-
+	memory_write(0xFFFF, 0);
 }
 static inline void ei(){
-
+	memory_write(0xFFFF, 1);
 }
 static inline void halt(){
 
@@ -1849,6 +1851,7 @@ static inline void reti(){
 	//PLUS FLAG IF
 	z80.PC = (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP);
 	z80.SP += 2;
+	ei();
 }
 
 static inline void rst(BYTE addr){

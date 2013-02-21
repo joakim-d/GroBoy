@@ -9,6 +9,8 @@
 #include <string.h>
 #include "def.h"
 #include "memory.h"
+#include "gpu.h"
+#include "interrupts.h"
 void run();
 void cpu_init();
 unsigned char *rom_buffer;
@@ -25,7 +27,6 @@ typedef struct {
 	unsigned char L;	
 } z80_t;
 
-#include "interrupts.h"
 static const BYTE z80_cycles[] = {
 4, 12, 8, 8, 4, 4, 8, 4, 20, 8, 8, 8, 4, 4, 8, 4, 
 4, 12, 8, 8, 4, 4, 8, 4, 12, 8, 8, 8, 4, 4, 8, 4,
