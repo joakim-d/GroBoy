@@ -65,16 +65,16 @@ void sound_run(){
 	switch(address){
 
 		case NR10:
-			apu.channel1.sweep_period = (memory_read(address) & 0x70);
+			apu.channel1.sweep_period = ((memory_read(address) & 0x70) >> 4);
 			apu.channel1.sweep_shift = (memory_read(address) & 0x07);
 			if((memory_read(address) & BIT_3) > 0)apu.channel1.sweep_regulation = 1;else apu.channel1.sweep_regulation = 0;
 		break;
 		case NR11:
-			apu.channel1.wave_duty = (memory_read(address) & 0xC0);
+			apu.channel1.wave_duty = ((memory_read(address) & 0xC0) >> 6);
 			apu.channel1.sound_length = (memory_read(address) & 0x3F);
 		break;
 		case NR12:
-			apu.channel1.initial_volume = (memory_read(address) & 0xF0);
+			apu.channel1.initial_volume = ((memory_read(address) & 0xF0) >> 4);
 			apu.channel1.nb_sweep_env = (memory_read(address) & 0x07);
 			if((memory_read(address) & BIT_3)>0) apu.channel1.env_direction = 1;else apu.channel1.env_direction = 0;
 		break;
@@ -90,11 +90,11 @@ void sound_run(){
 		break;
 		//SC2
 		case NR21:
-			apu.channel2.wave_duty = (memory_read(address) & 0xC0);
+			apu.channel2.wave_duty = ((memory_read(address) & 0xC0) >> 6);
 			apu.channel2.sound_length = (memory_read(address) & 0x3F);
 		break;
 		case NR22:
-			apu.channel2.initial_env_volume = (memory_read(address) & 0xF0);
+			apu.channel2.initial_env_volume = ((memory_read(address) & 0xF0) >> 4);
 			apu.channel2.nb_sweep_env = (memory_read(address) & 0x07);
 			if((memory_read(address) & BIT_3)>0) apu.channel2.env_direction = 1;else apu.channel2.env_direction = 0;
 		break;
@@ -114,7 +114,7 @@ void sound_run(){
 			apu.channel3.sound_length = memory_read(address);
 		break;
 		case NR32:
-			apu.channel3.output_level = (memory_read(address) & 0x60);
+			apu.channel3.output_level = ((memory_read(address) & 0x60) >> 4);
 		break;
 		case NR33:
 			apu.channel3.freq_low = memory_read(address);
@@ -129,12 +129,12 @@ void sound_run(){
 			apu.channel4.sound_length = (memory_read(address) & 0x3F);
 		break;
 		case NR42:
-			apu.channel4.initial_env_volume = (memory_read(address) & 0xF0);
+			apu.channel4.initial_env_volume = ((memory_read(address) & 0xF0) >> 4);
 			apu.channel4.sweep_number = (memory_read(address) & 0x07);
 			if((memory_read(address) & BIT_3)>0) apu.channel4.env_direction = 1;else apu.channel4.env_direction = 0;
 		break;
 		case NR43:
-			apu.channel4.freq_shift = (memory_read(address) & 0xF0);
+			apu.channel4.freq_shift = ((memory_read(address) & 0xF0) >> 4);
 			apu.channel4.freq_division_ratio = (memory_read(address) & 0x07);
 			if((memory_read(address) & BIT_3)>0) apu.channel4.step_counter = 1;else apu.channel4.step_counter = 0;
 		break;
@@ -144,7 +144,7 @@ void sound_run(){
 		break;
 		//SOUND CONTROLL
 		case NR50:
-			apu.sound_controller.so2_output_level = (memory_read(address) & 0x70);
+			apu.sound_controller.so2_output_level = ((memory_read(address) & 0x70) >> 4);
 			apu.sound_controller.so1_output_level = (memory_read(address) & 0x07);
 			if((memory_read(address) & BIT_7)>0) apu.sound_controller.output_to_so2 = 1;else apu.sound_controller.output_to_so2 = 0;
 			if((memory_read(address) & BIT_3)>0) apu.sound_controller.output_to_so1 = 1;else apu.sound_controller.output_to_so1 = 0;
