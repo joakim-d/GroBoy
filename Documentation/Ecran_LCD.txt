@@ -1,0 +1,102 @@
+Fonctionnement de l'écran LCD
+
+L'écran LCD va générer les lignes une par une, à la fin de chaque ligne il entre dans une période dite Hblank
+Pour se positionner à la ligne suivante, sauf pour la ligne 144. L'écran rentre alors dans une période dite VBlank,
+et va se repositionner à la première ligne.
+
+	0_______________159	
+  ----->|----ligne1---->|_Hblank_	 					
+ /   ___|		|_______/
+|    \->|----ligne2---->|_Hblank_	 					
+|    ___|		|_______/
+|    \->|----ligne3---->|
+|
+|	       ...		  	
+|		
+|
+|
+|				
+|	|		|	 				
+|    143|----ligne144-->|___V_blank_
+|	|_______________|          /
+ \________________________________/
+
+
+Lors de la génération d'une ligne:
+
+l'écran LCD peut générer 3 couches de dessins:
+-Background
+-Window
+-Sprite
+le registre à l'adresse FF40 permet ou non à l'utilisateur d'activer les couches de Background et Window.
+
+
+Background:
+Cette couche contient les éléments du décor du jeu.
+dans la mémoire elle est représentée par une matrice de 256x256 pixels, soit 32*32 tuiles (carré de 8x8pixels).
+La gameboy permet de switcher entre 2 maps différentes, donc 2 matrices de 256x256.
+Une map est donc plus grande que l'écran LCD (160*144), on peut positionner l'écran sur la map grâce à deux registres.
+
+Window:
+Cette couche sert généralement pour les barres de menu et reste souvent statique à l'écran.
+Son comportement est similaire au Background excepté qu'elle est superposée sur la couche background 
+et qu'elle est positionnée par rapport à l'écran.
+
+Sprite:
+Cette couche est en priorité utilisée pour dessiner les personnages, objets, etc.
+la mémoire vidéo contient en tout 40 tuiles qui peuvent être utilisées pendant l'affichage d'un écran.
+Les sprites contiennent des spécificités comme leur position absolue sur l'écran, des flips, etc.
+
+
+Lorsqu'une ligne est générée (disons la 70eme), 
+l'écran LCD va chercher les tuiles correspondantes dans la background map et dessiner les pixels correspondants
+
+______________________________255
+|0	Background map		|
+|				|
+|				|
+|	0_______________159	|
+|	|Ecran LCD	|	|
+|	|		|	|
+|	|_ligne_70______|	|
+|	|		|	|
+|	|		|	|
+|	|		|	|
+|	|143____________|	|
+|				|
+|255____________________________|
+
+Puis l'écran LCD va chercher les tuiles correspondantes dans la window map et dessiner les pixels correspondants.
+Ici aucun pixel ne sera dessiné pour la ligne 70 car la window map est positionnée en bas de l'écran LCD.
+
+0_______________159
+|Ecran LCD	|	
+|		|	
+|_ligne_70______|	
+|		|	
+|_______________|______________255
+|		|Window map	|
+|_______________|		|
+|				|
+|				|
+|				|
+|				|
+|				|
+|				|
+|				|
+|				|
+|				|
+|255____________________________|
+
+Enfin l'écran LCD regarde un par un chaque sprite et vérifie 
+si un sprite n'est pas positionné sur la ligne qu'il est entrain de dessiner
+
+0_______________159	
+|Ecran LCD	|	 					
+|		|	  _
+|_ligne_70______|	 |_|:Sprite 1 pos x = [33,40], pos y = [68,75] -> ok, LCD dessine la 3eme ligne du sprite de x=33à40 
+|		|	  _				
+|		|	 |_|:Sprite 2 pos x = [59, 66], pos y = [23, 30] -> non						
+|		|	 				
+|143____________|	 ...:Sprite 40					
+
