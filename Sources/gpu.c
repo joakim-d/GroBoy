@@ -1,20 +1,19 @@
 #include "gpu.h"
 
 void gpu_init(){
-	gpu_counter = 0;
+	line_counter = 0;
 	current_mode = 2;
 	current_line = 0;
 	//fonctions SDL
 }
 void gpu_update(int cycles){ //fonction appelée en premier
-	gpu_counter += cycles;
+	line_counter += cycles;
 	gpu_update_line();
 	gpu_update_stat();
 }
 
 void gpu_update_line(){
 	BYTE lcdc;
-	BYTE current_line;
 	lcdc = memory_read(0xFF40);
 	current_line = memory_read(0xFF44);
 	if(lcdc & 0x80){
@@ -24,7 +23,7 @@ void gpu_update_line(){
 			}
 			current_line++;
 			memory_write(0xFF44, current_line);
-			gpu_counter %= ONE_LINE_CYCLES;
+			line_counter %= ONE_LINE_CYCLES;
 		}
 		if(current_line == LY_VISIBLE_MAX){
 			make_request(V_BLANK);
@@ -38,7 +37,7 @@ void gpu_update_line(){
 
 void gpu_update_stat(){
 	BYTE lcdc;//LCD Control 
-	BYTE current_line, lyc, lcd_stat;
+	BYTE lyc, lcd_stat;
 
 	lcdc = memory_read(0xFF40);
 	current_line = memory_read(0xFF44);
@@ -57,7 +56,7 @@ void gpu_update_stat(){
 	}
 	if(lcdc & 0x80){
 		if(current_line < LY_MAX){ 
-			if(gpu_counter < 80){
+			if(line_counter < 80){
 				//Mode 2 The LCD controller is reading from OAM memory.
 				lcd_stat &= 0xFC;
 				lcd_stat |= 0x02;
@@ -66,7 +65,7 @@ void gpu_update_stat(){
 					make_request(LCD_STAT);
 				}
 			}
-			else if(gpu_counter < 172){
+			else if(line_counter < 172){
 				//Mode 3 The LCD controller is reading from both OAM and VRAM
 				lcd_stat |= 0x03;
 				memory_write(0xFF41, lcd_stat);	

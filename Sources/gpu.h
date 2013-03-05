@@ -20,7 +20,6 @@ typedef struct{
 int line_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
 BYTE current_mode;
 BYTE current_line;
-BYTE gpu_counter;
 BYTE gpu_screen[144][160];
 void gpu_init();
 void gpu_update(int cycles);

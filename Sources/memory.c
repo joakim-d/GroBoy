@@ -166,7 +166,6 @@ void memory_write(unsigned short addr, BYTE data){
 	}
 	else{
 		switch(addr){
-			case 0xFF44: internal_ram[0x5F44] = 0;break;
 			case 0xFF46: dma_transfer(data);break;
 			default: internal_ram[addr - 0xA000] = data;break;	
 		}
