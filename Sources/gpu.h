@@ -27,5 +27,6 @@ void gpu_update_line();
 void gpu_update_stat();
 void gpu_drawline();
 void get_tile(BYTE num, tile_t *tile, int type);
+void tile_flip(tile_t *tile, int flipx_y, int size);
 
 #endif
