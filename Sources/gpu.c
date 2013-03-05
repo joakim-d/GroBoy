@@ -264,6 +264,10 @@ void get_tile(BYTE num, tile_t *tile, int type){
 		}
 		lig++;
 	}
+
+	if(tile->x_flip !=0 )tile_flip(tile,0,size);
+	if(tile->y_flip !=0 )tile_flip(tile,1,size);
+
 	for(i = 0; i < size; i++){
 		for(j = 0; j < 8; j++){
 			if(tile->px[i][j] == 0 && type != SPRITES) tile->px[i][j] = tile->palette & 0x03;
@@ -275,3 +279,54 @@ void get_tile(BYTE num, tile_t *tile, int type){
 	tile->size = size;
 }
 
+
+//prend en parametre une tile , 0 pour le flip horizontal ou 1 pour le flip vertical, la taille de la tile
+void tile_flip(tile_t *tile, int flipx_y, int size)
+{
+        BYTE tempflip[16][8];
+        int cpt;
+
+        for(int i=0; i<16; i++)
+        {
+                for(int j=0; j<8; j++)
+                {
+                        tempflip[i][j] = 0;
+                }
+        }
+
+        if(flipx_y == 0)
+        {
+
+                for(int i=0; i<size; i++)
+                {
+                        cpt = 0;
+                        for(int j=7; j=0; j++)
+                        {
+                                tempflip[i][cpt] = tile->px[i][j];
+                                cpt++;
+                        }
+                }
+        }
+
+
+        if(flipx_y == 1)
+        {
+                cpt = 0;
+                for(int i=size-1; i=0; i--)
+                {
+                        for(int j=0; j<8; j++)
+                        {
+                                tempflip[cpt][j] = tile->px[i][j];
+                        }
+                        cpt++;
+                }
+        }
+
+        for(int i=0; i<16; i++)
+        {
+                for(int j=0; j<8; j++)
+                {
+                        tile->px[i][j] = tempflip[i][j];
+                }
+        }
+}
