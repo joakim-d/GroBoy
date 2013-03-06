@@ -1,5 +1,6 @@
 #ifndef DEF_H
 #define DEF_H
+#define DEBUG 1
 #define BYTE unsigned char
 #define BYTE_S char
 #define FLAG_Z 0x80
@@ -18,4 +19,6 @@
 #define BIT_5 0x20
 #define BIT_6 0x40
 #define BIT_7 0x80
+#define ADD 1
+#define SUB 0
 #endif

@@ -5,21 +5,23 @@ void gpu_init(){
 	current_mode = 2;
 	current_line = 0;
 	//fonctions SDL
-	if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
-    	{
-        	fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
-        	exit(EXIT_FAILURE); // On quitte le programme
-    	}
-	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE);
-	SDL_WM_SetCaption("Groboy", NULL);
-	for(int i=0; i<144; i++)
-        {
-                for(int j=0; j<160; j++)
-                {
-                        sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
-                }
-        }
+	if(!DEBUG){
 
+		if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
+		{
+			fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
+			exit(EXIT_FAILURE); // On quitte le programme
+		}
+		sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE);
+		SDL_WM_SetCaption("Groboy", NULL);
+		for(int i=0; i<144; i++)
+		{
+			for(int j=0; j<160; j++)
+			{
+				sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
+			}
+		}
+	}
 }
 void gpu_update(int cycles){ //fonction appelée en premier
 	line_counter += cycles;
@@ -97,6 +99,7 @@ void gpu_update_stat(){
 		else{
 			if(current_line == LY_MAX && (lcd_stat & 0x10))
 				make_request(V_BLANK);
+			draw_screen();
 		}
 	}
 }
@@ -122,7 +125,7 @@ void gpu_drawline(){
 	if(lcd_cont & 0x01){ //Si background établi
 		bg_y = current_line + memory_read(0xFF42); 	//On récupère la ligne du background à dessiner
 		bg_x = memory_read(0xFF43);			//On récupère la colonne du bg à dessiner
-		
+
 		tile.palette = memory_read(0xFF47);
 		tile.x_flip = 0;
 		tile.y_flip = 0;
@@ -222,7 +225,7 @@ void gpu_drawline(){
 			for(j = 0; j < 8; j++){
 				if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
 					if(sprite_sets & 0x80 || gpu_screen[current_line][sprite_x + i] == 0)	//si le sprite est dessus ou que le background est à 0
-					gpu_screen[current_line][sprite_x + i] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
+						gpu_screen[current_line][sprite_x + i] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
 				}
 			}
 		}
@@ -298,76 +301,78 @@ void get_tile(BYTE num, tile_t *tile, int type){
 //prend en parametre une tile , 0 pour le flip horizontal ou 1 pour le flip vertical, la taille de la tile
 void tile_flip(tile_t *tile, int flipx_y, int size)
 {
-        BYTE tempflip[16][8];
-        int cpt;
+	BYTE tempflip[16][8];
+	int cpt;
 
-        for(int i=0; i<16; i++)
-        {
-                for(int j=0; j<8; j++)
-                {
-                        tempflip[i][j] = 0;
-                }
-        }
+	for(int i=0; i<16; i++)
+	{
+		for(int j=0; j<8; j++)
+		{
+			tempflip[i][j] = 0;
+		}
+	}
 
-        if(flipx_y == 0)
-        {
+	if(flipx_y == 0)
+	{
 
-                for(int i=0; i<size; i++)
-                {
-                        cpt = 0;
-                        for(int j=7; j=0; j++)
-                        {
-                                tempflip[i][cpt] = tile->px[i][j];
-                                cpt++;
-                        }
-                }
-        }
+		for(int i=0; i<size; i++)
+		{
+			cpt = 0;
+			for(int j=7; j=0; j++)
+			{
+				tempflip[i][cpt] = tile->px[i][j];
+				cpt++;
+			}
+		}
+	}
 
 
-        if(flipx_y == 1)
-        {
-                cpt = 0;
-                for(int i=size-1; i=0; i--)
-                {
-                        for(int j=0; j<8; j++)
-                        {
-                                tempflip[cpt][j] = tile->px[i][j];
-                        }
-                        cpt++;
-                }
-        }
+	if(flipx_y == 1)
+	{
+		cpt = 0;
+		for(int i=size-1; i=0; i--)
+		{
+			for(int j=0; j<8; j++)
+			{
+				tempflip[cpt][j] = tile->px[i][j];
+			}
+			cpt++;
+		}
+	}
 
-        for(int i=0; i<16; i++)
-        {
-                for(int j=0; j<8; j++)
-                {
-                        tile->px[i][j] = tempflip[i][j];
-                }
-        }
+	for(int i=0; i<16; i++)
+	{
+		for(int j=0; j<8; j++)
+		{
+			tile->px[i][j] = tempflip[i][j];
+		}
+	}
 }
 
 void draw_screen()
 {
 	SDL_Rect position;
-	for(int i=0; i<144; i++)
-	{
-		position.y=i;
-		for(int j=0; j<160; j++)
+	if(!DEBUG){
+		for(int i=0; i<144; i++)
 		{
-			position.x=j;
-			sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
-			if(gpu_screen[i][j] == 0)
-				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 0, 0, 0)); // Dessin
-    			else if(gpu_screen[i][j] == 1)
-				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 85, 85, 85)); // Dessin
-    			else if(gpu_screen[i][j] == 2)
-				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 170, 170, 170)); // Dessin
-    			else 
-				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 255, 255, 255)); // Dessin
+			position.y=i;
+			for(int j=0; j<160; j++)
+			{
+				position.x=j;
+				sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
+				if(gpu_screen[i][j] == 0)
+					SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 0, 0, 0)); // Dessin
+				else if(gpu_screen[i][j] == 1)
+					SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 85, 85, 85)); // Dessin
+				else if(gpu_screen[i][j] == 2)
+					SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 170, 170, 170)); // Dessin
+				else 
+					SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 255, 255, 255)); // Dessin
 
-			SDL_BlitSurface(sdl_matrix[i][j], NULL, sdl_screen, &position); // Collage 
+				SDL_BlitSurface(sdl_matrix[i][j], NULL, sdl_screen, &position); // Collage 
+			}
 		}
+		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
+		SDL_Delay(16);
 	}
-	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-	SDL_Delay(16);
 }

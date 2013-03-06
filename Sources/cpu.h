@@ -15,6 +15,7 @@
 void run();
 void cpu_init();
 unsigned char *rom_buffer;
+int cycles;
 typedef struct {
 	unsigned short PC;
 	unsigned short SP;
