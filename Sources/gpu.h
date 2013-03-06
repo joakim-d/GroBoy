@@ -1,5 +1,8 @@
 #ifndef GPU_H
 #define GPU_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <SDL/SDL.h>
 #include "def.h"
 #include "memory.h"
 #include "interrupts.h"
@@ -21,6 +24,8 @@ int line_counter;//line counter permet de savoir où en est le GPU sur la ligne 
 BYTE current_mode;
 BYTE current_line;
 BYTE gpu_screen[144][160];
+SDL_Surface sdl_matrix[144][160];
+SDL_Surface *sdl_screen;
 void gpu_init();
 void gpu_update(int cycles);
 void gpu_update_line();

@@ -5,6 +5,21 @@ void gpu_init(){
 	current_mode = 2;
 	current_line = 0;
 	//fonctions SDL
+	if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
+    	{
+        	fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
+        	exit(EXIT_FAILURE); // On quitte le programme
+    	}
+	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE);
+	SDL_WM_SetCaption("Groboy", NULL);
+	for(int i=0; i<144; i++)
+        {
+                for(int j=0; j<160; j++)
+                {
+                        sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
+                }
+        }
+
 }
 void gpu_update(int cycles){ //fonction appelée en premier
 	line_counter += cycles;
@@ -329,4 +344,30 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
                         tile->px[i][j] = tempflip[i][j];
                 }
         }
+}
+
+void draw_screen()
+{
+	SDL_Rect position;
+	for(int i=0; i<144; i++)
+	{
+		position.y=i;
+		for(int j=0; j<160; j++)
+		{
+			position.x=j;
+			sdl_marix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
+			if(gpu_screen[i][j] == 0)
+				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 0, 0, 0)); // Dessin
+    			else if(gpu_screen[i][j] == 1)
+				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 85, 85, 85)); // Dessin
+    			else if(gpu_screen[i][j] == 2)
+				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 170, 170, 170)); // Dessin
+    			else 
+				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 255, 255, 255)); // Dessin
+
+			SDL_BlitSurface(sdl_matrix[i][j], NULL, sdl_screen, &position); // Collage 
+		}
+	}
+	SDL_Flip(ecran); /* Mise à jour de l'écran */
+	SDL_Delay(16);
 }
