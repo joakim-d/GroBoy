@@ -11,6 +11,7 @@
 #include "memory.h"
 #include "gpu.h"
 #include "interrupts.h"
+#include "sound.h"
 void run();
 void cpu_init();
 unsigned char *rom_buffer;

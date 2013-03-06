@@ -2,7 +2,7 @@
 
 apu_t apu;
 
-void init(){
+void sound_init(){
 	apu.channel1.sweep_period = 0x00;
 	apu.channel1.sweep_shift = 0x00;
 	apu.channel1.sweep_regulation = 0; 
@@ -50,9 +50,9 @@ void init(){
 	apu.sound_controller.output_to_so1 = 0; 
 	apu.sound_controller.all_sounds_trigger = 0; 
 
-	apu.sound_controller.output_sound_so1 = (int *)malloc(3*sizeof(int));
-	apu.sound_controller.output_sound_so2 = (int *)malloc(3*sizeof(int));
-	apu.sound_controller.sound_flags = (int *)malloc(3*sizeof(int));
+	/*apu.sound_controller.output_sound_so1 = (int *)malloc(4*sizeof(int));
+	apu.sound_controller.output_sound_so2 = (int *)malloc(4*sizeof(int));
+	apu.sound_controller.sound_flags = (int *)malloc(4*sizeof(int));*/
 	for(int i=0;i<4;i++){
 		apu.sound_controller.output_sound_so1[i] = 0;
 		apu.sound_controller.output_sound_so2[i] = 0;
@@ -62,6 +62,7 @@ void init(){
 
 void sound_run(unsigned short address){
 	BYTE value = memory_read(address);
+	printf("ADDRESS = %x\n", address);
 	switch(address){
 		case NR10:
 			apu.channel1.sweep_period = ((value & 0x70) >> 4);
@@ -149,14 +150,14 @@ void sound_run(unsigned short address){
 			if((value & BIT_3)>0) apu.sound_controller.output_to_so1 = 1;else apu.sound_controller.output_to_so1 = 0;
 		break;
 		case NR51:
-			apu.sound_controller.output_sound_so1[0] = (value & BIT_0);
+			apu.sound_controller.output_sound_so1[0] = (value & BIT_0); 
 			apu.sound_controller.output_sound_so1[1] = (value & BIT_1);
 			apu.sound_controller.output_sound_so1[2] = (value & BIT_2);
 			apu.sound_controller.output_sound_so1[3] = (value & BIT_3);
-			apu.sound_controller.output_sound_so2[4] = (value & BIT_4);
-			apu.sound_controller.output_sound_so2[5] = (value & BIT_5);
-			apu.sound_controller.output_sound_so2[6] = (value & BIT_6);
-			apu.sound_controller.output_sound_so2[7] = (value & BIT_7);
+			apu.sound_controller.output_sound_so2[0] = (value & BIT_4);
+			apu.sound_controller.output_sound_so2[1] = (value & BIT_5);
+			apu.sound_controller.output_sound_so2[2] = (value & BIT_6);
+			apu.sound_controller.output_sound_so2[3] = (value & BIT_7);
 
 		break;
 		case NR52:

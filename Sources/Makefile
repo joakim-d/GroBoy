@@ -11,4 +11,5 @@ groboy:
 debug: 
 	$(CC) -o $(EXEC) $(SRC) $(CFLAGS) -g
 clean:
-	rm groboy
+	rm groboy 
+	rm *.o

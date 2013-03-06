@@ -136,11 +136,16 @@ typedef struct {
 	int output_to_so2; //booleen
 	int output_to_so1; //booleen
 	//NR51
-	int* output_sound_so1; //i[0..3], output sound i to so2 terminal
-	int* output_sound_so2; //i[0..3], output sound i to so1 terminal
+	//FIXME
+	/*int* output_sound_so1; //i[0..3], output sound i to so2 terminal
+	int* output_sound_so2; //i[0..3], output sound i to so1 terminal*/
+	int output_sound_so1[4];
+	int output_sound_so2[4];
 	//NR52
 	int all_sounds_trigger; //booleen, 0 : stop all circuits 1 : on
-	int* sound_flags;//i[0..3], flag for sci
+	//FIXME
+	//int* sound_flags;//i[0..3], flag for sci
+	int sound_flags[4];
 }sound_control_t;
 
 //Audio processing unit
@@ -153,6 +158,6 @@ typedef struct{
 
 } apu_t;
 
-void init();
+void sound_init();
 void sound_run(unsigned short address);
 #endif
