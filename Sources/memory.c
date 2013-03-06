@@ -164,6 +164,9 @@ void memory_write(unsigned short addr, BYTE data){
 	else if(addr >= 0x8000 && addr <= 0x9FFF){
 		internal_ram[addr - 0x8000] = data;	
 	}
+	else if(addr >= 0xff10 && addr <= 0xff26){
+		sound_run(addr);	
+	}
 	else{
 		switch(addr){
 			case 0xFF46: dma_transfer(data);break;

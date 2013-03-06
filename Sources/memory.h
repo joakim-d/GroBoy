@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "def.h"
+#include "sound.h"
 BYTE cartridge_type;
 BYTE enable_ram;
 BYTE rom_mode;

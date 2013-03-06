@@ -154,5 +154,5 @@ typedef struct{
 } apu_t;
 
 void init();
-void sound_run();
+void sound_run(unsigned short address);
 #endif
