@@ -355,7 +355,7 @@ void draw_screen()
 		for(int j=0; j<160; j++)
 		{
 			position.x=j;
-			sdl_marix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
+			sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
 			if(gpu_screen[i][j] == 0)
 				SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 0, 0, 0)); // Dessin
     			else if(gpu_screen[i][j] == 1)
@@ -368,6 +368,6 @@ void draw_screen()
 			SDL_BlitSurface(sdl_matrix[i][j], NULL, sdl_screen, &position); // Collage 
 		}
 	}
-	SDL_Flip(ecran); /* Mise à jour de l'écran */
+	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
 	SDL_Delay(16);
 }
