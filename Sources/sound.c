@@ -62,7 +62,7 @@ void sound_init(){
 
 void sound_run(unsigned short address){
 	BYTE value = memory_read(address);
-	printf("ADDRESS = %x\n", address);
+	//printf("ADDRESS = %x\n", address);
 	switch(address){
 		case NR10:
 			apu.channel1.sweep_period = ((value & 0x70) >> 4);

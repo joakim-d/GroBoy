@@ -178,8 +178,8 @@ void run(){
 				break;
 			case 0x21:
 				//LD HL, d16
-				ld_reg(&z80.H, memory_read(z80.PC++));
 				ld_reg(&z80.L, memory_read(z80.PC++));
+				ld_reg(&z80.H, memory_read(z80.PC++));
 				break;
 			case 0x22:
 				//LD (HL+), A
@@ -1757,20 +1757,24 @@ static inline void halfcarry_8bit_update(BYTE old_value, BYTE new_value, BYTE ty
 	BYTE old_nibble, new_nibble;
 	old_nibble = old_value & 0xF;
 	new_nibble = new_value & 0xF;
-	if(type == ADD)
+	if(type == ADD){
 		if(new_nibble < old_nibble) z80.F |= 0x20;
-	else
+	}
+	else{
 		if(new_nibble > old_nibble) z80.F |= 0x20;
+	}
 }
 
 static inline void halfcarry_16bit_update(unsigned short old_value, unsigned short new_value, BYTE type){
 	BYTE old_nibble, new_nibble;
 	old_nibble = (old_value & 0xF00)>>8;
 	new_nibble = (new_value & 0xF00)>>8;
-	if(type == ADD)
+	if(type == ADD){
 		if(new_nibble < old_nibble) z80.F |= 0x20;
-	else
+	}
+	else{
 		if(new_nibble > old_nibble) z80.F |= 0x20;
+	}
 }
 
 //-----------Misc/control instructions------------------
@@ -2063,14 +2067,11 @@ static inline void dec_sp(){
 
 static inline void dec_smpl(BYTE *reg1){
 	// Z 1 H -
-	printf("%d\n", *reg1);
-	*reg1--;
-	
-	printf("%d\n", *reg1);
 	if(z80.F & FLAG_C) z80.F = 0x50;
 	else z80.F = 0x40;
+	halfcarry_8bit_update(*reg1, *reg1 - 1, SUB);
+	*reg1 = *reg1 - 1;	
 	if(*reg1 == 0) z80.F |= FLAG_Z;
-	else if(*reg1 == 0x0F) z80.F |= FLAG_H;
 }
 
 static inline void inc_at(unsigned short addr){

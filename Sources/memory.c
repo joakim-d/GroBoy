@@ -8,7 +8,6 @@ void read_rom_info(char* rom_path){
 	fstat(file_d, &file_stat);
 
 	cartridge_rom_buffer = (BYTE *) malloc(file_stat.st_size);
-
 	read(file_d, cartridge_rom_buffer, file_stat.st_size);
 	close(file_d);
 
@@ -25,8 +24,8 @@ void read_rom_info(char* rom_path){
 		case 0x01: printf("MBC1");break;
 		case 0x02: printf("MBC1+RAM");break;
 		case 0x03: printf("MBC1+RAM+BATTERY");break;
-		case 0x05: printf("MBC2");alloc_ram_mem(0x200);break;
-		case 0x06: printf("MBC2+BATTERY");alloc_ram_mem(0x200);break;
+		case 0x05: printf("MBC2");break;
+		case 0x06: printf("MBC2+BATTERY");break;
 		case 0x08: printf("ROM+RAM");break;
 		case 0x09: printf("ROM+RAM+BATTERY");break;
 		case 0x0B: printf("MMM01");break;
@@ -54,17 +53,17 @@ void read_rom_info(char* rom_path){
 	}
 	printf("\nRom Size ");
 	switch(*(cartridge_rom_buffer + 0x0148)){
-		case 0x00: printf("32KB: 2 Banks");break;
-		case 0x01: printf("64KB: 4 Banks");break;
-		case 0x02: printf("128KB: 8 Banks");break;
-		case 0x03: printf("256KB: 16 Banks");break;
-		case 0x04: printf("512KB: 32 Banks");break;
-		case 0x05: printf("1MB: 64 Banks");break;
-		case 0x06: printf("2MB: 128 Banks");break;
-		case 0x07: printf("4MB: 256 Banks");break;
-		case 0x52: printf("1.1MB: 72 Banks");break;
-		case 0x53: printf("1.2MB: 80 Banks");break;
-		case 0x54: printf("1.5MB: 96 Banks");break;
+		case 0x00: printf("32KB: 2 Banks");alloc_ram_mem(0x8000);break;
+		case 0x01: printf("64KB: 4 Banks");alloc_ram_mem(0x10000);break;
+		case 0x02: printf("128KB: 8 Banks");alloc_ram_mem(0x20000);break;
+		case 0x03: printf("256KB: 16 Banks");alloc_ram_mem(0x40000);break;
+		case 0x04: printf("512KB: 32 Banks");alloc_ram_mem(0x80000);break;
+		case 0x05: printf("1MB: 64 Banks");alloc_ram_mem(0x100000);break;
+		case 0x06: printf("2MB: 128 Banks");alloc_ram_mem(0x200000);break;
+		case 0x07: printf("4MB: 256 Banks");alloc_ram_mem(0x400000);break;
+		case 0x52: printf("1.1MB: 72 Banks");alloc_ram_mem(0x120000);break;
+		case 0x53: printf("1.2MB: 80 Banks");alloc_ram_mem(0x140000);break;
+		case 0x54: printf("1.5MB: 96 Banks");alloc_ram_mem(0x180000);break;
 	}
 	printf("\nRam Size ");
 	switch(*(cartridge_rom_buffer + 0x0149)){
