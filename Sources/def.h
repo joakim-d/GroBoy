@@ -21,4 +21,16 @@
 #define BIT_7 0x80
 #define ADD 1
 #define SUB 0
+typedef struct {
+	unsigned short PC;
+	unsigned short SP;
+	unsigned char A;
+	unsigned char F;
+	unsigned char B;
+	unsigned char C;
+	unsigned char D;
+	unsigned char E;
+	unsigned char H;
+	unsigned char L;	
+} z80_t;
 #endif

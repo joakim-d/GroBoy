@@ -97,7 +97,6 @@ void gpu_update_stat(){
 			}
 		}
 		else{
-			printf("yo\n");
 			if(current_line == LY_MAX && (lcd_stat & 0x10))
 				make_request(V_BLANK);
 			draw_screen();
@@ -360,7 +359,7 @@ void draw_screen()
 			for(int j=0; j<160; j++)
 			{
 				position.x=j;
-				printf("%d", gpu_screen[i][j]);
+				//printf("%d", gpu_screen[i][j]);
 				sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
 				if(gpu_screen[i][j] == 0)
 					SDL_FillRect(sdl_matrix[i][j], NULL, SDL_MapRGB(sdl_screen->format, 0, 0, 0)); // Dessin
@@ -373,7 +372,7 @@ void draw_screen()
 
 				SDL_BlitSurface(sdl_matrix[i][j], NULL, sdl_screen, &position); // Collage 
 			}
-			printf("\n");
+			//printf("\n");
 		}
 		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
 		SDL_Delay(16);

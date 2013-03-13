@@ -1739,7 +1739,7 @@ void run(){
 				break;
 		}
 		gpu_update(cycles);	
-		handle_interrupts(cycles);
+		handle_interrupts(&z80);
 
 		/*if(Counter<=0)
 		  {

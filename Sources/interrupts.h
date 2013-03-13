@@ -1,7 +1,6 @@
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 #include "def.h"
-#include "cpu.h"
 #include "memory.h"
 #define V_BLANK 0
 #define LCD_STAT 1
@@ -11,7 +10,7 @@
 BYTE IME; // Interrupt Master Enable Flag (Si flag = 0 -> aucune interruption tolérée, si Flag = 1 interruptions tolérées)
 void set_IME();
 void reset_IME();
-void handle_interrupts(BYTE cycles);
-void execute_interrupt(BYTE type);
+void handle_interrupts(z80_t *z80);
+void execute_interrupt(BYTE type, z80_t *z80);
 void make_request(BYTE type);
 #endif

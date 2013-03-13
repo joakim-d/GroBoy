@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <SDL/SDL.h>
 #include "def.h"
+#include "cpu.h"
 #include "memory.h"
 #include "interrupts.h"
 #define LY_VISIBLE_MAX 144
