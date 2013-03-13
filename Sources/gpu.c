@@ -120,48 +120,49 @@ void gpu_drawline(){
 	BYTE sprite_size;
 	BYTE sprite_sets;
 	BYTE sprite_x;
+	BYTE scy;
+	BYTE scx;
 	lcd_cont = memory_read(0xFF40);
 	current_line;
 	if(lcd_cont & 0x01){ //Si background établi
-		bg_y = current_line + memory_read(0xFF42); 	//On récupère la ligne du background à dessiner
-		bg_x = memory_read(0xFF43);			//On récupère la colonne du bg à dessiner
+		
+		scy = memory_read(0xFF42);
+		scx = memory_read(0xFF43);
+		bg_y = ((current_line + scy)/8)%32; 	//On récupère la ligne du background à dessiner
+		bg_x = scx/8;			//On récupère la colonne du bg à dessiner
 
 		tile.palette = memory_read(0xFF47);
 		tile.x_flip = 0;
 		tile.y_flip = 0;
+		
+		//printf("%d\n", bg_y*32 + bg_x);
 
-		cur_tile_nb = (bg_y*4) + (bg_x/8);		// Calcul pour savoir quelle tuile : (num_Ligne/8px * 32) + (num_colonne/8)
 		if(lcd_cont & 0x08)				// On regarde quelle est la background map			
-			get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, BACKGROUND);	// On récupère la tuile correspondante	
+			get_tile(memory_read(0x9C00 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
 		else
-			get_tile(memory_read(cur_tile_nb + 0x9800), &tile, BACKGROUND);	// On récupère la tuile correspondante	
-
-		cur_tile_px_x = bg_x % 8;			//On récupère la position en x du pixel sur la tuile à dessiner
-		cur_tile_px_y = bg_y % 8;			//On récupère la position en y du pixel sur la tuile à dessiner
+			get_tile(memory_read(0x9800 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
+		/*int i,j;
+		for(i = 0x9800; i < 0x9FFF;i++){
+			printf("%d\n", memory_read(i));
+		}*/
+		cur_tile_px_x = (scx) % 8;			//On récupère la position en x du pixel sur la tuile à dessiner
+		cur_tile_px_y = (scy+current_line) % 8;		//On récupère la position en y du pixel sur la tuile à dessiner
 
 		while(current_pixel < 160){			//On parcourt toute la ligne
 			gpu_screen[current_line][current_pixel++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
-			bg_x++;
 			if(cur_tile_px_x > 7){ 
 				cur_tile_px_x = 0;
-				cur_tile_nb++;
+				bg_x = (bg_x + 1)%32;
+				//printf("%d\n", bg_y*32 + bg_x);
 				if(lcd_cont & 0x08)				// On regarde quelle est la background map			
-					get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, BACKGROUND);	// On récupère la tuile correspondante	
+					get_tile(memory_read(0x9C00 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
 				else
-					get_tile(memory_read(cur_tile_nb + 0x9800), &tile, BACKGROUND);	// On récupère la tuile correspondante	
-			}
-			if(bg_x > 255){
-				bg_x = 0;
-				cur_tile_nb = bg_y*4;
-				if(lcd_cont & 0x08)				// On regarde quelle est la background map			
-					get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, BACKGROUND);	// On récupère la tuile correspondante	
-				else
-					get_tile(memory_read(cur_tile_nb + 0x9800), &tile, BACKGROUND);	// On récupère la tuile correspondante	
+					get_tile(memory_read(0x9800 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
 			}
 		}
 	}
 	if(lcd_cont & 0x20){ //Si Window établie
-		window_y = memory_read(0xFF4A);
+	/*	window_y = memory_read(0xFF4A);
 		window_x = memory_read(0xFF4B) - 7;
 		if(current_line >= window_y && window_x < 160){
 
@@ -191,9 +192,10 @@ void gpu_drawline(){
 				}
 			}
 
-		}
+		}*/
 	}
 	if(lcd_cont & 0x02){ //Si Sprites établis
+		/*
 		displyd_sprites_nb = 0;
 		for(i = 0xFE00; i < 0xFE9F; i+= 4){//préparation des sprites pour le tri et récupération des sprites à afficher
 			if(current_line >= memory_read(i) && current_line <= memory_read(i) + 7){ //memory_read(i) correspond à la pos en y du sprite
@@ -228,7 +230,7 @@ void gpu_drawline(){
 						gpu_screen[current_line][sprite_x + i] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
 				}
 			}
-		}
+		}*/
 	}
 }
 
@@ -317,7 +319,6 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 
 		for(int i=0; i<size; i++)
 		{
-			cpt = 0;
 			for(int j=7; j=0; j++)
 			{
 				tempflip[i][cpt] = tile->px[i][j];
