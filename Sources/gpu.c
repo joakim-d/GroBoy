@@ -42,10 +42,7 @@ void gpu_update_line(){
 			memory_write(0xFF44, current_line);
 			line_counter %= ONE_LINE_CYCLES;
 		}
-		if(current_line == LY_VISIBLE_MAX){
-			make_request(V_BLANK);
-		}
-		else if(current_line >= LY_MAX){
+		if(current_line >= LY_MAX){
 			line_counter = 0;
 			memory_write(0xFF44, 0);
 		}
@@ -97,7 +94,7 @@ void gpu_update_stat(){
 			}
 		}
 		else{
-			if(current_line == LY_MAX && (lcd_stat & 0x10))
+			if(current_line == LY_VISIBLE_MAX && (lcd_stat & 0x10))
 				make_request(V_BLANK);
 			draw_screen();
 		}
@@ -141,10 +138,10 @@ void gpu_drawline(){
 			get_tile(memory_read(0x9C00 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
 		else
 			get_tile(memory_read(0x9800 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
-		/*int i,j;
-		for(i = 0x9800; i < 0x9FFF;i++){
-			printf("%d\n", memory_read(i));
-		}*/
+		int i,j;
+		for(i = 0x8000; i < 0x9FFF;i++){
+		//	printf("%d\n", memory_read(i));
+		}
 		cur_tile_px_x = (scx) % 8;			//On récupère la position en x du pixel sur la tuile à dessiner
 		cur_tile_px_y = (scy+current_line) % 8;		//On récupère la position en y du pixel sur la tuile à dessiner
 

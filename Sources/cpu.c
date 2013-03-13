@@ -29,6 +29,7 @@ void run(){
 			printf("instruction : %d\n", i++);
 			printf("PC: %x\n", z80.PC);
 			printf("Opcode :%x\n",op_code);
+			//printf("The next two bytes in memory are: %x, %x\n", memory_read(z80.PC + 1), memory_read(z80.PC + 2));
 			printf("AF: %x\n", (z80.A << 8) + z80.F);
 			printf("BC: %x\n", (z80.B << 8) + z80.C);
 			printf("DE: %x\n", (z80.D << 8) + z80.E);

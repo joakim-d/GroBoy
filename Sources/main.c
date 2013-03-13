@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include "cpu.h"
 #include "memory.h"
+#include "interrupts.h"
 int main(int argc, char * argv[]){
 	memory_init(argv[1]);
 	sound_init();
 	cpu_init();
 	gpu_init();
+	interrupts_init();
 	run();
 	
 	return 0;
