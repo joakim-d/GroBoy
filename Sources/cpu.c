@@ -1780,10 +1780,10 @@ static inline void halfcarry_16bit_update(unsigned short old_value, unsigned sho
 //-----------Misc/control instructions------------------
 
 static inline void di(){
-	memory_write(0xFFFF, 0);
+	reset_IME();
 }
 static inline void ei(){
-	memory_write(0xFFFF, 1);
+	set_IME();
 }
 static inline void halt(){
 
@@ -1889,7 +1889,7 @@ static inline void reti(){
 	//PLUS FLAG IF
 	z80.PC = (memory_read(z80.SP + 1) << 8) + memory_read(z80.SP);
 	z80.SP += 2;
-	ei();
+	set_IME();
 }
 
 static inline void rst(BYTE addr){
