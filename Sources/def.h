@@ -1,6 +1,6 @@
 #ifndef DEF_H
 #define DEF_H
-#define DEBUG 1
+#define DEBUG 0
 #define BYTE unsigned char
 #define BYTE_S char
 #define FLAG_Z 0x80

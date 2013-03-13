@@ -838,7 +838,7 @@ void run(){
 				jp_cond(0x80);
 				break;
 			case 0xCB: //Two bytes Opcode
-				op_code = rom_buffer[z80.PC++];
+				op_code = memory_read(z80.PC++);
 				switch(op_code){
 					case 0x00: //RLC B
 						rlc(&z80.B);
@@ -1902,6 +1902,7 @@ static inline void rst(BYTE addr){
 //--------8bit load/store/move instructions
 
 static inline void ld_reg(BYTE *reg, BYTE data){
+	//printf("%d\n",data);
 	*reg = data;
 }
 static inline void ld_mem(unsigned short addr, BYTE data){
