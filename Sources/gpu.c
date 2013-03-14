@@ -5,16 +5,14 @@ void gpu_init(){
 	current_mode = 2;
 	current_line = 0;
 	//fonctions SDL
-	if(!DEBUG){
 
-		if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
-		{
-			fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
-			exit(EXIT_FAILURE); // On quitte le programme
-		}
-		sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE);
-		SDL_WM_SetCaption("Groboy", NULL);
+	if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
+	{
+		fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
+		exit(EXIT_FAILURE); // On quitte le programme
 	}
+	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE);
+	SDL_WM_SetCaption("Groboy", NULL);
 }
 void gpu_update(int cycles){ //fonction appelée en premier
 	line_counter += cycles;
@@ -87,9 +85,10 @@ void gpu_update_stat(){
 			}
 		}
 		else{
-			if(current_line == LY_VISIBLE_MAX && (lcd_stat & 0x10))
-				make_request(V_BLANK);
-			draw_screen();
+			if(current_line == LY_VISIBLE_MAX){
+				if(lcd_stat & 0x10) make_request(V_BLANK);
+				draw_screen();
+			}
 		}
 	}
 }
@@ -124,7 +123,7 @@ void gpu_drawline(){
 		tile.palette = memory_read(0xFF47);
 		tile.x_flip = 0;
 		tile.y_flip = 0;
-		
+
 		//printf("%d\n", bg_y*32 + bg_x);
 
 		if(lcd_cont & 0x08)				// On regarde quelle est la background map			
@@ -150,74 +149,74 @@ void gpu_drawline(){
 	}
 	if(lcd_cont & 0x20){ //Si Window établie
 		/*window_y = memory_read(0xFF4A);
-		window_x = memory_read(0xFF4B) - 7;
-		if(current_line >= window_y && window_x < 160){
+		  window_x = memory_read(0xFF4B) - 7;
+		  if(current_line >= window_y && window_x < 160){
 
-			tile.palette = memory_read(0xFF47);
-			tile.x_flip = 0;
-			tile.y_flip = 0;
-			cur_tile_nb = ((window_y - current_line)*4) + (window_x/8);
-			if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-				get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-			else
-				get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+		  tile.palette = memory_read(0xFF47);
+		  tile.x_flip = 0;
+		  tile.y_flip = 0;
+		  cur_tile_nb = ((window_y - current_line)*4) + (window_x/8);
+		  if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+		  get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+		  else
+		  get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
 
-			cur_tile_px_x = window_x % 8;
-			cur_tile_px_y = window_y % 8;
+		  cur_tile_px_x = window_x % 8;
+		  cur_tile_px_y = window_y % 8;
 
-			while(window_x < 160){	//On parcourt toute la ligne
-				if(window_x>=0)
-					gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
-				window_x++;
-				if(cur_tile_px_x > 7){ 
-					cur_tile_px_x = 0;
-					cur_tile_nb++;
-					if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-						get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-					else
-						get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
-				}
-			}
+		  while(window_x < 160){	//On parcourt toute la ligne
+		  if(window_x>=0)
+		  gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
+		  window_x++;
+		  if(cur_tile_px_x > 7){ 
+		  cur_tile_px_x = 0;
+		  cur_tile_nb++;
+		  if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+		  get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+		  else
+		  get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+		  }
+		  }
 
-		}*/
+		  }*/
 	}
 	if(lcd_cont & 0x02){ //Si Sprites établis
 		/*
-		displyd_sprites_nb = 0;
-		for(i = 0xFE00; i < 0xFE9F; i+= 4){//préparation des sprites pour le tri et récupération des sprites à afficher
-			if(current_line >= memory_read(i) && current_line <= memory_read(i) + 7){ //memory_read(i) correspond à la pos en y du sprite
-				tried_sprites[displyd_sprites_nb++] = i;
-			}
-		}
-		i = 0;
-		while(i < displyd_sprites_nb - 1){//tri des sprites
-			if(memory_read(tried_sprites[i + 1] + 1) < memory_read(tried_sprites[i] + 1)){ //on compare la pos en x des deux sprites
-				while(memory_read(tried_sprites[i + 1] + 1) < memory_read(tried_sprites[i] + 1)){
-					temp_sprite = tried_sprites[i];
-					tried_sprites[i] = tried_sprites[i+1];
-					tried_sprites[i+1] = temp_sprite;
-					i--;
-				}
-				i = 0;
-			}
-			else i++;
-		}
-		for(i = displyd_sprites_nb - 1; i >= 0; i--){//affichage des sprites
-			sprite_sets = memory_read(tried_sprites[i] + 3); 	//caractéristiques du sprite
-			sprite_x = memory_read(tried_sprites[i] + 1);		//position en x du sprite sur l'écran
-			tile.x_flip = sprite_sets & 0x20;			//si il y'a un flip horizontal	
-			tile.y_flip = sprite_sets & 0x40;			//si il y'a un flip vertical
-			if(sprite_sets & 0x10)	tile.palette = memory_read(0xFF48);
-			else tile.palette = memory_read(0xFF49);
-			get_tile(memory_read(tried_sprites[i] + 2), &tile, SPRITES);
-			cur_tile_px_y = (current_line - memory_read(tried_sprites[i])) % 8;
-			for(j = 0; j < 8; j++){
-				if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
-					if(sprite_sets & 0x80 || gpu_screen[current_line][sprite_x + i] == 0)	//si le sprite est dessus ou que le background est à 0
-						gpu_screen[current_line][sprite_x + i] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
-				}
-			}
-		}*/
+		   displyd_sprites_nb = 0;
+		   for(i = 0xFE00; i < 0xFE9F; i+= 4){//préparation des sprites pour le tri et récupération des sprites à afficher
+		   if(current_line >= memory_read(i) && current_line <= memory_read(i) + 7){ //memory_read(i) correspond à la pos en y du sprite
+		   tried_sprites[displyd_sprites_nb++] = i;
+		   }
+		   }
+		   i = 0;
+		   while(i < displyd_sprites_nb - 1){//tri des sprites
+		   if(memory_read(tried_sprites[i + 1] + 1) < memory_read(tried_sprites[i] + 1)){ //on compare la pos en x des deux sprites
+		   while(memory_read(tried_sprites[i + 1] + 1) < memory_read(tried_sprites[i] + 1)){
+		   temp_sprite = tried_sprites[i];
+		   tried_sprites[i] = tried_sprites[i+1];
+		   tried_sprites[i+1] = temp_sprite;
+		   i--;
+		   }
+		   i = 0;
+		   }
+		   else i++;
+		   }
+		   for(i = displyd_sprites_nb - 1; i >= 0; i--){//affichage des sprites
+		   sprite_sets = memory_read(tried_sprites[i] + 3); 	//caractéristiques du sprite
+		   sprite_x = memory_read(tried_sprites[i] + 1);		//position en x du sprite sur l'écran
+		   tile.x_flip = sprite_sets & 0x20;			//si il y'a un flip horizontal	
+		   tile.y_flip = sprite_sets & 0x40;			//si il y'a un flip vertical
+		   if(sprite_sets & 0x10)	tile.palette = memory_read(0xFF48);
+		   else tile.palette = memory_read(0xFF49);
+		   get_tile(memory_read(tried_sprites[i] + 2), &tile, SPRITES);
+		   cur_tile_px_y = (current_line - memory_read(tried_sprites[i])) % 8;
+		   for(j = 0; j < 8; j++){
+		   if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
+		   if(sprite_sets & 0x80 || gpu_screen[current_line][sprite_x + i] == 0)	//si le sprite est dessus ou que le background est à 0
+		   gpu_screen[current_line][sprite_x + i] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
+		   }
+		   }
+		   }*/
 	}
 }
 
@@ -342,22 +341,20 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 
 void draw_screen()
 {
-	if(!DEBUG){
-		for(int i=0; i<144; i++)
+	for(int i=0; i<144; i++)
+	{
+		for(int j=0; j<160; j++)
 		{
-			for(int j=0; j<160; j++)
-			{
-				if(gpu_screen[i][j] == 0)
-					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 255,255,255);
-				else if(gpu_screen[i][j] == 1)
-					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 170,170,170);
-				else if(gpu_screen[i][j] == 2)
-					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 85,85,85);
-				else 
-					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 0,0,0);
-			}
+			if(gpu_screen[i][j] == 0)
+				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 255,255,255);
+			else if(gpu_screen[i][j] == 1)
+				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 170,170,170);
+			else if(gpu_screen[i][j] == 2)
+				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 85,85,85);
+			else 
+				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 0,0,0);
 		}
-		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-		SDL_Delay(16);
 	}
+	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
+	SDL_Delay(16);
 }
