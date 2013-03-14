@@ -5,6 +5,6 @@
 #include "memory.h"
 #define CLOCK_SPEED 4194304
 #define DIVIDER_TIMER_SPEED CLOCK_SPEED/16384
-static const int tac_speed[] = {CLOCK_SPEED / 4096, CLOCK_SPEED/262144, CLOCK_SPEED/65536, CLOCK_SPEED/16384};
-static inline void handle_timer(BYTE cycles);
+static const int tac_speed[] = {4096, 262144, 65536, 16384};
+void timer_update(BYTE cycles);
 #endif

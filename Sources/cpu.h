@@ -13,11 +13,12 @@
 #include "sound.h"
 #include "interrupts.h"
 #include "joypad.h"
+#include "timer.h"
 void run();
 void cpu_init();
 unsigned char *rom_buffer;
 int cycles;
-
+BYTE halted;
 static const BYTE z80_cycles[] = {
 4, 12, 8, 8, 4, 4, 8, 4, 20, 8, 8, 8, 4, 4, 8, 4, 
 4, 12, 8, 8, 4, 4, 8, 4, 12, 8, 8, 8, 4, 4, 8, 4,
@@ -55,6 +56,7 @@ static const BYTE z80_cb_cycles[] = {
 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8
 };
 
+void reset_halt();
 
 //Misc/control instructions
 static inline void di();

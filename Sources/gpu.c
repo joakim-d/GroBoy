@@ -4,7 +4,6 @@ void gpu_init(){
 	clock_counter = 0;
 	current_mode = 2;
 	current_line = 0;
-	already_drawed = 0;
 	//fonctions SDL
 
 	if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
@@ -16,35 +15,24 @@ void gpu_init(){
 	SDL_WM_SetCaption("Groboy", NULL);
 }
 void gpu_update(int cycles){ //fonction appelée en premier
-	clock_counter += cycles;
-	gpu_update_line();
-	gpu_update_stat();
-}
-
-void gpu_update_line(){
 	BYTE lcdc;
-	lcdc = memory_read(0xFF40);
-	current_line = memory_read(0xFF44);
-	if(lcdc & 0x80){
-		if(clock_counter > ONE_LINE_CYCLES){ //dépassement du temps pour générer une ligne
+	clock_counter += cycles;
+	if(clock_counter > ONE_LINE_CYCLES){
+		lcdc = memory_read(0xFF40);
+		if(lcdc & 0x80){
+			current_line = memory_read(0xFF44);
 			if(current_line < LY_VISIBLE_MAX){//Si la ligne est dans le "champ de vision" 
 				gpu_drawline();
 			}
 			current_line++;
-			memory_write(0xFF44, current_line);
 			clock_counter %= ONE_LINE_CYCLES;
-		}
-		if(current_line == LY_VISIBLE_MAX && !already_drawed){
-			draw_screen();
-			already_drawed = 1;
-
-		}
-		else if(current_line >= LY_MAX){
-			clock_counter = 0;
-			memory_write(0xFF44, 0);
-			already_drawed = 0;
+			
+			if(current_line == LY_VISIBLE_MAX) draw_screen();
+			else if(current_line >= LY_MAX)	current_line = 0;
+			memory_write(0xFF44, current_line);
 		}
 	}
+	gpu_update_stat();
 }
 
 void gpu_update_stat(){
@@ -136,7 +124,6 @@ void gpu_drawline(){
 			get_tile(memory_read(0x9C00 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
 		else
 			get_tile(memory_read(0x9800 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
-		int i,j;
 
 		cur_tile_px_x = (scx) % 8;			//On récupère la position en x du pixel sur la tuile à dessiner
 		cur_tile_px_y = (scy+current_line) % 8;		//On récupère la position en y du pixel sur la tuile à dessiner
@@ -260,7 +247,7 @@ void get_tile(BYTE num, tile_t *tile, int type){
 	}
 	else{
 		size = 8;
-		if(lcd_cont & 0x10){pos = 0x8000 + (num * 16);}
+		if(lcd_cont & 0x10) pos = 0x8000 + (num * 16);
 		else {
 			BYTE_S num_s = (BYTE_S) num;
 			pos = 0x8800 + (num_s + 128) * 16;
@@ -276,21 +263,18 @@ void get_tile(BYTE num, tile_t *tile, int type){
 			if(byte1 & (1<<(7-i))) tile->px[lig][i] = 1;
 			else tile->px[lig][i]=0;
 			if(byte2 & (1<<(7-i))) tile->px[lig][i] |= 2;
+
+			if(tile->px[lig][i] == 0 && type != SPRITES) tile->px[lig][i] = tile->palette & 0x03;
+			else if(tile->px[lig][i] == 1) tile->px[lig][i] = (tile->palette & 0x0C) >> 2;
+			else if(tile->px[lig][i] == 2) tile->px[lig][i] = (tile->palette & 0x30) >> 4;
+			else tile->px[lig][i] = (tile->palette & 0xC0) >> 6;
 		}
 		lig++;
 	}
 
-	if(tile->x_flip !=0 )tile_flip(tile,0,size);
-	if(tile->y_flip !=0 )tile_flip(tile,1,size);
+	if(tile->x_flip)tile_flip(tile,0,size);
+	if(tile->y_flip)tile_flip(tile,1,size);
 
-	for(i = 0; i < size; i++){
-		for(j = 0; j < 8; j++){
-			if(tile->px[i][j] == 0 && type != SPRITES) tile->px[i][j] = tile->palette & 0x03;
-			else if(tile->px[i][j] == 1) tile->px[i][j] = (tile->palette & 0x0C) >> 2;
-			else if(tile->px[i][j] == 2) tile->px[i][j] = (tile->palette & 0x30) >> 4;
-			else tile->px[i][j] = (tile->palette & 0xC0) >> 6;
-		}
-	}
 	tile->size = size;
 }
 

@@ -1,6 +1,7 @@
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 #include "def.h"
+#include "cpu.h"
 #include "memory.h"
 #define V_BLANK 0
 #define LCD_STAT 1

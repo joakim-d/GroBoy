@@ -22,7 +22,6 @@ typedef struct{
 }tile_t;
 
 int clock_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
-BYTE already_drawed;
 BYTE current_mode;
 BYTE current_line;
 BYTE gpu_screen[144][160];

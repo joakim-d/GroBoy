@@ -1,6 +1,6 @@
 #include "timer.h"
 
-static inline void handle_timer(BYTE cycles){
+void timer_update(BYTE cycles){
 	static unsigned int div_timer = 0;
 	static unsigned int tac_timer = 0;
 	BYTE timer_control;
