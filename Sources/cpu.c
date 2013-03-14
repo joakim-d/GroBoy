@@ -47,8 +47,8 @@ void run(){
 				break;
 			case 0x01:
 				//LD BC,d16
-				ld_reg(&z80.B, memory_read(z80.PC++));
 				ld_reg(&z80.C, memory_read(z80.PC++));
+				ld_reg(&z80.B, memory_read(z80.PC++));
 				break;
 			case 0x02:
 				//LD (BC),A
@@ -114,8 +114,8 @@ void run(){
 				break;
 			case 0x11:
 				//LD DE, d16
-				ld_reg(&z80.D, memory_read(z80.PC++));
 				ld_reg(&z80.E, memory_read(z80.PC++));
+				ld_reg(&z80.D, memory_read(z80.PC++));
 				break;
 			case 0x12:
 				//LD (DE), A
@@ -1683,8 +1683,8 @@ void run(){
 			case 0xE8: //ADD SP,r8
 				add_sp_r8(memory_read(z80.PC++));
 				break;
-			case 0xE9: //JP (HL)
-				jp(memory_read((z80.H << 8) + z80.L));	
+			case 0xE9: //JP (HL) -> c'est une feinte l'expression devrait être marqué JP HL
+				jp((z80.H << 8) + z80.L);	
 				break;
 			case 0xEA: //LD (a16),A
 				ld_at((memory_read(z80.PC + 1) << 8) + memory_read(z80.PC));
@@ -1730,7 +1730,6 @@ void run(){
 				break;
 			case 0xFB: //EI
 				ei();
-				printf("yo\n");
 				break;
 			case 0xFE: //CP d8
 				cp(memory_read(z80.PC++));
@@ -1947,8 +1946,8 @@ static inline void ld_sp(unsigned short data){
 }
 
 static inline void pop(BYTE *reg1, BYTE *reg2){
-	*reg1 = memory_read(z80.SP);
-	*reg2 = memory_read(z80.SP + 1);
+	*reg1 = memory_read(z80.SP + 1);
+	*reg2 = memory_read(z80.SP);
 	z80.SP += 2;
 }
 
@@ -2148,7 +2147,7 @@ static inline void add_dbl(BYTE *reg1, BYTE *reg2, unsigned short data){
 	unsigned short op = r1r2 + data;
 	if(z80.F & FLAG_Z) z80.F = 0x80;
 	else z80.F = 0;
-	if (data < r1r2) z80.F |= 0x10;
+	if (op < r1r2) z80.F |= 0x10;
  	halfcarry_16bit_update(r1r2, op, ADD);
 	*reg1 =( 0xFF00 & op) >> 8;
 	*reg2 =( 0x00FF & op);
@@ -2182,7 +2181,7 @@ static inline void inc_dbl(BYTE *reg1, BYTE *reg2){
 static inline void bit(BYTE bit, BYTE data){
 	if(z80.F & 0x10) z80.F = 0x30;
 	else z80.F = 0x20;
-	if(data & bit) z80.F |= 0x80;
+	if(!(data & bit)) z80.F |= 0x80;
 }
 
 static inline void res(BYTE b, BYTE *a) 
