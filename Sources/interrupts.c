@@ -1,7 +1,7 @@
 #include "interrupts.h"
 
 void interrupts_init(){
-	IME = 0;
+	IME = 1;
 }
 
 void set_IME(){
@@ -45,7 +45,6 @@ void handle_interrupts(z80_t *z80){
 void make_request(BYTE type){
 	switch(type){
 		case V_BLANK:
-			printf("yo\n");
 			memory_write(0xFF0F, memory_read(0xFF0F) | 0x01);
 			break;
 		case LCD_STAT:

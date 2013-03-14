@@ -12,6 +12,7 @@
 #include "gpu.h"
 #include "sound.h"
 #include "interrupts.h"
+#include "joypad.h"
 void run();
 void cpu_init();
 unsigned char *rom_buffer;

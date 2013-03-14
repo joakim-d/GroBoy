@@ -28,7 +28,7 @@ void run(){
 		if(DEBUG){
 			printf("instruction : %d\n", i++);
 			printf("PC: %x\n", z80.PC);
-			printf("Opcode :%x\n",op_code);
+			printf("Opcode :%x + next 2 bytes: %x, %x\n",op_code, memory_read(z80.PC + 1), memory_read(z80.PC + 2));
 			//printf("The next two bytes in memory are: %x, %x\n", memory_read(z80.PC + 1), memory_read(z80.PC + 2));
 			printf("AF: %x\n", (z80.A << 8) + z80.F);
 			printf("BC: %x\n", (z80.B << 8) + z80.C);
@@ -1729,7 +1729,8 @@ void run(){
 				z80.PC +=2;
 				break;
 			case 0xFB: //EI
-
+				ei();
+				printf("yo\n");
 				break;
 			case 0xFE: //CP d8
 				cp(memory_read(z80.PC++));
@@ -1740,6 +1741,7 @@ void run(){
 				break;
 		}
 		gpu_update(cycles);	
+		joypad_update();
 		handle_interrupts(&z80);
 
 		/*if(Counter<=0)
