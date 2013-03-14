@@ -1,9 +1,10 @@
 #include "gpu.h"
 
 void gpu_init(){
-	line_counter = 0;
+	clock_counter = 0;
 	current_mode = 2;
 	current_line = 0;
+	already_drawed = 0;
 	//fonctions SDL
 
 	if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
@@ -11,11 +12,11 @@ void gpu_init(){
 		fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
 		exit(EXIT_FAILURE); // On quitte le programme
 	}
-	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE);
+	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
 	SDL_WM_SetCaption("Groboy", NULL);
 }
 void gpu_update(int cycles){ //fonction appelée en premier
-	line_counter += cycles;
+	clock_counter += cycles;
 	gpu_update_line();
 	gpu_update_stat();
 }
@@ -25,17 +26,23 @@ void gpu_update_line(){
 	lcdc = memory_read(0xFF40);
 	current_line = memory_read(0xFF44);
 	if(lcdc & 0x80){
-		if(line_counter > ONE_LINE_CYCLES){ //dépassement du temps pour générer une ligne
+		if(clock_counter > ONE_LINE_CYCLES){ //dépassement du temps pour générer une ligne
 			if(current_line < LY_VISIBLE_MAX){//Si la ligne est dans le "champ de vision" 
 				gpu_drawline();
 			}
 			current_line++;
 			memory_write(0xFF44, current_line);
-			line_counter %= ONE_LINE_CYCLES;
+			clock_counter %= ONE_LINE_CYCLES;
 		}
-		if(current_line >= LY_MAX){
-			line_counter = 0;
+		if(current_line == LY_VISIBLE_MAX && !already_drawed){
+			draw_screen();
+			already_drawed = 1;
+
+		}
+		else if(current_line >= LY_MAX){
+			clock_counter = 0;
 			memory_write(0xFF44, 0);
+			already_drawed = 0;
 		}
 	}
 }
@@ -61,7 +68,7 @@ void gpu_update_stat(){
 	}
 	if(lcdc & 0x80){
 		if(current_line < LY_VISIBLE_MAX){ 
-			if(line_counter < 80){
+			if(clock_counter < 80){
 				//Mode 2 The LCD controller is reading from OAM memory.
 				lcd_stat &= 0xFC;
 				lcd_stat |= 0x02;
@@ -70,7 +77,7 @@ void gpu_update_stat(){
 					make_request(LCD_STAT);
 				}
 			}
-			else if(line_counter < 172){
+			else if(clock_counter < 172){
 				//Mode 3 The LCD controller is reading from both OAM and VRAM
 				lcd_stat |= 0x03;
 				memory_write(0xFF41, lcd_stat);	
@@ -85,9 +92,8 @@ void gpu_update_stat(){
 			}
 		}
 		else{
-			if(current_line == LY_VISIBLE_MAX){
-				if(lcd_stat & 0x10) make_request(V_BLANK);
-				draw_screen();
+			if(current_line == LY_VISIBLE_MAX && (lcd_stat & 0x10)){
+				make_request(V_BLANK);
 			}
 		}
 	}
