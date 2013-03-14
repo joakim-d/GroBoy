@@ -112,8 +112,9 @@ void gpu_drawline(){
 	BYTE sprite_x;
 	BYTE scy;
 	BYTE scx;
+
 	lcd_cont = memory_read(0xFF40);
-	current_line;
+
 	if(lcd_cont & 0x01){ //Si background établi
 		scy = memory_read(0xFF42);
 		scx = memory_read(0xFF43);
@@ -131,9 +132,7 @@ void gpu_drawline(){
 		else
 			get_tile(memory_read(0x9800 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
 		int i,j;
-		for(i = 0x8000; i < 0x9FFF;i++){
-		//	printf("%d\n", memory_read(i));
-		}
+
 		cur_tile_px_x = (scx) % 8;			//On récupère la position en x du pixel sur la tuile à dessiner
 		cur_tile_px_y = (scy+current_line) % 8;		//On récupère la position en y du pixel sur la tuile à dessiner
 
@@ -142,7 +141,6 @@ void gpu_drawline(){
 			if(cur_tile_px_x > 7){ 
 				cur_tile_px_x = 0;
 				bg_x = (bg_x + 1)%32;
-				//printf("%d\n", bg_y*32 + bg_x);
 				if(lcd_cont & 0x08)				// On regarde quelle est la background map			
 					get_tile(memory_read(0x9C00 + bg_y*32 + bg_x), &tile, BACKGROUND);	// On récupère la tuile correspondante	
 				else
@@ -151,7 +149,7 @@ void gpu_drawline(){
 		}
 	}
 	if(lcd_cont & 0x20){ //Si Window établie
-	/*	window_y = memory_read(0xFF4A);
+		/*window_y = memory_read(0xFF4A);
 		window_x = memory_read(0xFF4B) - 7;
 		if(current_line >= window_y && window_x < 160){
 
@@ -233,10 +231,10 @@ void get_tile(BYTE num, tile_t *tile, int type){
 	int i,j;
 	unsigned short bg_wd_table_addr; //table du background & window
 	BYTE palette;
-	BYTE byte1,byte2,pos; 
+	BYTE byte1,byte2; 
 	BYTE lcd_cont;
 	int pt;
-
+	unsigned short pos;
 	lcd_cont = memory_read(0xFF40);
 	if (lcd_cont & 0x10) bg_wd_table_addr = 0x8000;
 	else bg_wd_table_addr = 0x8800;
@@ -257,7 +255,7 @@ void get_tile(BYTE num, tile_t *tile, int type){
 	}
 	else{
 		size = 8;
-		if(lcd_cont & 0x10) pos = 0x8000 + (num * 16);
+		if(lcd_cont & 0x10){pos = 0x8000 + (num * 16);}
 		else {
 			BYTE_S num_s = (BYTE_S) num;
 			pos = 0x8800 + (num_s + 128) * 16;
