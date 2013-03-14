@@ -119,7 +119,8 @@ void run(){
 				break;
 			case 0x12:
 				//LD (DE), A
-				ld_mem(memory_read((z80.D << 8)+z80.E), z80.A);
+				ld_mem((z80.D << 8)+z80.E, z80.A);
+				//printf("%x\n", memory_read((z80.D << 8)+z80.E));
 				break;
 			case 0x13:
 				//INC DE

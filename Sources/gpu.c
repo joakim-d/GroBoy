@@ -14,13 +14,6 @@ void gpu_init(){
 		}
 		sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE);
 		SDL_WM_SetCaption("Groboy", NULL);
-		for(int i=0; i<144; i++)
-		{
-			for(int j=0; j<160; j++)
-			{
-				sdl_matrix[i][j] = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0, 0, 0, 0);
-			}
-		}
 	}
 }
 void gpu_update(int cycles){ //fonction appelée en premier
@@ -122,7 +115,6 @@ void gpu_drawline(){
 	lcd_cont = memory_read(0xFF40);
 	current_line;
 	if(lcd_cont & 0x01){ //Si background établi
-		
 		scy = memory_read(0xFF42);
 		scx = memory_read(0xFF43);
 		bg_y = ((current_line + scy)/8)%32; 	//On récupère la ligne du background à dessiner
@@ -236,14 +228,14 @@ void gpu_drawline(){
 //type 2 -> background
 //type 3 -> window
 void get_tile(BYTE num, tile_t *tile, int type){
-	int size = 8;// 8x8 ou 8x16
-	int lig = 0;
+	int size;// 8x8 ou 8x16
+	int lig;
 	int i,j;
 	unsigned short bg_wd_table_addr; //table du background & window
 	BYTE palette;
 	BYTE byte1,byte2,pos; 
 	BYTE lcd_cont;
-	BYTE pt;
+	int pt;
 
 	lcd_cont = memory_read(0xFF40);
 	if (lcd_cont & 0x10) bg_wd_table_addr = 0x8000;
@@ -254,21 +246,24 @@ void get_tile(BYTE num, tile_t *tile, int type){
 			size = 16;
 			pos = 0x8000 + ((num & 0xFE) * 16);
 		}
-		else
+		else{
 			pos = 0x8000 + (num * 16);	
+			size = 8;
+		}
 		//tile_table est unique pour les sprites elle est définie de 0x8000 à 0x8FFF
 		//Il y'a 16 (0x10) octets par sprite et 256 sprites(0x100), donc 0x100 * 0x10 = 0x1000 octets.
 		//Ce qui correspond bien à la plage 0x8000-0x8FFF
 		//num permet de sélectionner un sprite entre 0 et FF.
 	}
 	else{
+		size = 8;
 		if(lcd_cont & 0x10) pos = 0x8000 + (num * 16);
 		else {
 			BYTE_S num_s = (BYTE_S) num;
 			pos = 0x8800 + (num_s + 128) * 16;
 		}
-
 	}
+	lig = 0;
 	for(pt=pos; pt < pos+(size*2); pt+=2)
 	{
 		byte1 = memory_read(pt);
@@ -355,13 +350,13 @@ void draw_screen()
 			for(int j=0; j<160; j++)
 			{
 				if(gpu_screen[i][j] == 0)
-					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 0,0,0);
-				else if(gpu_screen[i][j] == 1)
-					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 85,85,85);
-				else if(gpu_screen[i][j] == 2)
-					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 170,170,170);
-				else 
 					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 255,255,255);
+				else if(gpu_screen[i][j] == 1)
+					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 170,170,170);
+				else if(gpu_screen[i][j] == 2)
+					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 85,85,85);
+				else 
+					*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 0,0,0);
 			}
 		}
 		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
