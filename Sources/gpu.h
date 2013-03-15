@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <SDL/SDL.h>
 #include "def.h"
+#include "cpu.h"
 #include "memory.h"
 #include "interrupts.h"
 #define LY_VISIBLE_MAX 144
@@ -20,7 +21,7 @@ typedef struct{
 	BYTE palette;
 }tile_t;
 
-int line_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
+int clock_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
 BYTE current_mode;
 BYTE current_line;
 BYTE gpu_screen[144][160];

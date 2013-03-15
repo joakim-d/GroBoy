@@ -10,25 +10,15 @@
 #include "def.h"
 #include "memory.h"
 #include "gpu.h"
-#include "interrupts.h"
 #include "sound.h"
+#include "interrupts.h"
+#include "joypad.h"
+#include "timer.h"
 void run();
 void cpu_init();
 unsigned char *rom_buffer;
 int cycles;
-typedef struct {
-	unsigned short PC;
-	unsigned short SP;
-	unsigned char A;
-	unsigned char F;
-	unsigned char B;
-	unsigned char C;
-	unsigned char D;
-	unsigned char E;
-	unsigned char H;
-	unsigned char L;	
-} z80_t;
-
+BYTE halted;
 static const BYTE z80_cycles[] = {
 4, 12, 8, 8, 4, 4, 8, 4, 20, 8, 8, 8, 4, 4, 8, 4, 
 4, 12, 8, 8, 4, 4, 8, 4, 12, 8, 8, 8, 4, 4, 8, 4,
@@ -66,6 +56,7 @@ static const BYTE z80_cb_cycles[] = {
 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8
 };
 
+void reset_halt();
 
 //Misc/control instructions
 static inline void di();

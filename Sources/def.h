@@ -1,6 +1,6 @@
 #ifndef DEF_H
 #define DEF_H
-#define DEBUG 1
+#define DEBUG 0
 #define BYTE unsigned char
 #define BYTE_S char
 #define FLAG_Z 0x80
@@ -21,4 +21,16 @@
 #define BIT_7 0x80
 #define ADD 1
 #define SUB 0
+typedef struct {
+	unsigned short PC;
+	unsigned short SP;
+	unsigned char A;
+	unsigned char F;
+	unsigned char B;
+	unsigned char C;
+	unsigned char D;
+	unsigned char E;
+	unsigned char H;
+	unsigned char L;	
+} z80_t;
 #endif

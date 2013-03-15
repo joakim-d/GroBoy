@@ -9,9 +9,10 @@
 #define SERIAL 3
 #define JOYPAD 4
 BYTE IME; // Interrupt Master Enable Flag (Si flag = 0 -> aucune interruption tolérée, si Flag = 1 interruptions tolérées)
+void interrupts_init();
 void set_IME();
 void reset_IME();
-void handle_interrupts(BYTE cycles);
-void execute_interrupt(BYTE type);
+void handle_interrupts(z80_t *z80);
+void execute_interrupt(BYTE type, z80_t *z80);
 void make_request(BYTE type);
 #endif
