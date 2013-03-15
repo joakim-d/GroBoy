@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include <SDL/SDL.h>
 #include "def.h"
 #include "memory.h"
 
@@ -157,7 +158,10 @@ typedef struct{
 	sound_control_t sound_controller;//Controleur de son
 
 } apu_t;
-
+SDL_AudioSpec desired;
+SDL_AudioSpec obtained;
 void sound_init();
 void sound_run(unsigned short address);
+void update_sound();
+static void callback(void* data, Uint8 *stream, int len);
 #endif

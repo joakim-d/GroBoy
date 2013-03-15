@@ -58,11 +58,26 @@ void sound_init(){
 		apu.sound_controller.output_sound_so2[i] = 0;
 		apu.sound_controller.sound_flags[i] = 0;
 	}
+	if(SDL_Init(SDL_INIT_AUDIO) < 0){
+			fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
+			exit(EXIT_FAILURE); // On quitte le programme
+	}
+	desired.freq = (apu.channel1.freq_low);
+	desired.format = AUDIO_S16SYS;
+	desired.channels = 2;
+	desired.samples = 2048;
+	desired.callback = callback;
+	desired.userdata = NULL;
+	if(SDL_OpenAudio(&desired, NULL) < 0){
+		fprintf(stderr, "Erreur à l'ouverture du peripherique audio : %s\n", SDL_GetError()); // Écriture de l'erreur
+		exit(EXIT_FAILURE); // On quitte le programme
+	}
 }
 
 void sound_run(unsigned short address){
 	BYTE value = memory_read(address);
-	//printf("ADDRESS = %x\n", address);
+	update_sound();
+	SDL_PauseAudio(0);
 	switch(address){
 		case NR10:
 			apu.channel1.sweep_period = ((value & 0x70) >> 4);
@@ -170,5 +185,15 @@ void sound_run(unsigned short address){
 		default:
 		break;
 	}
+	SDL_Delay(100);
+	SDL_PauseAudio(1);
 }
 
+void update_sound(){
+	desired.freq = (apu.channel2.freq_low);	
+}
+
+static void callback(void* data, Uint8 *stream, int len){
+	//desired.freq = (apu.channel1.freq_low);	
+	desired.freq = 4410;	
+}
