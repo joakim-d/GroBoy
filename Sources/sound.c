@@ -185,7 +185,7 @@ void sound_run(unsigned short address){
 		default:
 		break;
 	}
-	SDL_Delay(100);
+	//SDL_Delay(100);
 	SDL_PauseAudio(1);
 }
 

@@ -1,6 +1,6 @@
 SRC= cpu.c gpu.c memory.c main.c interrupts.c timer.c sound.c joypad.c
 CC=gcc
-CFLAGS = -std=c99 -lSDL 
+CFLAGS = -std=c99 -lSDL -Wall
 EXEC= groboy
 OBJ= $(SRC: .c=.o)
 
@@ -11,5 +11,5 @@ groboy:
 debug: 
 	$(CC) -o $(EXEC) $(SRC) $(CFLAGS) -g
 clean:
-	rm groboy 
-	rm *.o
+	rm groboy 2>null
+	rm *.o 2>null
