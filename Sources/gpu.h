@@ -21,8 +21,14 @@ typedef struct{
 	BYTE palette;
 }tile_t;
 
+typedef struct{
+	BYTE x;
+	BYTE y;
+	BYTE pattern_nb;
+	BYTE attributes;
+}sprite_t;
+
 int clock_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
-BYTE current_mode;
 BYTE current_line;
 BYTE gpu_screen[144][160];
 SDL_Surface* sdl_matrix[144][160];

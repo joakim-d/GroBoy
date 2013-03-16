@@ -1,8 +1,9 @@
 #include "gpu.h"
 
+static void swap_sprites(sprite_t *spr1, sprite_t *spr2);
+
 void gpu_init(){
 	clock_counter = 0;
-	current_mode = 2;
 	current_line = 0;
 	//fonctions SDL
 
@@ -20,13 +21,8 @@ void gpu_update(int cycles){ //fonction appelée en premier
 	if(clock_counter > ONE_LINE_CYCLES){
 		lcdc = memory_read(0xFF40);
 		if(lcdc & 0x80){
-			current_line = memory_read(0xFF44);
-			if(current_line < LY_VISIBLE_MAX){//Si la ligne est dans le "champ de vision" 
-				gpu_drawline();
-			}
-			current_line++;
+			current_line = memory_read(0xFF44)+1;
 			clock_counter %= ONE_LINE_CYCLES;
-			
 			if(current_line == LY_VISIBLE_MAX) draw_screen();
 			else if(current_line >= LY_MAX)	current_line = 0;
 			memory_write(0xFF44, current_line);
@@ -38,6 +34,7 @@ void gpu_update(int cycles){ //fonction appelée en premier
 void gpu_update_stat(){
 	BYTE lcdc;//LCD Control 
 	BYTE lyc, lcd_stat;
+	static BYTE mode = 4;
 
 	lcdc = memory_read(0xFF40);
 	current_line = memory_read(0xFF44);
@@ -56,8 +53,9 @@ void gpu_update_stat(){
 	}
 	if(lcdc & 0x80){
 		if(current_line < LY_VISIBLE_MAX){ 
-			if(clock_counter < 80){
+			if(clock_counter < 80 && mode != 2){
 				//Mode 2 The LCD controller is reading from OAM memory.
+				mode = 2;
 				lcd_stat &= 0xFC;
 				lcd_stat |= 0x02;
 				memory_write(0xFF41, lcd_stat);
@@ -65,13 +63,18 @@ void gpu_update_stat(){
 					make_request(LCD_STAT);
 				}
 			}
-			else if(clock_counter < 172){
+			else if(clock_counter < 172 && mode != 3){
 				//Mode 3 The LCD controller is reading from both OAM and VRAM
+				mode = 3;
 				lcd_stat |= 0x03;
 				memory_write(0xFF41, lcd_stat);	
 			}
-			else{
+			else if(mode != 0){
 				//Mode 0 The LCD controller is in the H-Blank period and 
+				mode = 0;
+				if(current_line < LY_VISIBLE_MAX){//Si la ligne est dans le "champ de vision" 
+					gpu_drawline();
+				}
 				lcd_stat &= 0xFC;
 				memory_write(0xFF41, lcd_stat);
 				if(lcd_stat & 0x08){
@@ -79,9 +82,14 @@ void gpu_update_stat(){
 				}
 			}
 		}
-		else{
-			if(current_line == LY_VISIBLE_MAX && (lcd_stat & 0x10)){
-				make_request(V_BLANK);
+		else if (mode != 1){//VBLANK
+			make_request(V_BLANK);
+			mode = 1;
+			lcd_stat &= 0xFC;
+			lcd_stat |= 0x01;
+			memory_write(0xFF41, lcd_stat);
+			if(lcd_stat & 0x10){
+				make_request(LCD_STAT);
 			}
 		}
 	}
@@ -97,7 +105,8 @@ void gpu_drawline(){
 	BYTE cur_tile_px_y; 			//Permet de savoir quelle ligne du pixel choisir
 	unsigned short cur_tile_nb;		//num de la tuile courante
 	tile_t tile; 				//tuile courante
-	unsigned short tried_sprites[40];
+	sprite_t sprites[40];
+	BYTE ordered_sprites_num[40];
 	unsigned short temp_sprite;
 	BYTE displyd_sprites_nb;
 	BYTE sprite_size;
@@ -141,75 +150,80 @@ void gpu_drawline(){
 		}
 	}
 	if(lcd_cont & 0x20){ //Si Window établie
-		/*window_y = memory_read(0xFF4A);
-		  window_x = memory_read(0xFF4B) - 7;
-		  if(current_line >= window_y && window_x < 160){
+		/*
+		window_y = memory_read(0xFF4A);
+		window_x = memory_read(0xFF4B) - 7;
+		if(current_line >= window_y && window_x < 160){
 
-		  tile.palette = memory_read(0xFF47);
-		  tile.x_flip = 0;
-		  tile.y_flip = 0;
-		  cur_tile_nb = ((window_y - current_line)*4) + (window_x/8);
-		  if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-		  get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-		  else
-		  get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+			tile.palette = memory_read(0xFF47);
+			tile.x_flip = 0;
+			tile.y_flip = 0;
+			cur_tile_nb = ((window_y - current_line)*4) + (window_x/8);
+			if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+				get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+			else
+				get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
 
-		  cur_tile_px_x = window_x % 8;
-		  cur_tile_px_y = window_y % 8;
+			cur_tile_px_x = window_x % 8;
+			cur_tile_px_y = window_y % 8;
 
-		  while(window_x < 160){	//On parcourt toute la ligne
-		  if(window_x>=0)
-		  gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
-		  window_x++;
-		  if(cur_tile_px_x > 7){ 
-		  cur_tile_px_x = 0;
-		  cur_tile_nb++;
-		  if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-		  get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-		  else
-		  get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
-		  }
-		  }
+			while(window_x < 160){	//On parcourt toute la ligne
+				if(window_x>=0)
+					gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
+				window_x++;
+				if(cur_tile_px_x > 7){ 
+					cur_tile_px_x = 0;
+					cur_tile_nb++;
+					if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+						get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+					else
+						get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+				}
+			}
 
-		  }*/
+		}*/
 	}
 	if(lcd_cont & 0x02){ //Si Sprites établis
-		/*
-		   displyd_sprites_nb = 0;
-		   for(i = 0xFE00; i < 0xFE9F; i+= 4){//préparation des sprites pour le tri et récupération des sprites à afficher
-		   if(current_line >= memory_read(i) && current_line <= memory_read(i) + 7){ //memory_read(i) correspond à la pos en y du sprite
-		   tried_sprites[displyd_sprites_nb++] = i;
-		   }
-		   }
-		   i = 0;
-		   while(i < displyd_sprites_nb - 1){//tri des sprites
-		   if(memory_read(tried_sprites[i + 1] + 1) < memory_read(tried_sprites[i] + 1)){ //on compare la pos en x des deux sprites
-		   while(memory_read(tried_sprites[i + 1] + 1) < memory_read(tried_sprites[i] + 1)){
-		   temp_sprite = tried_sprites[i];
-		   tried_sprites[i] = tried_sprites[i+1];
-		   tried_sprites[i+1] = temp_sprite;
-		   i--;
-		   }
-		   i = 0;
-		   }
-		   else i++;
-		   }
-		   for(i = displyd_sprites_nb - 1; i >= 0; i--){//affichage des sprites
-		   sprite_sets = memory_read(tried_sprites[i] + 3); 	//caractéristiques du sprite
-		   sprite_x = memory_read(tried_sprites[i] + 1);		//position en x du sprite sur l'écran
-		   tile.x_flip = sprite_sets & 0x20;			//si il y'a un flip horizontal	
-		   tile.y_flip = sprite_sets & 0x40;			//si il y'a un flip vertical
-		   if(sprite_sets & 0x10)	tile.palette = memory_read(0xFF48);
-		   else tile.palette = memory_read(0xFF49);
-		   get_tile(memory_read(tried_sprites[i] + 2), &tile, SPRITES);
-		   cur_tile_px_y = (current_line - memory_read(tried_sprites[i])) % 8;
-		   for(j = 0; j < 8; j++){
-		   if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
-		   if(sprite_sets & 0x80 || gpu_screen[current_line][sprite_x + i] == 0)	//si le sprite est dessus ou que le background est à 0
-		   gpu_screen[current_line][sprite_x + i] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
-		   }
-		   }
-		   }*/
+
+		displyd_sprites_nb = 0;
+		j = 0;
+		for(i = 0xFE00; i < 0xFE9F; i+= 4){//préparation des sprites pour le tri et récupération des sprites à afficher
+			sprites[j].y = memory_read(i);
+			sprites[j].x = memory_read(i + 1);
+			sprites[j].pattern_nb = memory_read(i + 2);
+			sprites[j].attributes = memory_read(i + 3);
+			if(current_line >= (sprites[j].y - 16) && current_line <= (sprites[j].y - 9)
+				&& sprites[j].x > 7 && sprites[j].x < 168){
+				ordered_sprites_num[displyd_sprites_nb++] = j;
+			}
+			j++;
+		}
+		i = 0;
+		while(i < displyd_sprites_nb - 1){//tri des sprites
+			if(sprites[ordered_sprites_num[i + 1]].x < sprites[ordered_sprites_num[i]].x){ //on compare la pos en x des deux sprites
+				while(sprites[ordered_sprites_num[i + 1]].x < sprites[ordered_sprites_num[i]].x && i>=0){
+					swap_sprites(sprites + ordered_sprites_num[i+1], sprites + ordered_sprites_num[i]);
+					i--;
+				}
+				i = 0;
+			}
+			else i++;
+		}
+		for(i = displyd_sprites_nb - 1; i >= 0; i--){//affichage des sprites
+			tile.x_flip = sprites[ordered_sprites_num[i]].attributes & 0x20;			//si il y'a un flip horizontal	
+			tile.y_flip = sprites[ordered_sprites_num[i]].attributes & 0x40;			//si il y'a un flip vertical
+			if(sprites[ordered_sprites_num[i]].attributes & 0x10)	tile.palette = memory_read(0xFF48);
+			else tile.palette = memory_read(0xFF49);
+			
+			get_tile(sprites[ordered_sprites_num[i]].pattern_nb, &tile, SPRITES);
+			cur_tile_px_y = (current_line - sprites[ordered_sprites_num[i]].y) % tile.size;
+			for(j = 0; j < 8; j++){
+				if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
+					if(!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0)	//si le sprite est dessus ou que le background est à 0
+						gpu_screen[current_line][sprites[ordered_sprites_num[i]].x - 8 +j] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
+				}
+			}
+		}
 	}
 }
 
@@ -264,13 +278,16 @@ void get_tile(BYTE num, tile_t *tile, int type){
 			else if(tile->px[lig][i] == 1) tile->px[lig][i] = (tile->palette & 0x0C) >> 2;
 			else if(tile->px[lig][i] == 2) tile->px[lig][i] = (tile->palette & 0x30) >> 4;
 			else tile->px[lig][i] = (tile->palette & 0xC0) >> 6;
+			//if(type == SPRITES) printf("%d", tile->px[lig][i]);
 		}
+		//if(type == SPRITES) printf("\n");
 		lig++;
 	}
-
+	//if(type == SPRITES)printf("\n");
+	/*
 	if(tile->x_flip)tile_flip(tile,0,size);
 	if(tile->y_flip)tile_flip(tile,1,size);
-
+	*/
 	tile->size = size;
 }
 
@@ -343,4 +360,23 @@ void draw_screen()
 	}
 	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
 	SDL_Delay(16);
+}
+
+static void swap_sprites(sprite_t *spr1, sprite_t *spr2){
+	sprite_t spr_temp;
+	
+	spr_temp.x = spr1->x;
+	spr_temp.y = spr1->y;
+	spr_temp.pattern_nb = spr1->pattern_nb;
+	spr_temp.attributes = spr1->attributes;
+	
+	spr1->x = spr2->x;
+	spr1->y = spr2->y;
+	spr1->pattern_nb = spr2->pattern_nb;
+	spr1->attributes = spr2->attributes;
+
+	spr2->x = spr_temp.x;
+	spr2->y = spr_temp.y;
+	spr2->pattern_nb = spr_temp.pattern_nb;
+	spr2->attributes = spr_temp.attributes;
 }

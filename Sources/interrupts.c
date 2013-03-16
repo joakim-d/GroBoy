@@ -69,6 +69,7 @@ void execute_interrupt(BYTE type, z80_t *z80){
 	memory_write(z80->SP - 2, (z80->PC & 0x00FF));
 	z80->SP -= 2;
 
+//	printf("%d\n", type);
 	switch(type){
 		case V_BLANK:	
 			z80->PC = 0x40;
