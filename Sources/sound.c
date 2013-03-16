@@ -1,7 +1,7 @@
 #include "sound.h"
 
 apu_t apu;
-
+static void callback(void* data, Uint8 *stream, int len);
 void sound_init(){
 	apu.channel1.sweep_period = 0x00;
 	apu.channel1.sweep_shift = 0x00;

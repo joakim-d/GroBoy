@@ -163,5 +163,4 @@ SDL_AudioSpec obtained;
 void sound_init();
 void sound_run(unsigned short address);
 void update_sound();
-static void callback(void* data, Uint8 *stream, int len);
 #endif

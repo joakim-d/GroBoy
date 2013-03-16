@@ -220,16 +220,12 @@ void gpu_drawline(){
 void get_tile(BYTE num, tile_t *tile, int type){
 	int size;// 8x8 ou 8x16
 	int lig;
-	int i,j;
-	unsigned short bg_wd_table_addr; //table du background & window
-	BYTE palette;
+	int i;
 	BYTE byte1,byte2; 
 	BYTE lcd_cont;
 	int pt;
 	unsigned short pos;
 	lcd_cont = memory_read(0xFF40);
-	if (lcd_cont & 0x10) bg_wd_table_addr = 0x8000;
-	else bg_wd_table_addr = 0x8800;
 
 	if (type == SPRITES){
 		if(lcd_cont & 0x04){
@@ -298,7 +294,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 
 		for(int i=0; i<size; i++)
 		{
-			for(int j=7; j=0; j++)
+			for(int j=7; j>=0; j--)
 			{
 				tempflip[i][cpt] = tile->px[i][j];
 				cpt++;
@@ -310,7 +306,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 	if(flipx_y == 1)
 	{
 		cpt = 0;
-		for(int i=size-1; i=0; i--)
+		for(int i=size-1; i>=0; i--)
 		{
 			for(int j=0; j<8; j++)
 			{

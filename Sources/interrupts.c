@@ -77,7 +77,6 @@ void execute_interrupt(BYTE type, z80_t *z80){
 			z80->PC = 0x48;
 			break;
 		case TIMER:
-			printf("yo\n");
 			z80->PC = 0x50;
 			break;
 		case SERIAL:
