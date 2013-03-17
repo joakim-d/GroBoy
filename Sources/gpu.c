@@ -156,38 +156,39 @@ void gpu_drawline(){
 		}
 	}
 	if(lcd_cont & 0x20){ //Si Window établie
-		/*
-		   window_y = memory_read(0xFF4A);
-		   window_x = memory_read(0xFF4B) - 7;
-		   if(current_line >= window_y && window_x < 160){
 
-		   tile.palette = memory_read(0xFF47);
-		   tile.x_flip = 0;
-		   tile.y_flip = 0;
-		   cur_tile_nb = ((window_y - current_line)*4) + (window_x/8);
-		   if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-		   get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-		   else
-		   get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+		window_y = memory_read(0xFF4A);
+		window_x = memory_read(0xFF4B) - 7;
+		if(current_line >= window_y && window_x < 160){
+			scy = (current_line - window_y)/8;
+			scx = (current_line - window_x);
+			tile.palette = memory_read(0xFF47);
+			tile.x_flip = 0;
+			tile.y_flip = 0;
+			cur_tile_nb = ((window_y)*4) + (window_x/8);
+			if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+				get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+			else
+				get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
 
-		   cur_tile_px_x = window_x % 8;
-		   cur_tile_px_y = window_y % 8;
+			cur_tile_px_x = window_x % 8;
+			cur_tile_px_y = window_y % 8;
 
-		   while(window_x < 160){	//On parcourt toute la ligne
-		   if(window_x>=0)
-		   gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
-		   window_x++;
-		   if(cur_tile_px_x > 7){ 
-		   cur_tile_px_x = 0;
-		   cur_tile_nb++;
-		   if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-		   get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-		   else
-		   get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
-		   }
-		   }
+			while(window_x < 160){	//On parcourt toute la ligne
+				if(window_x>=0)
+					gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
+				window_x++;
+				if(cur_tile_px_x > 7){ 
+					cur_tile_px_x = 0;
+					cur_tile_nb++;
+					if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+						get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+					else
+						get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+				}
+			}
 
-		   }*/
+		}
 	}
 	if(lcd_cont & 0x02){ //Si Sprites établis
 
@@ -222,8 +223,7 @@ void gpu_drawline(){
 			else tile.palette = memory_read(0xFF48);
 
 			get_tile(sprites[ordered_sprites_num[i]].pattern_nb, &tile, SPRITES);
-			cur_tile_px_y = (current_line) % tile.size;
-			
+			cur_tile_px_y = current_line % tile.size;
 			for(j = 0; j < 8; j++){
 				if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
 					if(!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0)	//si le sprite est dessus ou que le background est à 0
@@ -365,7 +365,7 @@ void draw_screen()
 		}
 	}
 	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-	SDL_Delay(16);
+	SDL_Delay(10);
 }
 
 static void swap_sprites(sprite_t *spr1, sprite_t *spr2){
