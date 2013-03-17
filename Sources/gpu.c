@@ -24,10 +24,10 @@ void gpu_update(int cycles){ //fonction appelée en premier
 			current_line = memory_read(0xFF44)+1;
 			clock_counter %= ONE_LINE_CYCLES;
 			if(current_line == LY_VISIBLE_MAX) draw_screen();
-			else if(current_line >= LY_MAX)	current_line = 0;
+			else if(current_line >= LY_MAX) current_line = 0;
 			memory_write(0xFF44, current_line);
-		}
-	}
+		}   
+	}   
 	gpu_update_stat();
 }
 
@@ -37,19 +37,20 @@ void gpu_update_stat(){
 	static BYTE mode = 4;
 
 	lcdc = memory_read(0xFF40);
-	current_line = memory_read(0xFF44);
 	lyc = memory_read(0xFF45);
 	lcd_stat = memory_read(0xFF41);
-
+	current_line = memory_read(0xFF44);
 	if(current_line == lyc){//Vérification d'intersection entre LYC et LY
 		lcd_stat |= 0x04;
 		memory_write(0xFF41, lcd_stat);
-		if(lcd_stat & 0x40)
+		if(lcd_stat & 0x40){
 			make_request(LCD_STAT);
+		}
 	}
 	else{
 		lcd_stat &= 0xFB;
 		memory_write(0xFF41, lcd_stat);
+
 	}
 	if(lcdc & 0x80){
 		if(current_line < LY_VISIBLE_MAX){ 
@@ -92,6 +93,11 @@ void gpu_update_stat(){
 				make_request(LCD_STAT);
 			}
 		}
+	}
+	else{
+		lcd_stat = memory_read(0xFF41);
+		//memory_write(0xFF44, 0);
+		lcd_stat = (lcd_stat & 0xFC) + 1;
 	}
 }
 
@@ -151,37 +157,37 @@ void gpu_drawline(){
 	}
 	if(lcd_cont & 0x20){ //Si Window établie
 		/*
-		window_y = memory_read(0xFF4A);
-		window_x = memory_read(0xFF4B) - 7;
-		if(current_line >= window_y && window_x < 160){
+		   window_y = memory_read(0xFF4A);
+		   window_x = memory_read(0xFF4B) - 7;
+		   if(current_line >= window_y && window_x < 160){
 
-			tile.palette = memory_read(0xFF47);
-			tile.x_flip = 0;
-			tile.y_flip = 0;
-			cur_tile_nb = ((window_y - current_line)*4) + (window_x/8);
-			if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-				get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-			else
-				get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+		   tile.palette = memory_read(0xFF47);
+		   tile.x_flip = 0;
+		   tile.y_flip = 0;
+		   cur_tile_nb = ((window_y - current_line)*4) + (window_x/8);
+		   if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+		   get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+		   else
+		   get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
 
-			cur_tile_px_x = window_x % 8;
-			cur_tile_px_y = window_y % 8;
+		   cur_tile_px_x = window_x % 8;
+		   cur_tile_px_y = window_y % 8;
 
-			while(window_x < 160){	//On parcourt toute la ligne
-				if(window_x>=0)
-					gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
-				window_x++;
-				if(cur_tile_px_x > 7){ 
-					cur_tile_px_x = 0;
-					cur_tile_nb++;
-					if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-						get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
-					else
-						get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
-				}
-			}
+		   while(window_x < 160){	//On parcourt toute la ligne
+		   if(window_x>=0)
+		   gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
+		   window_x++;
+		   if(cur_tile_px_x > 7){ 
+		   cur_tile_px_x = 0;
+		   cur_tile_nb++;
+		   if(lcd_cont & 0x40)				// On regarde quelle est la background map			
+		   get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+		   else
+		   get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+		   }
+		   }
 
-		}*/
+		   }*/
 	}
 	if(lcd_cont & 0x02){ //Si Sprites établis
 
@@ -193,7 +199,7 @@ void gpu_drawline(){
 			sprites[j].pattern_nb = memory_read(i + 2);
 			sprites[j].attributes = memory_read(i + 3);
 			if(current_line >= (sprites[j].y - 16) && current_line <= (sprites[j].y - 9)
-				&& sprites[j].x > 7 && sprites[j].x < 168){
+					&& sprites[j].x > 7 && sprites[j].x < 168){
 				ordered_sprites_num[displyd_sprites_nb++] = j;
 			}
 			j++;
@@ -212,11 +218,12 @@ void gpu_drawline(){
 		for(i = displyd_sprites_nb - 1; i >= 0; i--){//affichage des sprites
 			tile.x_flip = sprites[ordered_sprites_num[i]].attributes & 0x20;			//si il y'a un flip horizontal	
 			tile.y_flip = sprites[ordered_sprites_num[i]].attributes & 0x40;			//si il y'a un flip vertical
-			if(sprites[ordered_sprites_num[i]].attributes & 0x10)	tile.palette = memory_read(0xFF48);
-			else tile.palette = memory_read(0xFF49);
-			
+			if(sprites[ordered_sprites_num[i]].attributes & 0x10)	tile.palette = memory_read(0xFF49);
+			else tile.palette = memory_read(0xFF48);
+
 			get_tile(sprites[ordered_sprites_num[i]].pattern_nb, &tile, SPRITES);
-			cur_tile_px_y = (current_line - sprites[ordered_sprites_num[i]].y) % tile.size;
+			cur_tile_px_y = (current_line) % tile.size;
+			
 			for(j = 0; j < 8; j++){
 				if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
 					if(!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0)	//si le sprite est dessus ou que le background est à 0
@@ -274,20 +281,19 @@ void get_tile(BYTE num, tile_t *tile, int type){
 			else tile->px[lig][i]=0;
 			if(byte2 & (1<<(7-i))) tile->px[lig][i] |= 2;
 
-			if(tile->px[lig][i] == 0 && type != SPRITES) tile->px[lig][i] = tile->palette & 0x03;
+			if(tile->px[lig][i] == 0){
+				if(type != SPRITES) tile->px[lig][i] = tile->palette & 0x03;
+			}
 			else if(tile->px[lig][i] == 1) tile->px[lig][i] = (tile->palette & 0x0C) >> 2;
 			else if(tile->px[lig][i] == 2) tile->px[lig][i] = (tile->palette & 0x30) >> 4;
 			else tile->px[lig][i] = (tile->palette & 0xC0) >> 6;
-			//if(type == SPRITES) printf("%d", tile->px[lig][i]);
 		}
-		//if(type == SPRITES) printf("\n");
 		lig++;
 	}
-	//if(type == SPRITES)printf("\n");
 	/*
-	if(tile->x_flip)tile_flip(tile,0,size);
-	if(tile->y_flip)tile_flip(tile,1,size);
-	*/
+	   if(tile->x_flip)tile_flip(tile,0,size);
+	   if(tile->y_flip)tile_flip(tile,1,size);
+	 */
 	tile->size = size;
 }
 
@@ -364,12 +370,12 @@ void draw_screen()
 
 static void swap_sprites(sprite_t *spr1, sprite_t *spr2){
 	sprite_t spr_temp;
-	
+
 	spr_temp.x = spr1->x;
 	spr_temp.y = spr1->y;
 	spr_temp.pattern_nb = spr1->pattern_nb;
 	spr_temp.attributes = spr1->attributes;
-	
+
 	spr1->x = spr2->x;
 	spr1->y = spr2->y;
 	spr1->pattern_nb = spr2->pattern_nb;
