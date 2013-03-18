@@ -2066,7 +2066,7 @@ static inline void adc(BYTE data){
 	if (op == 0) z80.F |= 0x80;
 	if (z80.A + data + c > 0xFF) z80.F |= 0x10;
 	halfcarry_8bit_update(z80.A, op, ADD);
-	z80.A = z80.A + data + c;
+	z80.A = op;
 }
 
 static inline void add(BYTE data){
@@ -2156,7 +2156,7 @@ static inline void dec_at(unsigned short addr){
 	else z80.F = 0x40;
 	if (d8 == 0) z80.F |= 0x80;
 	halfcarry_8bit_update(d8, d8-1, SUB);
-	memory_write(addr, d8);
+	memory_write(addr, d8 - 1);
 }
 
 static inline void dec_sp(){
@@ -2187,11 +2187,13 @@ static inline void inc_at(unsigned short addr){
 
 static inline void inc_smpl(BYTE *reg1){
 	// Z 0 H -
+	BYTE d8 = *reg1 + 1;
 	*reg1+=0x01;
 	if(z80.F & FLAG_C) z80.F = FLAG_C;
 	else z80.F = 0;
-	if(*reg1 == 0) z80.F |= FLAG_Z;
-	else if(*reg1 == 0x10) z80.F |= FLAG_H;
+	halfcarry_8bit_update(*reg1, d8, ADD);
+	if(d8 == 0) z80.F |= FLAG_Z;
+	*reg1 = d8;
 }
 
 static inline void inc_sp(){
@@ -2207,7 +2209,7 @@ static inline void sbc(BYTE data){
 	if (op == 0) z80.F |= 0x80;
 	if (op > z80.A) z80.F |= 0x10;
 	halfcarry_8bit_update(z80.A, op, SUB);
-	z80.A = (z80.A - data - c);
+	z80.A = op;
 }
 
 static inline void scf(){

@@ -1,6 +1,11 @@
 #include "memory.h"
 
-void read_rom_info(char* rom_path){
+static void read_rom_info(char* rom_path);
+static void alloc_ram_mem(size_t size);
+static inline void write_mbc1(unsigned short addr, BYTE data);
+static inline void write_mbc2(unsigned short addr, BYTE data);
+static inline void dma_transfer(BYTE data);
+static void read_rom_info(char* rom_path){
 	int file_d;
 	struct stat file_stat;
 
@@ -53,21 +58,21 @@ void read_rom_info(char* rom_path){
 	}
 	printf("\nRom Size ");
 	switch(*(cartridge_rom_buffer + 0x0148)){
-		case 0x00: printf("32KB: 2 Banks");alloc_ram_mem(0x8000);break;
-		case 0x01: printf("64KB: 4 Banks");alloc_ram_mem(0x10000);break;
-		case 0x02: printf("128KB: 8 Banks");alloc_ram_mem(0x20000);break;
-		case 0x03: printf("256KB: 16 Banks");alloc_ram_mem(0x40000);break;
-		case 0x04: printf("512KB: 32 Banks");alloc_ram_mem(0x80000);break;
-		case 0x05: printf("1MB: 64 Banks");alloc_ram_mem(0x100000);break;
-		case 0x06: printf("2MB: 128 Banks");alloc_ram_mem(0x200000);break;
-		case 0x07: printf("4MB: 256 Banks");alloc_ram_mem(0x400000);break;
-		case 0x52: printf("1.1MB: 72 Banks");alloc_ram_mem(0x120000);break;
-		case 0x53: printf("1.2MB: 80 Banks");alloc_ram_mem(0x140000);break;
-		case 0x54: printf("1.5MB: 96 Banks");alloc_ram_mem(0x180000);break;
+		case 0x00: printf("32KB: 2 Banks");break;
+		case 0x01: printf("64KB: 4 Banks");break;
+		case 0x02: printf("128KB: 8 Banks");break;
+		case 0x03: printf("256KB: 16 Banks");break;
+		case 0x04: printf("512KB: 32 Banks");break;
+		case 0x05: printf("1MB: 64 Banks");break;
+		case 0x06: printf("2MB: 128 Banks");break;
+		case 0x07: printf("4MB: 256 Banks");break;
+		case 0x52: printf("1.1MB: 72 Banks");break;
+		case 0x53: printf("1.2MB: 80 Banks");break;
+		case 0x54: printf("1.5MB: 96 Banks");break;
 	}
 	printf("\nRam Size ");
 	switch(*(cartridge_rom_buffer + 0x0149)){
-		case 0: printf("None");break;
+		case 0: printf("None");alloc_ram_mem(0x2000);break;
 		case 1: printf("2KB: 1 Bank");alloc_ram_mem(0x100);break;
 		case 2: printf("8KB: 1 Bank");alloc_ram_mem(0x2000);break;
 		case 3: printf("32KB: 4 Banks");alloc_ram_mem(0x8000);break;
@@ -129,7 +134,7 @@ void memory_init(char *rom_path){
 
 
 
-	BYTE memory_read(unsigned short addr){
+	inline BYTE memory_read(unsigned short addr){
 		if(addr <= 0x3FFF) 		//demande de lecture dans la banque de rom 0 de la cartouche
 			return cartridge_rom_buffer[addr];
 		if(addr >= 0x4000 && addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
@@ -142,14 +147,11 @@ void memory_init(char *rom_path){
 			return internal_ram[addr - 0xA000];
 	}
 
-void alloc_rom_mem(size_t size){
-	cartridge_rom_buffer = (BYTE *) malloc(size);
-}
-void alloc_ram_mem(size_t size){
+static void alloc_ram_mem(size_t size){
 	cartridge_ram_buffer = (BYTE *) malloc(size);
 }
 
-void memory_write(unsigned short addr, BYTE data){
+inline void memory_write(unsigned short addr, BYTE data){
 	if((addr <= 0x7FFF) || (addr >= 0xA000 && addr <= 0xBFFF)){
 		if(cartridge_type >= 0x01 || cartridge_type <= 0x03){//MBC1
 			write_mbc1(addr, data);		
@@ -175,7 +177,7 @@ void memory_write(unsigned short addr, BYTE data){
 
 }
 
-void write_mbc2(unsigned short addr, BYTE data){
+static inline void write_mbc2(unsigned short addr, BYTE data){
 	if(addr <= 0x1FFF){
 		if((data & 0x100) == 0) enable_ram = 1;
 		else enable_ram = 0;
@@ -188,7 +190,7 @@ void write_mbc2(unsigned short addr, BYTE data){
 		cartridge_ram_buffer[addr - 0xA000] = data;
 }
 
-void write_mbc1(unsigned short addr, BYTE data){
+static inline void write_mbc1(unsigned short addr, BYTE data){
 	if(addr <= 0x1FFF){
 		if((data & 0x0A) == 0x0A) enable_ram = 1;
 		else enable_ram = 0;
@@ -208,7 +210,7 @@ void write_mbc1(unsigned short addr, BYTE data){
 		cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000] = data;
 }
 
-void dma_transfer(BYTE data){
+static inline void dma_transfer(BYTE data){
 	int i;
 	unsigned short source = data << 8;
 	for(i = 0; i < 0x9F; i++){
