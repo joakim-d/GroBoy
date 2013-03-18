@@ -1831,7 +1831,7 @@ void run(){
 		}
 		gpu_update(cycles);	
 		timer_update(cycles);
-		joypad_update();
+		joypad_update(cycles);
 		handle_interrupts(&z80);
 		/*if(Counter<=0)
 		  {

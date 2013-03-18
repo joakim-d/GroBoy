@@ -12,6 +12,7 @@
 #include "sound.h"
 BYTE cartridge_type;
 BYTE enable_ram;
+BYTE cartridge_ram_enabled;
 BYTE rom_mode;
 BYTE rom_selector;				//Permet de savoir quelle banque de rom est sélectionnée
 BYTE ram_selector;				//Permet de savoir quelle banque de ram est sélectionnée
