@@ -1,8 +1,13 @@
 #include "sound.h"
 
 apu_t apu;
+int sound_cycles = 0;
+static blip_t* blip;
+static int sample_rate = 44100;
+static int clock_rate = 4194304;
 static void callback(void* data, Uint8 *stream, int len);
 void sound_init(){
+
 	apu.channel1.sweep_period = 0x00;
 	apu.channel1.sweep_shift = 0x00;
 	apu.channel1.sweep_regulation = 0; 
@@ -72,11 +77,16 @@ void sound_init(){
 		fprintf(stderr, "Erreur à l'ouverture du peripherique audio : %s\n", SDL_GetError()); // Écriture de l'erreur
 		exit(EXIT_FAILURE); // On quitte le programme
 	}
+	blip = blip_new(sample_rate / 10);
+	blip_set_rates(blip,clock_rate,sample_rate);
+	
+	//SDL_PauseAudio(0);
 }
 
 void sound_run(unsigned short address){
+	blip = blip_new(sample_rate / 10);
+	blip_set_rates(blip,clock_rate,sample_rate);
 	BYTE value = memory_read(address);
-	update_sound();
 	SDL_PauseAudio(0);
 	switch(address){
 		case NR10:
@@ -186,14 +196,47 @@ void sound_run(unsigned short address){
 		break;
 	}
 	//SDL_Delay(100);
+	//printf("sound\n");
+	update_sound();
 	SDL_PauseAudio(1);
 }
 
 void update_sound(){
-	desired.freq = (apu.channel2.freq_low);	
+	//int delta = ; //phase * volume - amplitude
+	//blip_add_delta(blip, apu.channel1.sound_length, apu.channel1.initial_volume);
+	int period = (int) (clock_rate / ((apu.channel1.freq_high) / 2 +0.5));
+	int ampl = apu.channel1.freq_high - apu.channel1.freq_low;
+	int length = apu.channel1.sound_length;
+	int volume = apu.channel1.initial_volume * 65536 / 2 + 0.5;
+	int phase = apu.channel1.nb_sweep_env;
+	for( ; length < sound_cycles; length += period){
+		int delta = phase * volume - ampl;
+		ampl += delta;
+		blip_add_delta(blip,length,delta);
+		phase = -1 * phase;
+	}
+	length -= sound_cycles;
+	
+	ampl = apu.channel2.freq_high - apu.channel2.freq_low;
+	length = apu.channel2.sound_length;
+	volume = apu.channel2.initial_env_volume * 65536 / 2 + 0.5;
+	phase = apu.channel2.nb_sweep_env;
+	for( ; length < sound_cycles; length += apu.channel1.sweep_period){
+		int delta = phase * volume - ampl;
+		ampl += delta;
+		blip_add_delta(blip,length,delta);
+		phase = -1 * phase;
+	}
+	length -= sound_cycles;
+	
+
 }
 
 static void callback(void* data, Uint8 *stream, int len){
-	//desired.freq = (apu.channel1.freq_low);	
-	desired.freq = 4410;	
+	Sint16 *buffer = (Sint16 *)stream;
+	sound_cycles = blip_clocks_needed(blip, len/4);
+	update_sound();
+	blip_end_frame(blip, sound_cycles);
+	blip_read_samples(blip, buffer, len, 1);
 }
+

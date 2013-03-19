@@ -9,6 +9,7 @@
 #include <SDL/SDL.h>
 #include "def.h"
 #include "memory.h"
+#include "blip_buf.h"
 
 //Registres du Canal de son 1
 #define NR10 0xff10 //Registre de balayage (R/W)
