@@ -35,7 +35,6 @@ void gpu_update(int cycles){ //fonction appelée en premier
 		vblank_clock_counter -= 70224;
 		line_clock_counter = vblank_clock_counter;
 	}
-	event_process();
 	current_line = vblank_clock_counter / 456;
 	memory_write(0xFF44, current_line);
 
@@ -353,6 +352,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 
 void draw_screen()
 {
+	//event_process();
 	for(int i=0; i<144; i++)
 	{
 		for(int j=0; j<160; j++)
@@ -369,7 +369,7 @@ void draw_screen()
 	}
 	scale(sdl_screenTemp,sdl_screen);
 	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-	SDL_Delay(1);
+	SDL_Delay(16);
 }
 
 static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){

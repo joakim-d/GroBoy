@@ -1,21 +1,25 @@
 #include "joypad.h"
 
 void joypad_update(int cycles){
-	static BYTE joy_stat = 0xCF;
+	static int joypad_counter = 0;	
+	static BYTE joy_new;
+	static BYTE joy_cur;
+	static BYTE joy_old = 0;
 	BYTE key_buttons; //
 	SDL_Event event;
 
-	static int joypad_counter = 0;	
 	joypad_counter += cycles;
 
-	if(joypad_counter > 80000){
-		joy_stat = memory_read(0xFF00);
-		key_buttons = 0xFF;
-		while(SDL_PollEvent(&event)){;
-			switch(event.type)
-			{
+	key_buttons = 0xFF;
+	joy_cur = memory_read(0xFF00);
+
+	if(joypad_counter >= 80000){
+		joypad_counter -= 80000;
+		while(SDL_PollEvent(&event)){
+			switch(event.type){
 				case SDL_QUIT:
-					exit(0);break;
+					exit(0);
+					break;
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym){
 						case SDLK_RIGHT: 
@@ -42,19 +46,30 @@ void joypad_update(int cycles){
 						case SDLK_BACKSPACE:
 							key_buttons &= 0x7F;
 							break;
-						default: 
+						default:
 							break;
 					}
 					break;
+				default:
+					break;
 			}
-			joypad_counter %= 80000;
 		}
-		if(key_buttons != 0xFF){
-			printf("TONBOU:%x\n", key_buttons);
-			make_request(JOYPAD);
-		}
-		if(!(0x20 & joy_stat)) joy_stat = (joy_stat & 0xF0) | (key_buttons & 0x0F);
-		if(!(0x10 & joy_stat)) joy_stat = (joy_stat & 0xF0) | ((key_buttons & 0xF0)>>4);
-		memory_write(0xFF00, joy_stat);
+	}
+
+	//printf("%x\n",(joy_stat & 0xF0) | (key_buttons & 0x0F));
+	//printf("%x\n",(joy_stat & 0xF0) | ((key_buttons & 0xF0)>>4));
+	joy_new = 0x0F;
+	if(0x20 & joy_cur) {
+		joy_new &= ((key_buttons & 0xF0)>>4);
+	}
+	if(0x10 & joy_cur) {
+		joy_new &= (key_buttons & 0x0F);
+	}
+
+
+	memory_write(0xFF00, (joy_cur & 0xF0) | joy_new);
+	if(joy_new != joy_old){
+		joy_old = joy_new;
 	}
 }
+
