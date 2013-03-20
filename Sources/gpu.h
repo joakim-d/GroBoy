@@ -13,6 +13,7 @@
 #define SPRITES 1
 #define BACKGROUND 2
 #define WINDOW 3
+#define SDL_VIDEO_FLAGS (SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_RESIZABLE)
 typedef struct{
 	BYTE px[16][8];
 	BYTE size;
@@ -28,11 +29,13 @@ typedef struct{
 	BYTE attributes;
 }sprite_t;
 
+int screen_mode; //0 pour fenetré , 1 pour plein ecran
 int clock_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
 BYTE current_line;
 BYTE gpu_screen[144][160];
 SDL_Surface* sdl_matrix[144][160];
 SDL_Surface *sdl_screen;
+SDL_Surface *sdl_screenTemp; 
 void gpu_init();
 void gpu_update(int cycles);
 void gpu_update_line();
@@ -41,4 +44,7 @@ void gpu_drawline();
 void get_tile(BYTE num, tile_t *tile, int type);
 void tile_flip(tile_t *tile, int flipx_y, int size);
 void draw_screen();
+void ChangeMode();
+void event_process();
+void scale(SDL_Surface* in, SDL_Surface* out);
 #endif

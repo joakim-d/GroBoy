@@ -1,5 +1,8 @@
 #include "gpu.h"
 
+static inline Uint32 get_pixel(const SDL_Surface* surface, const int x, const int y);
+static inline void put_pixel(const SDL_Surface* surface, const int x, const int y, const Uint32 pixel);
+
 static void swap_sprites(sprite_t *spr1, sprite_t *spr2);
 
 void gpu_init(){
@@ -12,8 +15,10 @@ void gpu_init(){
 		fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
 		exit(EXIT_FAILURE); // On quitte le programme
 	}
-	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_VIDEO_FLAGS);
+	sdl_screenTemp = SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
 	SDL_WM_SetCaption("Groboy", NULL);
+	screen_mode = 0;
 }
 void gpu_update(int cycles){ //fonction appelée en premier
 	BYTE lcdc;
@@ -28,6 +33,7 @@ void gpu_update(int cycles){ //fonction appelée en premier
 			memory_write(0xFF44, current_line);
 		}   
 	}   
+	event_process();
 	gpu_update_stat();
 }
 
@@ -355,15 +361,16 @@ void draw_screen()
 		for(int j=0; j<160; j++)
 		{
 			if(gpu_screen[i][j] == 0)
-				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 255,255,255);
+				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 255,255,255);
 			else if(gpu_screen[i][j] == 1)
-				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 170,170,170);
+				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 170,170,170);
 			else if(gpu_screen[i][j] == 2)
-				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 85,85,85);
+				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 85,85,85);
 			else 
-				*((Uint32*)(sdl_screen->pixels) + j + i * sdl_screen->w) = SDL_MapRGB(sdl_screen->format, 0,0,0);
+				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
 		}
 	}
+	scale(sdl_screenTemp,sdl_screen);
 	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
 	SDL_Delay(10);
 }
@@ -385,4 +392,73 @@ static void swap_sprites(sprite_t *spr1, sprite_t *spr2){
 	spr2->y = spr_temp.y;
 	spr2->pattern_nb = spr_temp.pattern_nb;
 	spr2->attributes = spr_temp.attributes;
+}
+
+void event_process()
+{
+	SDL_Event event;
+    	while (SDL_PollEvent(&event))
+    	{
+		switch (event.type)
+		{
+          		case SDL_KEYDOWN:
+	       			if(event.key.keysym.sym==SDLK_ESCAPE)
+	       			{
+					ChangeMode();
+				}
+				break;
+			case SDL_VIDEORESIZE:
+				scale(sdl_screenTemp,sdl_screen);
+        			SDL_Flip(sdl_screen);
+				break;
+			default:break;
+			
+		}
+	}
+}
+	
+void scale(SDL_Surface* in, SDL_Surface* out)
+{
+	int pixel, px, py;
+	for(int y=0; y<out->h; y++)
+	{
+		for(int x=0; x<out->w; x++)
+		{
+			px= x*in->w/out->w;
+			py= y*in->h/out->h;
+			pixel = get_pixel(in,px,py);
+			put_pixel(out,x,y,pixel);	
+		}
+	}
+}
+
+static inline Uint32 get_pixel(const SDL_Surface* surface, const int x, const int y) 
+{
+        return *(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4));
+}
+
+static inline void put_pixel(const SDL_Surface* surface, const int x, const int y, const Uint32 pixel) {
+        *(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4)) = pixel;
+}
+
+
+//Passer du mode fenetré au mode plein ecran et inversement
+void ChangeMode()
+{
+	if(screen_mode==0)
+	{	
+		sdl_screen = SDL_SetVideoMode(0, 0, 0, SDL_VIDEO_FLAGS ^ SDL_FULLSCREEN); /* Passe en mode plein écran */
+		if(sdl_screen == NULL) sdl_screen = SDL_SetVideoMode(0, 0, 0, SDL_VIDEO_FLAGS); /* Si le changement échoue, réinitialise la fenêtre avec la configuration précédente */
+		if(sdl_screen == NULL) exit(1); /* Si la réinitialisation échoue, alors c'est un échec */
+		scale(sdl_screenTemp,sdl_screen);
+        	SDL_Flip(sdl_screen);
+		screen_mode = 1;
+	}
+	else
+	{
+		sdl_screen = SDL_SetVideoMode(160,144,32,SDL_VIDEO_FLAGS);
+		scale(sdl_screenTemp,sdl_screen);
+        	SDL_Flip(sdl_screen);
+		screen_mode = 0;
+	}
 }
