@@ -21,74 +21,84 @@ static void read_rom_info(char* rom_path){
 		exit(-1);
 	}
 
-	printf("Game title: %s\n", cartridge_rom_buffer + 0x0134);
-	printf("Cartridge type: ");	
 	cartridge_type = *(cartridge_rom_buffer + 0x0147);
-	switch(*(cartridge_rom_buffer + 0x0147)){
-		case 0x00: printf("ROM ONLY");break;
-		case 0x01: printf("MBC1");break;
-		case 0x02: printf("MBC1+RAM");break;
-		case 0x03: printf("MBC1+RAM+BATTERY");break;
-		case 0x05: printf("MBC2");break;
-		case 0x06: printf("MBC2+BATTERY");break;
-		case 0x08: printf("ROM+RAM");break;
-		case 0x09: printf("ROM+RAM+BATTERY");break;
-		case 0x0B: printf("MMM01");break;
-		case 0x0C: printf("MMM01+RAM");break;
-		case 0x0D: printf("MMM01+RAM+BATTERY");break;
-		case 0x0F: printf("MBC3+TIMER+BATTERY");break;
-		case 0x10: printf("MBC3+TIMER+RAM+BATTERY");break;
-		case 0x11: printf("MBC3");break;
-		case 0x12: printf("MBC3+RAM");break;
-		case 0x13: printf("MBC3+RAM+BATTERY");break;
-		case 0x15: printf("MBC4");break;
-		case 0x16: printf("MBC4+RAM");break;
-		case 0x17: printf("MBC4+RAM+BATTERY");break;
-		case 0x19: printf("MBC5");break;
-		case 0x1A: printf("MBC5+RAM");break;
-		case 0x1B: printf("MBC5+RAM+BATTERY");break;
-		case 0x1C: printf("MBC5+RUMBLE");break;
-		case 0x1D: printf("MBC5+RUMBLE+RAM");break;
-		case 0x1E: printf("MBC5+RUMBLE+RAM+BATTERY");break;
-		case 0xFC: printf("POCKET CAMERA");break;
-		case 0xFD: printf("BANDAI TAMA5");break;
-		case 0xFE: printf("HuC3");break;
-		case 0xFF: printf("HuC1+RAM+BATTERY");break;
-		default: printf("UNKNOWN");break;
+	if(!DEBUG){
+		printf("Game title: %s\n", cartridge_rom_buffer + 0x0134);
+		printf("Cartridge type: ");	
+		switch(*(cartridge_rom_buffer + 0x0147)){
+			case 0x00: printf("ROM ONLY");break;
+			case 0x01: printf("MBC1");break;
+			case 0x02: printf("MBC1+RAM");break;
+			case 0x03: printf("MBC1+RAM+BATTERY");break;
+			case 0x05: printf("MBC2");break;
+			case 0x06: printf("MBC2+BATTERY");break;
+			case 0x08: printf("ROM+RAM");break;
+			case 0x09: printf("ROM+RAM+BATTERY");break;
+			case 0x0B: printf("MMM01");break;
+			case 0x0C: printf("MMM01+RAM");break;
+			case 0x0D: printf("MMM01+RAM+BATTERY");break;
+			case 0x0F: printf("MBC3+TIMER+BATTERY");break;
+			case 0x10: printf("MBC3+TIMER+RAM+BATTERY");break;
+			case 0x11: printf("MBC3");break;
+			case 0x12: printf("MBC3+RAM");break;
+			case 0x13: printf("MBC3+RAM+BATTERY");break;
+			case 0x15: printf("MBC4");break;
+			case 0x16: printf("MBC4+RAM");break;
+			case 0x17: printf("MBC4+RAM+BATTERY");break;
+			case 0x19: printf("MBC5");break;
+			case 0x1A: printf("MBC5+RAM");break;
+			case 0x1B: printf("MBC5+RAM+BATTERY");break;
+			case 0x1C: printf("MBC5+RUMBLE");break;
+			case 0x1D: printf("MBC5+RUMBLE+RAM");break;
+			case 0x1E: printf("MBC5+RUMBLE+RAM+BATTERY");break;
+			case 0xFC: printf("POCKET CAMERA");break;
+			case 0xFD: printf("BANDAI TAMA5");break;
+			case 0xFE: printf("HuC3");break;
+			case 0xFF: printf("HuC1+RAM+BATTERY");break;
+			default: printf("UNKNOWN");break;
+		}
+		printf("\nRom Size ");
+		switch(*(cartridge_rom_buffer + 0x0148)){
+			case 0x00: printf("32KB: 2 Banks");break;
+			case 0x01: printf("64KB: 4 Banks");break;
+			case 0x02: printf("128KB: 8 Banks");break;
+			case 0x03: printf("256KB: 16 Banks");break;
+			case 0x04: printf("512KB: 32 Banks");break;
+			case 0x05: printf("1MB: 64 Banks");break;
+			case 0x06: printf("2MB: 128 Banks");break;
+			case 0x07: printf("4MB: 256 Banks");break;
+			case 0x52: printf("1.1MB: 72 Banks");break;
+			case 0x53: printf("1.2MB: 80 Banks");break;
+			case 0x54: printf("1.5MB: 96 Banks");break;
+		}
+
+		printf("\nRam Size ");
+		switch(*(cartridge_rom_buffer + 0x0149)){
+			case 0: printf("None");break;
+			case 1: printf("2KB: 1 Bank");break;
+			case 2: printf("8KB: 1 Bank");break;
+			case 3: printf("32KB: 4 Banks");break;
+		}
+		printf("\nLanguage ");
+		switch(*(cartridge_rom_buffer + 0x014A)){
+			case 0: printf("Japanese Game");break;
+			case 1: printf("English Game");break;
+		}
+		printf("\nManufacturer");
+		switch(*(cartridge_rom_buffer + 0x014B)){
+			case 0x33: printf("Nintendo or extended");break;
+			case 0x79: printf("Accolade");break;
+			case 0xA4: printf("Konami");break;
+		}
+		printf("\nVersion number %d\n", cartridge_rom_buffer[0x014C]);
 	}
-	printf("\nRom Size ");
-	switch(*(cartridge_rom_buffer + 0x0148)){
-		case 0x00: printf("32KB: 2 Banks");break;
-		case 0x01: printf("64KB: 4 Banks");break;
-		case 0x02: printf("128KB: 8 Banks");break;
-		case 0x03: printf("256KB: 16 Banks");break;
-		case 0x04: printf("512KB: 32 Banks");break;
-		case 0x05: printf("1MB: 64 Banks");break;
-		case 0x06: printf("2MB: 128 Banks");break;
-		case 0x07: printf("4MB: 256 Banks");break;
-		case 0x52: printf("1.1MB: 72 Banks");break;
-		case 0x53: printf("1.2MB: 80 Banks");break;
-		case 0x54: printf("1.5MB: 96 Banks");break;
-	}
-	printf("\nRam Size ");
+
 	switch(*(cartridge_rom_buffer + 0x0149)){
-		case 0: printf("None");cartridge_ram_enabled = 0;break;
-		case 1: printf("2KB: 1 Bank");alloc_ram_mem(0x100);break;
-		case 2: printf("8KB: 1 Bank");alloc_ram_mem(0x2000);break;
-		case 3: printf("32KB: 4 Banks");alloc_ram_mem(0x8000);break;
+		case 0: cartridge_ram_enabled = 0;break;
+		case 1: alloc_ram_mem(0x100);break;
+		case 2: alloc_ram_mem(0x2000);break;
+		case 3: alloc_ram_mem(0x8000);break;
 	}
-	printf("\nLanguage ");
-	switch(*(cartridge_rom_buffer + 0x014A)){
-		case 0: printf("Japanese Game");break;
-		case 1: printf("English Game");break;
-	}
-	printf("\nManufacturer");
-	switch(*(cartridge_rom_buffer + 0x014B)){
-		case 0x33: printf("Nintendo or extended");break;
-		case 0x79: printf("Accolade");break;
-		case 0xA4: printf("Konami");break;
-	}
-	printf("\nVersion number %d\n", cartridge_rom_buffer[0x014C]);
 }
 
 void memory_init(char *rom_path){
@@ -137,18 +147,18 @@ void memory_init(char *rom_path){
 
 
 
-	BYTE memory_read(unsigned short addr){
-		if(addr <= 0x3FFF) 		//demande de lecture dans la banque de rom 0 de la cartouche
-			return cartridge_rom_buffer[addr];
-		else if(addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
-			return cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
-		else if(addr <= 0x9FFF) 		//demande de lecture vidéo ram
-			return internal_ram[addr - 0x8000];
-		else if(addr <= 0xBFFF && cartridge_ram_enabled)		//demande de lecture dans la banque de ram 0..n de la cartouche
-			return cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
-		else 						//demande de lecture dans le reste de la mémoire interne
-			return internal_ram[addr - 0xA000];
-	}
+BYTE memory_read(unsigned short addr){
+	if(addr <= 0x3FFF) 		//demande de lecture dans la banque de rom 0 de la cartouche
+		return cartridge_rom_buffer[addr];
+	else if(addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
+		return cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
+	else if(addr <= 0x9FFF) 		//demande de lecture vidéo ram
+		return internal_ram[addr - 0x8000];
+	else if(addr <= 0xBFFF && cartridge_ram_enabled)		//demande de lecture dans la banque de ram 0..n de la cartouche
+		return cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
+	else 						//demande de lecture dans le reste de la mémoire interne
+		return internal_ram[addr - 0xA000];
+}
 
 static void alloc_ram_mem(size_t size){
 	cartridge_ram_enabled = 1;
@@ -164,7 +174,7 @@ void memory_write(unsigned short addr, BYTE data){
 		{
 			write_mbc2(addr,data);
 		}
-		
+
 	}
 	else if(addr >= 0x8000 && addr <= 0x9FFF){
 		internal_ram[addr - 0x8000] = data;	

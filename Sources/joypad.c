@@ -16,7 +16,8 @@ void joypad_update(int cycles){
 			switch(event.type)
 			{
 				case SDL_QUIT:
-					exit(0);break;
+					exit(0);
+					break;
 			}
 			switch(event.key.keysym.sym){
 				case SDLK_RIGHT: 
@@ -47,6 +48,7 @@ void joypad_update(int cycles){
 			}
 			joypad_counter %= 80000;
 		}
+		//printf("key_buttons\n");
 		if(key_buttons != 0xFF) make_request(JOYPAD);
 		if(!(0x20 & joy_stat)) joy_stat = (joy_stat & 0xF0) | (key_buttons & 0x0F);
 		if(!(0x10 & joy_stat)) joy_stat = (joy_stat & 0xF0) | ((key_buttons & 0xF0)>>4);

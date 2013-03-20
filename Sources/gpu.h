@@ -28,15 +28,14 @@ typedef struct{
 	BYTE attributes;
 }sprite_t;
 
-int clock_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
+int line_clock_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
+int vblank_clock_counter;
 BYTE current_line;
 BYTE gpu_screen[144][160];
 SDL_Surface* sdl_matrix[144][160];
 SDL_Surface *sdl_screen;
 void gpu_init();
 void gpu_update(int cycles);
-void gpu_update_line();
-void gpu_update_stat();
 void gpu_drawline();
 void get_tile(BYTE num, tile_t *tile, int type);
 void tile_flip(tile_t *tile, int flipx_y, int size);

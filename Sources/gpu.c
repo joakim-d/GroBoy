@@ -1,9 +1,9 @@
 #include "gpu.h"
 
-static void swap_sprites(sprite_t *spr1, sprite_t *spr2);
+static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2);
+static inline void gpu_drawblackline();
 
 void gpu_init(){
-	clock_counter = 0;
 	current_line = 0;
 	//fonctions SDL
 
@@ -15,89 +15,87 @@ void gpu_init(){
 	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
 	SDL_WM_SetCaption("Groboy", NULL);
 }
-void gpu_update(int cycles){ //fonction appelée en premier
-	BYTE lcdc;
-	clock_counter += cycles;
-	if(clock_counter > ONE_LINE_CYCLES){
-		lcdc = memory_read(0xFF40);
-		if(lcdc & 0x80){
-			current_line = memory_read(0xFF44)+1;
-			clock_counter %= ONE_LINE_CYCLES;
-			if(current_line == LY_VISIBLE_MAX) draw_screen();
-			else if(current_line >= LY_MAX) current_line = 0;
-			memory_write(0xFF44, current_line);
-		}   
-	}   
-	gpu_update_stat();
-}
 
-void gpu_update_stat(){
-	BYTE lcdc;//LCD Control 
-	BYTE lyc, lcd_stat;
-	static BYTE mode = 4;
+void gpu_update(int cycles){ //fonction appelée en premier
+	BYTE lcdc;		//FF40 lcdcontrol
+	BYTE lcdstat;		//FF41 lcdstat
+	BYTE lyc;		//FF45 ly compare
+
+	static unsigned int vblank_clock_counter = 0;
+	static unsigned int line_clock_counter = 0;
+	
+	vblank_clock_counter += cycles;
+	
+	if(vblank_clock_counter >= 70224){
+		current_line = 0;
+		vblank_clock_counter -= 70224;
+		line_clock_counter = vblank_clock_counter;
+	}
+
+	current_line = vblank_clock_counter / 456;
+	memory_write(0xFF44, current_line);
 
 	lcdc = memory_read(0xFF40);
-	lyc = memory_read(0xFF45);
-	lcd_stat = memory_read(0xFF41);
-	current_line = memory_read(0xFF44);
-	if(current_line == lyc){//Vérification d'intersection entre LYC et LY
-		lcd_stat |= 0x04;
-		memory_write(0xFF41, lcd_stat);
-		if(lcd_stat & 0x40){
-			make_request(LCD_STAT);
+	lcdstat = memory_read(0xFF41);
+	if(lcdc & 0x80){					//si LCD est sur on
+		lyc = memory_read(0xFF45);
+		if(current_line == lyc){			//on compare ligne actuelle avec lyc
+			if(!(lcdstat & 0x04)){			//si le flag n'est toujours pas mis
+				lcdstat |= 0x04;
+				memory_write(0xFF41, lcdstat);
+				if(lcdstat & 0x40){
+					make_request(LCD_STAT);
+				}
+			}
 		}
-	}
-	else{
-		lcd_stat &= 0xFB;
-		memory_write(0xFF41, lcd_stat);
+		else{
+			if(lcdstat & 0x04){	
+				lcdstat &= 0xFB;
+				memory_write(0xFF41, lcdstat);
+			}
+		}
+	} 
 
-	}
-	if(lcdc & 0x80){
-		if(current_line < LY_VISIBLE_MAX){ 
-			if(clock_counter < 80 && mode != 2){
-				//Mode 2 The LCD controller is reading from OAM memory.
-				mode = 2;
-				lcd_stat &= 0xFC;
-				lcd_stat |= 0x02;
-				memory_write(0xFF41, lcd_stat);
-				if(lcd_stat & 0x20){
-					make_request(LCD_STAT);
-				}
-			}
-			else if(clock_counter < 172 && mode != 3){
-				//Mode 3 The LCD controller is reading from both OAM and VRAM
-				mode = 3;
-				lcd_stat |= 0x03;
-				memory_write(0xFF41, lcd_stat);	
-			}
-			else if(mode != 0){
-				//Mode 0 The LCD controller is in the H-Blank period and 
-				mode = 0;
-				if(current_line < LY_VISIBLE_MAX){//Si la ligne est dans le "champ de vision" 
-					gpu_drawline();
-				}
-				lcd_stat &= 0xFC;
-				memory_write(0xFF41, lcd_stat);
-				if(lcd_stat & 0x08){
-					make_request(LCD_STAT);
-				}
-			}
-		}
-		else if (mode != 1){//VBLANK
+	if(vblank_clock_counter >= 65664){
+		if(!(lcdstat & 0x01)){
+			lcdstat &= 0xFC;
+			memory_write(0xFF41, lcdstat | 1);
+			draw_screen();
 			make_request(V_BLANK);
-			mode = 1;
-			lcd_stat &= 0xFC;
-			lcd_stat |= 0x01;
-			memory_write(0xFF41, lcd_stat);
-			if(lcd_stat & 0x10){
-				make_request(LCD_STAT);
-			}
+			if(lcdstat & 0x10) make_request(LCD_STAT);
 		}
 	}
 	else{
-		lcd_stat = memory_read(0xFF41);
-		//memory_write(0xFF44, 0);
-		lcd_stat = (lcd_stat & 0xFC) + 1;
+		line_clock_counter += cycles;
+		if(line_clock_counter >= 456) line_clock_counter -= 456;
+		if(line_clock_counter <= 80){ //mode 2
+			if(!(lcdstat & 0x02) != 2){
+				lcdstat &= 0xFC;
+				memory_write(0xFF41, lcdstat | 2);
+				if(lcdstat & 0x20) make_request(LCD_STAT);
+			}
+		}
+		else if(line_clock_counter <= 252){ //mode 3
+			if((lcdstat & 0x03) != 3){
+				memory_write(0xFF41, lcdstat | 3);
+			}
+		}
+		else { 				//mode 0 
+			if(lcdstat & 0x03){ 	
+				memory_write(0xFF41, lcdstat & 0xFC);
+				if(lcdstat & 0x08){
+					make_request(LCD_STAT);
+				}
+				gpu_drawline();
+			}
+		}
+	}
+}
+
+static inline void gpu_drawblackline(){
+	int i;
+	for(i = 0; i < 160;i++){
+		gpu_screen[current_line][i] = 3;
 	}
 }
 
@@ -155,6 +153,7 @@ void gpu_drawline(){
 			}
 		}
 	}
+	/*
 	if(lcd_cont & 0x20){ //Si Window établie
 
 		window_y = memory_read(0xFF4A);
@@ -189,7 +188,7 @@ void gpu_drawline(){
 			}
 
 		}
-	}
+	}*/
 	if(lcd_cont & 0x02){ //Si Sprites établis
 
 		displyd_sprites_nb = 0;
@@ -365,10 +364,10 @@ void draw_screen()
 		}
 	}
 	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-	SDL_Delay(10);
+	SDL_Delay(1);
 }
 
-static void swap_sprites(sprite_t *spr1, sprite_t *spr2){
+static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){
 	sprite_t spr_temp;
 
 	spr_temp.x = spr1->x;
