@@ -408,6 +408,8 @@ void event_process()
 				}
 				break;
 			case SDL_VIDEORESIZE:
+				//SDL_Surface *sdl_screen_copie;
+				sdl_screen = SDL_SetVideoMode(event.resize.w, event.resize.h,32,SDL_HWSURFACE | SDL_RESIZABLE);
 				scale(sdl_screenTemp,sdl_screen);
         			SDL_Flip(sdl_screen);
 				break;
@@ -451,14 +453,14 @@ void ChangeMode()
 		if(sdl_screen == NULL) sdl_screen = SDL_SetVideoMode(0, 0, 0, SDL_VIDEO_FLAGS); /* Si le changement échoue, réinitialise la fenêtre avec la configuration précédente */
 		if(sdl_screen == NULL) exit(1); /* Si la réinitialisation échoue, alors c'est un échec */
 		scale(sdl_screenTemp,sdl_screen);
-        	SDL_Flip(sdl_screen);
 		screen_mode = 1;
 	}
 	else
 	{
 		sdl_screen = SDL_SetVideoMode(160,144,32,SDL_VIDEO_FLAGS);
 		scale(sdl_screenTemp,sdl_screen);
-        	SDL_Flip(sdl_screen);
 		screen_mode = 0;
 	}
+	SDL_Flip(sdl_screen);
+
 }

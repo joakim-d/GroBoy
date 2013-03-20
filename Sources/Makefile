@@ -3,7 +3,7 @@ CC=gcc
 CFLAGS = -std=c99 -lSDL -Wall
 EXEC= groboy
 OBJ= $(SRC: .c=.o)
-LIBRARY= `sdl-config --cflags --libs` -lSDLmain -lSDL -I /auto_home/jdivet/LIB/include -L /auto_home/jdivet/LIB/lib
+LIBRARY= `sdl-config --cflags --libs` -lSDLmain -lSDL -I /auto_home/fvinard/LIB/include -L /auto_home/fvinard/LIB/lib
 all:
 	echo "make, trois options possibles : groboy, debug et clean"
 groboy:
