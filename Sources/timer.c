@@ -7,7 +7,9 @@ void timer_update(BYTE cycles){
 	BYTE timer_counter;
 	div_timer += cycles;
 	if(div_timer / DIVIDER_TIMER_SPEED >= 1){
+		set_force_write();
 		memory_write(0xFF04, memory_read(0xFF04) + 1);
+		reset_force_write();
 		div_timer -= DIVIDER_TIMER_SPEED;
 	}
 	timer_control = memory_read(0xFF07);

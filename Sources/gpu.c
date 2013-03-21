@@ -30,13 +30,15 @@ void gpu_update(int cycles){ //fonction appelée en premier
 	
 	vblank_clock_counter += cycles;
 	
-	if(vblank_clock_counter >= 70224){
+	if(vblank_clock_counter >= 70224){//si on dépasse la période de vblank
 		current_line = 0;
 		vblank_clock_counter -= 70224;
 		line_clock_counter = vblank_clock_counter;
 	}
 	current_line = vblank_clock_counter / 456;
+	set_force_write();
 	memory_write(0xFF44, current_line);
+	reset_force_write();
 
 	lcdc = memory_read(0xFF40);
 	lcdstat = memory_read(0xFF41);
@@ -59,7 +61,7 @@ void gpu_update(int cycles){ //fonction appelée en premier
 		}
 	} 
 
-	if(vblank_clock_counter >= 65664){
+	if(vblank_clock_counter >= 65664){ //Si on entre dans la période de vblank
 		if(!(lcdstat & 0x01)){
 			lcdstat &= 0xFC;
 			memory_write(0xFF41, lcdstat | 1);
@@ -200,6 +202,7 @@ void gpu_drawline(){
 			else sprite_size = 8;
 			if(current_line >= (sprites[j].y - 16) && current_line < (sprites[j].y - 16 + sprite_size)){
 				ordered_sprites_num[displyd_sprites_nb++] = j;
+				
 			}
 			j++;
 		}
@@ -339,7 +342,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 
 void draw_screen()
 {
-	//event_process();
+	event_process();
 	for(int i=0; i<144; i++)
 	{
 		for(int j=0; j<160; j++)

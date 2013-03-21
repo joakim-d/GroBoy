@@ -85,8 +85,6 @@ void joypad_update(int cycles){
 		}
 	}
 
-	//printf("%x\n",(joy_stat & 0xF0) | (key_buttons & 0x0F));
-	//printf("%x\n",(joy_stat & 0xF0) | ((key_buttons & 0xF0)>>4));
 	joy_new = 0x0F;
 	if(0x10 & joy_cur) {
 		joy_new &= ((key_buttons & 0xF0)>>4);
