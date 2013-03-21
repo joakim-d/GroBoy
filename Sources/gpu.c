@@ -106,7 +106,6 @@ void gpu_drawline(){
 	int bg_y, bg_x;
 	int window_y, window_x;
 	int i,j;
-	unsigned short cur_tile_nb;		//num de la tuile courante
 	BYTE lcd_cont;
 	BYTE current_pixel = 0; 		//compteur allant de 0 à 160 pour savoir lorsque l'on finit la ligne
 	BYTE cur_tile_px_x; 			//compteur pour savoir quel pixel récupérer sur la tuile et pour passer à la suivante lorsque > 7
