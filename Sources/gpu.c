@@ -114,11 +114,8 @@ void gpu_drawline(){
 	tile_t tile; 				//tuile courante
 	sprite_t sprites[40];
 	BYTE ordered_sprites_num[40];
-	unsigned short temp_sprite;
 	BYTE displyd_sprites_nb;
 	BYTE sprite_size;
-	BYTE sprite_sets;
-	BYTE sprite_x;
 	BYTE scy;
 	BYTE scx;
 
@@ -156,7 +153,7 @@ void gpu_drawline(){
 			}
 		}
 	}
-	/*
+	
 	if(lcd_cont & 0x20){ //Si Window établie
 
 		window_y = memory_read(0xFF4A);
@@ -191,7 +188,7 @@ void gpu_drawline(){
 			}
 
 		}
-	}*/
+	}
 	if(lcd_cont & 0x02){ //Si Sprites établis
 
 		displyd_sprites_nb = 0;
@@ -201,8 +198,9 @@ void gpu_drawline(){
 			sprites[j].x = memory_read(i + 1);
 			sprites[j].pattern_nb = memory_read(i + 2);
 			sprites[j].attributes = memory_read(i + 3);
-			if(current_line >= (sprites[j].y - 16) && current_line <= (sprites[j].y - 9)
-					&& sprites[j].x > 7 && sprites[j].x < 168){
+			if(lcd_cont & 0x04) sprite_size = 16;
+			else sprite_size = 8;
+			if(current_line >= (sprites[j].y - 16) && current_line < (sprites[j].y - 16 + sprite_size)){
 				ordered_sprites_num[displyd_sprites_nb++] = j;
 			}
 			j++;
@@ -225,9 +223,9 @@ void gpu_drawline(){
 			else tile.palette = memory_read(0xFF48);
 
 			get_tile(sprites[ordered_sprites_num[i]].pattern_nb, &tile, SPRITES);
-			cur_tile_px_y = current_line % tile.size;
+			cur_tile_px_y = current_line + 16 - sprites[ordered_sprites_num[i]].y; 
 			for(j = 0; j < 8; j++){
-				if(tile.px[cur_tile_px_y][j] != 0){ // Si le sprite n'est pas transparent
+				if(tile.px[cur_tile_px_y][j] != 4){ // Si le sprite n'est pas transparent
 					if(!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0)	//si le sprite est dessus ou que le background est à 0
 						gpu_screen[current_line][sprites[ordered_sprites_num[i]].x - 8 +j] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
 				}
@@ -285,6 +283,7 @@ void get_tile(BYTE num, tile_t *tile, int type){
 
 			if(tile->px[lig][i] == 0){
 				if(type != SPRITES) tile->px[lig][i] = tile->palette & 0x03;
+				else tile->px[lig][i] = 4;
 			}
 			else if(tile->px[lig][i] == 1) tile->px[lig][i] = (tile->palette & 0x0C) >> 2;
 			else if(tile->px[lig][i] == 2) tile->px[lig][i] = (tile->palette & 0x30) >> 4;
@@ -292,10 +291,10 @@ void get_tile(BYTE num, tile_t *tile, int type){
 		}
 		lig++;
 	}
-	/*
+	
 	   if(tile->x_flip)tile_flip(tile,0,size);
 	   if(tile->y_flip)tile_flip(tile,1,size);
-	 */
+	
 	tile->size = size;
 }
 
@@ -306,19 +305,11 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 	BYTE tempflip[16][8];
 	int cpt;
 
-	for(int i=0; i<16; i++)
-	{
-		for(int j=0; j<8; j++)
-		{
-			tempflip[i][j] = 0;
-		}
-	}
-
 	if(flipx_y == 0)
 	{
-
 		for(int i=0; i<size; i++)
 		{
+			cpt = 0;
 			for(int j=7; j>=0; j--)
 			{
 				tempflip[i][cpt] = tile->px[i][j];
@@ -326,9 +317,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 			}
 		}
 	}
-
-
-	if(flipx_y == 1)
+	else if(flipx_y == 1)
 	{
 		cpt = 0;
 		for(int i=size-1; i>=0; i--)

@@ -27,10 +27,10 @@ void joypad_update(int cycles){
 						case SDLK_LEFT:
 							key_buttons &= 0xFD;
 							break;
-						case SDLK_DOWN:
+						case SDLK_UP:
 							key_buttons &= 0xFB;
 							break;
-						case SDLK_UP:
+						case SDLK_DOWN:
 							key_buttons &= 0xF7;
 							break;
 						case SDLK_d:
@@ -57,10 +57,10 @@ void joypad_update(int cycles){
 						case SDLK_LEFT:
 							key_buttons |= 0x02;
 							break;
-						case SDLK_DOWN:
+						case SDLK_UP:
 							key_buttons |= 0x04;
 							break;
-						case SDLK_UP:
+						case SDLK_DOWN:
 							key_buttons |= 0x08;
 							break;
 						case SDLK_d:
