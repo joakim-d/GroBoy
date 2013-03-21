@@ -13,6 +13,7 @@ void joypad_update(int cycles){
 
 	joy_cur = memory_read(0xFF00);
 	if(joypad_counter > 80000){
+		joypad_counter -= 80000;
 		while(SDL_PollEvent(&event)){
 			switch(event.type){
 				case SDL_QUIT:
@@ -20,7 +21,7 @@ void joypad_update(int cycles){
 					break;
 				default:
 					break;
-			}
+		}
 		joypad_counter -= 80000;
 		keystate = SDL_GetKeyState(NULL);
 		if(keystate[SDLK_RIGHT]) key_buttons &=0xFE;
