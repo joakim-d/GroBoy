@@ -103,21 +103,20 @@ static inline void gpu_drawblackline(){
 }
 
 void gpu_drawline(){
-	BYTE lcd_cont;
 	int bg_y, bg_x;
 	int window_y, window_x;
 	int i,j;
+	BYTE lcd_cont;
 	BYTE current_pixel = 0; 		//compteur allant de 0 à 160 pour savoir lorsque l'on finit la ligne
 	BYTE cur_tile_px_x; 			//compteur pour savoir quel pixel récupérer sur la tuile et pour passer à la suivante lorsque > 7
 	BYTE cur_tile_px_y; 			//Permet de savoir quelle ligne du pixel choisir
-	unsigned short cur_tile_nb;		//num de la tuile courante
-	tile_t tile; 				//tuile courante
-	sprite_t sprites[40];
 	BYTE ordered_sprites_num[40];
 	BYTE displyd_sprites_nb;
 	BYTE sprite_size;
 	BYTE scy;
 	BYTE scx;
+	tile_t tile; 				//tuile courante
+	sprite_t sprites[40];
 
 	lcd_cont = memory_read(0xFF40);
 
@@ -156,34 +155,33 @@ void gpu_drawline(){
 	
 	if(lcd_cont & 0x20){ //Si Window établie
 
-		window_y = memory_read(0xFF4A);
-		window_x = memory_read(0xFF4B) - 7;
-		if(current_line >= window_y && window_x < 160){
-			scy = (current_line - window_y)/8;
-			scx = (current_line - window_x);
+		scy = memory_read(0xFF4A);
+		scx = memory_read(0xFF4B);
+		if(current_line >= scy && scx < 167){//si la ligne actuelle est bien au dessus de la window et que la window apparait en x
+			window_y = (current_line - scy)/8;
+			window_x = 0;
 			tile.palette = memory_read(0xFF47);
 			tile.x_flip = 0;
 			tile.y_flip = 0;
-			cur_tile_nb = ((window_y)*4) + (window_x/8);
 			if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-				get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+				get_tile(memory_read(0x9C00 + window_y*32), &tile, WINDOW);	// On récupère la tuile correspondante	
 			else
-				get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+				get_tile(memory_read(0x9800 + window_y*32), &tile, WINDOW);	// On récupère la tuile correspondante	
 
-			cur_tile_px_x = window_x % 8;
-			cur_tile_px_y = window_y % 8;
-
-			while(window_x < 160){	//On parcourt toute la ligne
-				if(window_x>=0)
-					gpu_screen[current_line][window_x++] = tile.px[cur_tile_px_y][cur_tile_px_x++];
-				window_x++;
+			cur_tile_px_x = 0;
+			cur_tile_px_y = (current_line - scy) % 8;
+			while(scx < 167){	//On parcourt toute la ligne
+				if(scx>=7)
+					gpu_screen[current_line][scx - 7] = tile.px[cur_tile_px_y][cur_tile_px_x];
+				scx++;
+				cur_tile_px_x++;
 				if(cur_tile_px_x > 7){ 
 					cur_tile_px_x = 0;
-					cur_tile_nb++;
+					window_x++;
 					if(lcd_cont & 0x40)				// On regarde quelle est la background map			
-						get_tile(memory_read(cur_tile_nb + 0x9C00), &tile, WINDOW);	// On récupère la tuile correspondante	
+						get_tile(memory_read(0x9C00 + window_y*32 + window_x), &tile, WINDOW);	// On récupère la tuile correspondante	
 					else
-						get_tile(memory_read(cur_tile_nb + 0x9800), &tile, WINDOW);	// On récupère la tuile correspondante	
+						get_tile(memory_read(0x9800 + window_y*32 + window_x), &tile, WINDOW);	// On récupère la tuile correspondante	
 				}
 			}
 
