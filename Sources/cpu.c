@@ -2110,43 +2110,36 @@ static inline void cpl(){
 	z80.F |= 0x60; // H + N
 }
 
-static inline void daa()
-{
-	unsigned int temp = z80.A;
-	if(z80.F & 0x40)
-	{
-		if(z80.F & (0x20))
-		{
-			temp = (temp - 6) & 0xff;
-		}
-		if(z80.F & (0x10))
-		{
-			temp -= 0x60;
-		}
-	}
-	else
-	{
-		if(z80.F & (0x20) || (temp & 0x0f) > 9)
-		{
+static inline void daa(){
+	int temp = z80.A;
+	if(!(z80.F & 0x40)){
+		if( (z80.F & (0x20)) || (temp & 0xf) > 9){
 			temp += 0x06;
 		}
-		if(z80.F & (0x10) || (temp >> 4 ) > 9)
-		{
+		if( (z80.F & (0x10)) || temp > 0x9F){
 			temp += 0x60;
 		}
 	}
-
-	if(temp & 0x100)
-	{
-		z80.F |= 0x10;
+	else {
+		if(z80.F & (0x20)){
+			temp = ((temp - 0x6) & 0xff);
+		}
+		if(z80.F & (0x10)){
+			temp -= 0x60;
+		}
 	}
 
-	temp &= ~(0x20);
-
+	//z80.F &= ~(0x20 | 0x80);
+	temp &= ~(0x20 | 0x80);
+	if((temp & 0x100) == 0x100){
+		z80.F |= 0x10;
+	}
 	temp &= 0xff;
-	if(z80.A == 0) z80.F |= 0x80;
-	else z80.F &= ~(0x80);
-
+	if(temp == 0x00){
+		z80.F |= 0x80;
+	} else { 
+		z80.F &= ~(0x80);
+	}
 	z80.A = temp;
 }
 
