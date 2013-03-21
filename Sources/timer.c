@@ -6,14 +6,15 @@ void timer_update(BYTE cycles){
 	BYTE timer_control;
 	BYTE timer_counter;
 	div_timer += cycles;
-	if(div_timer % DIVIDER_TIMER_SPEED < div_timer){
+	if(div_timer / DIVIDER_TIMER_SPEED >= 1){
 		memory_write(0xFF04, memory_read(0xFF04) + 1);
-		div_timer %= DIVIDER_TIMER_SPEED;
+		div_timer -= DIVIDER_TIMER_SPEED;
 	}
 	timer_control = memory_read(0xFF07);
 	if(timer_control & 0x04){
 		tac_timer += cycles;
-		if(tac_timer % tac_speed[timer_control & 0x03]){
+		if(tac_timer > tac_speed[timer_control & 0x03]){
+			tac_timer -= tac_speed[timer_control & 0x03];
 			timer_counter = memory_read(0xFF05);
 			if(timer_counter + 1 > 0xFF){
 				make_request(TIMER);
