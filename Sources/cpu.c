@@ -2121,18 +2121,18 @@ static inline void daa()
 		}
 		if(z80.F & (0x10))
 		{
-			temp -= 0x96;
+			temp -= 0x60;
 		}
 	}
 	else
 	{
 		if(z80.F & (0x20) || (temp & 0x0f) > 9)
 		{
-			temp += 6;
+			temp += 0x06;
 		}
 		if(z80.F & (0x10) || (temp >> 4 ) > 9)
 		{
-			temp += 0x96;
+			temp += 0x60;
 		}
 	}
 

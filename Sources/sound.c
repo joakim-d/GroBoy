@@ -88,6 +88,7 @@ void sound_run(unsigned short address){
 	blip_set_rates(blip,clock_rate,sample_rate);
 	BYTE value = memory_read(address);
 	SDL_PauseAudio(0);
+	update_sound();
 	switch(address){
 		case NR10:
 			apu.channel1.sweep_period = ((value & 0x70) >> 4);
@@ -197,7 +198,6 @@ void sound_run(unsigned short address){
 	}
 	//SDL_Delay(100);
 	//printf("sound\n");
-	update_sound();
 	SDL_PauseAudio(1);
 }
 
