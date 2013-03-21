@@ -187,14 +187,14 @@ void memory_write(unsigned short addr, BYTE data){
 	else if(addr >= 0x8000 && addr <= 0x9FFF){
 		internal_ram[addr - 0x8000] = data;	
 	}
-	else if(addr >= 0xff10 && addr <= 0xff26){
-		sound_run(addr);	
-	}
 	else{
 		if(!force_write){
-			if(addr == 0xFF04 || addr == 0xFF44) internal_ram[addr - 0xA000] = 0;	//reset counter
-			if(addr == 0xFF46) dma_transfer(data);					//dma transfer
-			else internal_ram[addr - 0xA000] = data;
+			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr - 0xA000] = 0;}	//reset counter
+			else if(addr >= 0xFF10 && addr <= 0xFF26){
+				sound_run(addr);	
+			}
+			else if(addr == 0xFF46) {dma_transfer(data);}					//dma transfer
+			else {internal_ram[addr - 0xA000] = data;}
 		}
 		else{
 			internal_ram[addr - 0xA000] = data;	

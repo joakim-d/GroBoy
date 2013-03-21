@@ -12,8 +12,6 @@ void joypad_update(int cycles){
 
 	joy_cur = memory_read(0xFF00);
 
-	if(joypad_counter >= 80000){
-		joypad_counter -= 80000;
 		while(SDL_PollEvent(&event)){
 			switch(event.type){
 				case SDL_QUIT:
@@ -83,7 +81,6 @@ void joypad_update(int cycles){
 					break;
 			}
 		}
-	}
 
 	joy_new = 0x0F;
 	if(0x10 & joy_cur) {
