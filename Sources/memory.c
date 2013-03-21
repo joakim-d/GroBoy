@@ -5,6 +5,13 @@ static void alloc_ram_mem(size_t size);
 static inline void write_mbc1(unsigned short addr, BYTE data);
 static inline void write_mbc2(unsigned short addr, BYTE data);
 static inline void dma_transfer(BYTE data);
+void set_force_write(){
+	force_write = 1;
+}
+
+void reset_force_write(){
+	force_write = 0;
+}
 static void read_rom_info(char* rom_path){
 	int file_d;
 	struct stat file_stat;
@@ -106,6 +113,7 @@ void memory_init(char *rom_path){
 	read_rom_info(rom_path);
 	rom_selector = 1;
 	ram_selector = 0;
+	force_write = 0;
 	for(i = 0; i < 32768; i++){
 		internal_ram[i] = 0;
 	}
@@ -179,13 +187,17 @@ void memory_write(unsigned short addr, BYTE data){
 	else if(addr >= 0x8000 && addr <= 0x9FFF){
 		internal_ram[addr - 0x8000] = data;	
 	}
-	else if(addr >= 0xff10 && addr <= 0xff26){
-		sound_run(addr);	
-	}
 	else{
-		switch(addr){
-			case 0xFF46: dma_transfer(data);break;
-			default: internal_ram[addr - 0xA000] = data;break;	
+		if(!force_write){
+			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr - 0xA000] = 0;}	//reset counter
+			else if(addr >= 0xFF10 && addr <= 0xFF26){
+				sound_run(addr);	
+			}
+			else if(addr == 0xFF46) {dma_transfer(data);}					//dma transfer
+			else {internal_ram[addr - 0xA000] = data;}
+		}
+		else{
+			internal_ram[addr - 0xA000] = data;	
 		}
 	}
 
