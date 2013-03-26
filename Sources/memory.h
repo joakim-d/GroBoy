@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "def.h"
 #include "sound.h"
+enum type_mem{ALL,FIRST_CART, SWITCH_CART, VRAM, EXTRAM, FIRST_WRAM, SWITCH_WRAM,ECHO, OAM, NONUSED, IO, HRAM, IER, DETAIL_VIDEO, DETAIL_SOUND, DETAIL_JOY, DETAIL_TIMER, DETAIL_INTERRUPTS};
 BYTE cartridge_type;
 BYTE enable_ram;
 BYTE cartridge_ram_enabled;
@@ -26,4 +27,5 @@ BYTE memory_read(unsigned short addr);
 void memory_write(unsigned short addr, BYTE data);
 void set_force_write();
 void reset_force_write();
+void memory_dump(int part); // un dump mémoire, ou part représente la partie de la mémoire à dumper
 #endif

@@ -248,3 +248,204 @@ static inline void dma_transfer(BYTE data){
 		memory_write(0xFE00 + i, memory_read(source + i));
 	}
 }
+
+void memory_dump(int part){
+	int i;
+	int diff=0;
+	switch(part){
+		case ALL:
+			for(i=0x00;i<=0xFFFF;i++){
+				if(!diff)printf("----- ALL MEMORY -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case FIRST_CART:
+			for(i=0x0000;i<=0x3FFF;i++){
+				if(!diff)printf("----- 16KB ROM BANK 00 -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case SWITCH_CART:
+			for(i=0x4000;i<=0x7FFF;i++){
+				if(!diff)printf("----- 16KB ROM BANK 01..NN -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case VRAM:
+			for(i=0x8000;i<=0x9FFF;i++){
+				if(!diff)printf("----- 8KB VIDEO RAM (VRAM) -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case EXTRAM:
+			for(i=0xA000;i<=0xBFFF;i++){
+				if(!diff)printf("----- 8KB EXTERNAL RAM -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case FIRST_WRAM:
+			for(i=0xC000;i<=0xCFFF;i++){
+				if(!diff)printf("----- 4KB WORK RAM BANK 0 -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case SWITCH_WRAM:
+			for(i=0xD000;i<=0xDFFF;i++){
+				if(!diff)printf("----- 4KB WORK RAM BANK 1 -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case ECHO:
+			for(i=0xE000;i<=0xFDFF;i++){
+				if(!diff)printf("----- SAME AS COOO-DDFF (ECHO) -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case OAM:
+			for(i=0xFE00;i<=0xFE9F;i++){
+				if(!diff)printf("----- SPRITE ATTRIBUTE TABLE (OAM) -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case NONUSED:
+			for(i=0xFEA0;i<=0xFEFF;i++){
+				if(!diff)printf("----- NOT USABLE -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case IO:
+			for(i=0xFF00;i<=0xFF7F;i++){
+				if(!diff)printf("----- I/O PORTS -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case HRAM:
+			for(i=0xFF80;i<=0xFFFE;i++){
+				if(!diff)printf("----- HIGH RAM (HRAM) -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			break;
+		case IER:
+			i = 0xFFFF;
+			if(!diff)printf("----- INTERRUP ENABLE REGISTER -----\n");
+			printf("%x : %x\n", i, memory_read(i));
+			break;
+		case DETAIL_VIDEO:
+			if(!diff)printf("LCDC - LCD Control\n");
+			printf("FF40 : %x\n", memory_read(0xFF40));
+			if(!diff)printf("STAT - LCDC Status\n");
+			printf("FF41 : %x\n", memory_read(0xFF41));
+			if(!diff)printf("SCY - Scroll Y\n");
+			printf("FF42 : %x\n", memory_read(0xFF42));
+			if(!diff)printf("SCX - Scroll X\n");
+			printf("FF43 : %x\n", memory_read(0xFF43));
+			if(!diff)printf("LY - LCDC Y-Coordinate\n");
+			printf("FF44 : %x\n", memory_read(0xFF44));
+			if(!diff)printf("LYC - LY Compare\n");
+			printf("FF45 : %x\n", memory_read(0xFF45));
+			if(!diff)printf("WY - Window Y Position\n");
+			printf("FF4A : %x\n", memory_read(0xFF4A));
+			if(!diff)printf("WX - Window X Position minus 7\n");
+			printf("FF4B : %x\n", memory_read(0xFF4B));
+			if(!diff)printf("BGP - BG Palette Data\n");
+			printf("FF47 : %x\n", memory_read(0xFF47));
+			if(!diff)printf("OBP0 Object Palette 0 Data\n");
+			printf("FF48 : %x\n", memory_read(0xFF48));
+			if(!diff)printf("OBP1 Object Palette 1 Data\n");
+			printf("FF49 : %x\n", memory_read(0xFF49));
+			if(!diff)printf("BCPS/BGPI Background Palette Index\n");
+			printf("FF68 : %x\n", memory_read(0xFF68));
+			if(!diff)printf("BCPD/BGPD Background Palette Data\n");
+			printf("FF69 : %x\n", memory_read(0xFF69));
+			if(!diff)printf("OCPS/OBPI Sprite Palette Index\n");
+			printf("FF6A : %x\n", memory_read(0xFF6A));
+			if(!diff)printf("OCPD/OBPD Sprite Palette Data\n");
+			printf("FF6B : %x\n", memory_read(0xFF6B));
+			if(!diff)printf("VBK VRAM Bank\n");
+			printf("FF4F : %x\n", memory_read(0xFF4F));
+			if(!diff)printf("DMA Transfert And Start Address\n");
+			printf("FF46 : %x\n", memory_read(0xFF46));
+			if(!diff)printf("New DMA Source, High\n");
+			printf("FF51 : %x\n", memory_read(0xFF51));
+			if(!diff)printf("New DMA Source, Low\n");
+			printf("FF52 : %x\n", memory_read(0xFF52));
+			if(!diff)printf("New DMA Destination, High\n");
+			printf("FF53 : %x\n", memory_read(0xFF53));
+			if(!diff)printf("New DMA Destination, Low\n");
+			printf("FF54 : %x\n", memory_read(0xFF54));
+			if(!diff)printf("New DMA Length/Mode/Start\n");
+			printf("FF55 : %x\n", memory_read(0xFF55));
+			break;
+		case DETAIL_SOUND:
+			if(!diff)printf("Channel 1 Sweep Register\n");
+			printf("FF10 : %x\n", memory_read(0xFF10));
+			if(!diff)printf("Channel 1 Sound Length/ Wave Pattern Duty\n");
+			printf("FF11 : %x\n", memory_read(0xFF11));
+			if(!diff)printf("Channel 1 Volume Envelope\n");
+			printf("FF12 : %x\n", memory_read(0xFF12));
+			if(!diff)printf("Channel 1 Frequency lo\n");
+			printf("FF13 : %x\n", memory_read(0xFF13));
+			if(!diff)printf("Channel 1 Frequency hi\n");
+			printf("FF14 : %x\n", memory_read(0xFF14));
+			if(!diff)printf("Channel 2 Sound Length/ Wave Pattern Duty\n");
+			printf("FF16 : %x\n", memory_read(0xFF16));
+			if(!diff)printf("Channel 2 Volume Envelope\n");
+			printf("FF17 : %x\n", memory_read(0xFF17));
+			if(!diff)printf("Channel 2 Frequency lo data\n");
+			printf("FF18 : %x\n", memory_read(0xFF18));
+			if(!diff)printf("Channel 2 Frequency hi data\n");
+			printf("FF19 : %x\n", memory_read(0xFF19));
+			if(!diff)printf("Channel 3 Sound On/Off\n");
+			printf("FF1A : %x\n", memory_read(0xFF1A));
+			if(!diff)printf("Channel 3 Sound Length\n");
+			printf("FF1B : %x\n", memory_read(0xFF1B));
+			if(!diff)printf("Channel 3 Select Output Level\n");
+			printf("FF1C : %x\n", memory_read(0xFF1C));
+			if(!diff)printf("Channel 3 Frequency's lower data\n");
+			printf("FF1D : %x\n", memory_read(0xFF1D));
+			if(!diff)printf("Channel 3 Frequency's higher data\n");
+			printf("FF1E : %x\n", memory_read(0xFF1E));
+			for(i=0xFF30;i<=0xFF3F;i++){
+				if(!diff)printf("----- WAVE PATTERN RAM STOCK -----\n");
+				printf("%x : %x\n", i, memory_read(i));
+			}
+			if(!diff)printf("Channel 4 Sound Length\n");
+			printf("FF20 : %x\n", memory_read(0xFF20));
+			if(!diff)printf("Channel 4 Volume Envelope\n");
+			printf("FF21 : %x\n", memory_read(0xFF21));
+			if(!diff)printf("Channel 4 Polynomial Counter\n");
+			printf("FF22 : %x\n", memory_read(0xFF22));
+			if(!diff)printf("Channel 4 Counter/consecutive; Initial\n");
+			printf("FF23 : %x\n", memory_read(0xFF23));
+			if(!diff)printf("Channel control / On-Off / Volume\n");
+			printf("FF24 : %x\n", memory_read(0xFF24));
+			if(!diff)printf("Selection of sound output terminal\n");
+			printf("FF25 : %x\n", memory_read(0xFF25));
+			if(!diff)printf("Sound On/Off\n");
+			printf("FF26 : %x\n", memory_read(0xFF26));
+			break;
+		case DETAIL_JOY:
+			if(!diff)printf("Joypad\n");
+			printf("FF00 : %x\n", memory_read(0xFF00));
+			break;
+		case DETAIL_TIMER:
+			if(!diff)printf("Divider Register\n");
+			printf("FF04 : %x\n", memory_read(0xFF04));
+			if(!diff)printf("Timer Counter\n");
+			printf("FF05 : %x\n", memory_read(0xFF05));
+			if(!diff)printf("Timer Modulo\n");
+			printf("FF06 : %x\n", memory_read(0xFF06));
+			if(!diff)printf("Timer Control\n");
+			printf("FF07 : %x\n", memory_read(0xFF07));
+			break;
+		case DETAIL_INTERRUPTS:
+			if(!diff)printf("----- DETAILS INTERRUPTIONS REGISTERS -----\n");
+			if(!diff)printf("Interrupt Enable\n");
+			printf("FFFF : %x\n", memory_read(0xFFFF));
+			if(!diff)printf("Interrupt Flag\n");
+			printf("FF0F : %x\n", memory_read(0xFF0F));
+			break;
+		default : 
+			break;
+	}
+}
