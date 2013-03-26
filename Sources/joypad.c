@@ -22,7 +22,6 @@ void joypad_update(int cycles){
 				default:
 					break;
 		}
-		joypad_counter -= 80000;
 		keystate = SDL_GetKeyState(NULL);
 		if(keystate[SDLK_RIGHT]) key_buttons &=0xFE;
 		else key_buttons |= 0x01;

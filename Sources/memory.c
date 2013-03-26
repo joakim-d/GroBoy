@@ -161,11 +161,11 @@ BYTE memory_read(unsigned short addr){
 	else if(addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
 		return cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
 	else if(addr <= 0x9FFF) 		//demande de lecture vidéo ram
-		return internal_ram[addr - 0x8000];
+		return internal_ram[addr];
 	else if(addr <= 0xBFFF && cartridge_ram_enabled)		//demande de lecture dans la banque de ram 0..n de la cartouche
 		return cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
 	else 						//demande de lecture dans le reste de la mémoire interne
-		return internal_ram[addr - 0xA000];
+		return internal_ram[addr];
 }
 
 static void alloc_ram_mem(size_t size){
@@ -184,20 +184,25 @@ void memory_write(unsigned short addr, BYTE data){
 		}
 
 	}
-	else if(addr >= 0x8000 && addr <= 0x9FFF){
-		internal_ram[addr - 0x8000] = data;	
+	else if(addr >= 0xC000 && addr <= 0xDDFF){
+		internal_ram[addr] = data;
+		internal_ram[0xE000 + (addr - 0xC000)] = data;
+	}
+	else if(addr >= 0xE000 && addr <= 0xFDFF){
+		internal_ram[addr] = data;
+		internal_ram[0xC000 + (addr - 0xE000)] = data;
 	}
 	else{
 		if(!force_write){
-			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr - 0xA000] = 0;}	//reset counter
+			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr] = 0;}	//reset counter
 			else if(addr >= 0xFF10 && addr <= 0xFF26){
 				sound_run(addr);	
 			}
 			else if(addr == 0xFF46) {dma_transfer(data);}					//dma transfer
-			else {internal_ram[addr - 0xA000] = data;}
+			else {internal_ram[addr] = data;}
 		}
 		else{
-			internal_ram[addr - 0xA000] = data;	
+			internal_ram[addr] = data;	
 		}
 	}
 
