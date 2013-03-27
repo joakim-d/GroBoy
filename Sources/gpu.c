@@ -14,7 +14,29 @@ void gpu_init(){
 		fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
 		exit(EXIT_FAILURE); // On quitte le programme
 	}
-	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_VIDEO_FLAGS);
+
+	/** //test pour connaitre les resolutions possibles
+	resolutions =SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+ 
+    	// On verifie si un mode est possible 
+    	if(resolutions == (SDL_Rect **)0){
+     	   printf("Aucune résolution n'est possible!\n");
+        	exit(-1);
+    	}
+ 
+  	// On verifie si toutes les resolutions sont possibles 
+    	if(resolutions == (SDL_Rect **)-1){
+        	printf("Toutes les resolutions sont possibles.\n");
+    	}
+    	else{
+        	// Print valid modes 
+        	printf("Résolutions possibles :\n");
+        	for(int i=0;resolutions[i];++i)
+        	   printf("  %d x %d\n", resolutions[i]->w, resolutions[i]->h);
+	}	*/
+
+
+	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible
 	sdl_screenTemp = SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
 	SDL_WM_SetCaption("Groboy", NULL);
 	screen_mode = 0;
@@ -29,7 +51,7 @@ void gpu_update(int cycles){ //fonction appelée en premier
 	static unsigned int line_clock_counter = 0;
 	
 	vblank_clock_counter += cycles;
-	
+	event_process();
 	if(vblank_clock_counter >= 70224){//si on dépasse la période de vblank
 		current_line = 0;
 		vblank_clock_counter -= 70224;
@@ -342,7 +364,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 
 void draw_screen()
 {
-	event_process();
+	//event_process();
 	for(int i=0; i<144; i++)
 	{
 		for(int j=0; j<160; j++)
@@ -388,12 +410,12 @@ void event_process()
     	{
 		switch (event.type)
 		{
-          		case SDL_KEYDOWN:
+          		/**case SDL_KEYDOWN:
 	       			if(event.key.keysym.sym==SDLK_ESCAPE)
 	       			{
 					ChangeMode();
 				}
-				break;
+				break;*/
 			case SDL_VIDEORESIZE:
 				//SDL_Surface *sdl_screen_copie;
 				sdl_screen = SDL_SetVideoMode(event.resize.w, event.resize.h,32,SDL_HWSURFACE | SDL_RESIZABLE);
@@ -436,7 +458,7 @@ void ChangeMode()
 {
 	if(screen_mode==0)
 	{	
-		sdl_screen = SDL_SetVideoMode(0, 0, 0, SDL_VIDEO_FLAGS ^ SDL_FULLSCREEN); /* Passe en mode plein écran */
+		sdl_screen = SDL_SetVideoMode(0, 0, 32, SDL_VIDEO_FLAGS ^ SDL_FULLSCREEN); /* Passe en mode plein écran */
 		if(sdl_screen == NULL) sdl_screen = SDL_SetVideoMode(0, 0, 0, SDL_VIDEO_FLAGS); /* Si le changement échoue, réinitialise la fenêtre avec la configuration précédente */
 		if(sdl_screen == NULL) exit(1); /* Si la réinitialisation échoue, alors c'est un échec */
 		scale(sdl_screenTemp,sdl_screen);
