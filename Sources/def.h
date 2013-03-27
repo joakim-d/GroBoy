@@ -1,8 +1,8 @@
 #ifndef DEF_H
 #define DEF_H
 #define DEBUG 0
-#define BYTE unsigned char
-#define BYTE_S char
+#define BYTE uint8_t
+#define BYTE_S int8_t
 #define FLAG_Z 0x80
 #define FLAG_N 0x40
 #define FLAG_H 0x20

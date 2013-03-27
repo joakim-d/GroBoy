@@ -207,8 +207,7 @@ void run(){
 					break;
 				case 0x12:
 					//LD (DE), A
-					ld_mem((z80.D << 8)+z80.E, z80.A);
-					//printf("%x\n", memory_read((z80.D << 8)+z80.E));
+					ld_at((z80.D << 8) + z80.E);
 					break;
 				case 0x13:
 					//INC DE
@@ -273,7 +272,7 @@ void run(){
 					break;
 				case 0x22:
 					//LD (HL+), A
-					ld_mem((z80.H << 8)+z80.L, z80.A);
+					ld_at((z80.H << 8)+z80.L);
 					inc_dbl(&z80.H,&z80.L);
 					break;
 				case 0x23:
@@ -335,12 +334,12 @@ void run(){
 					break;
 				case 0x31:
 					//LD SP,d16
-					ld_sp((memory_read(z80.PC + 1) << 8)+memory_read(z80.PC));
+					ld_sp((memory_read(z80.PC + 1) << 8)|memory_read(z80.PC));
 					z80.PC+=2;
 					break;
 				case 0x32:
 					//LD (HL-), A
-					ld_mem((z80.H << 8)+z80.L, z80.A);
+					ld_at((z80.H << 8)+z80.L);
 					dec_dbl(&z80.H,&z80.L);
 					break;
 				case 0x33:
@@ -1888,7 +1887,7 @@ static inline void halt(){
 	}
 }
 static inline void stop(){
-
+	printf("appel de stop\n");
 }
 //----------Jumps/calls--------------------------------
 
@@ -2145,12 +2144,9 @@ static inline void daa(){
 
 static inline void dec_at(unsigned short addr){
 	// Z 1 H -
-	BYTE d8 = memory_read(addr);
-	if (z80.F & 0x10) z80.F = 0x50;
-	else z80.F = 0x40;
-	if (d8 == 0) z80.F |= 0x80;
-	halfcarry_8bit_update(d8, d8-1, SUB);
-	memory_write(addr, d8 - 1);
+	BYTE d8 = memory_read(addr) - 1;
+	z80.F = FLAG_N | ((d8 & 0x0F) == 0x0F ? FLAG_H:0) | (d8 == 0 ? FLAG_Z:0);
+	memory_write(addr, d8);
 }
 
 static inline void dec_sp(){
@@ -2160,33 +2156,22 @@ static inline void dec_sp(){
 
 static inline void dec_smpl(BYTE *reg1){
 	// Z 1 H -
-	if(z80.F & FLAG_C) z80.F = 0x50;
-	else z80.F = 0x40;
-	halfcarry_8bit_update(*reg1, *reg1 - 1, SUB);
-	*reg1 = *reg1 - 1;	
-	if(*reg1 == 0) z80.F |= FLAG_Z;
+	BYTE d8 = *reg1 - 1;
+	z80.F = FLAG_N | ((d8 & 0x0F) == 0x0F ? FLAG_H:0) | (d8 == 0 ? FLAG_Z:0);
+	*reg1 = d8;
 }
 
 static inline void inc_at(unsigned short addr){
 	// Z 0 H -
-	BYTE d8 = memory_read(addr);
-	if (z80.F & 0x10) z80.F = 0x10;
-	else z80.F = 0;
-	halfcarry_8bit_update(d8, d8+1, ADD);
-	d8++;
-	if(d8 == 0) z80.F |= 0x80;
+	BYTE d8 = memory_read(addr) + 1;
+	z80.F = (z80.F & FLAG_C) | (d8 & 0x0F ? 0:FLAG_H) | (d8 == 0 ? FLAG_Z:0);
 	memory_write(addr, d8);
 }
-
 
 static inline void inc_smpl(BYTE *reg1){
 	// Z 0 H -
 	BYTE d8 = *reg1 + 1;
-	*reg1+=0x01;
-	if(z80.F & FLAG_C) z80.F = FLAG_C;
-	else z80.F = 0;
-	halfcarry_8bit_update(*reg1, d8, ADD);
-	if(d8 == 0) z80.F |= FLAG_Z;
+	z80.F = (z80.F & FLAG_C) | (d8 & 0x0F ? 0:FLAG_H) | (d8 == 0 ? FLAG_Z:0);
 	*reg1 = d8;
 }
 
