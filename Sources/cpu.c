@@ -2223,10 +2223,7 @@ static inline void add_dbl(BYTE *reg1, BYTE *reg2, unsigned short data){
 	// - 0 H C
 	unsigned short r1r2 = (*reg1 << 8) + *reg2;
 	unsigned short op = r1r2 + data;
-	if(z80.F & FLAG_Z) z80.F = 0x80;
-	else z80.F = 0;
-	if (op < r1r2) z80.F |= 0x10;
-	halfcarry_16bit_update(r1r2, op, ADD);
+	z80.F = (z80.F & FLAG_Z ? FLAG_Z:0) | ((r1r2^data^op)&0x1000? FLAG_H:0) | (((r1r2+data)&0x10000)? FLAG_C:0);
 	*reg1 =( 0xFF00 & op) >> 8;
 	*reg2 =( 0x00FF & op);
 }
