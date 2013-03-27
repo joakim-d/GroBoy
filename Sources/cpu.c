@@ -2013,8 +2013,8 @@ static inline void ld_mem(unsigned short addr, BYTE data){
 
 static inline void ld_a16_sp(){
 	unsigned short addr = (memory_read(z80.PC + 1) << 8) + memory_read(z80.PC);
-	memory_write(addr, (z80.SP & 0xFF00) >> 8);
 	memory_write(addr, (z80.SP & 0x00FF));
+	memory_write(addr + 1, (z80.SP & 0xFF00) >> 8);
 	z80.PC += 2;
 }
 
@@ -2320,13 +2320,8 @@ static inline void rlc_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 static inline void rlca(){
-	BYTE bit7 = z80.A & 0x80;
-	z80.A <<= 1;
-	if(bit7){
-		z80.A |= 1;
-		z80.F |= 0x10;
-	}
-	else z80.F = 0;
+	z80.F = (z80.A & 0x80) ? FLAG_C:0;
+	z80.A = z80.F ? (z80.A << 1) | 1 : z80.A << 1;
 }
 static inline void rr(BYTE *data){
 	BYTE F = z80.F & 0x10;
