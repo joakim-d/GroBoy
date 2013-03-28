@@ -18,8 +18,8 @@ void run();
 void cpu_init();
 unsigned char *rom_buffer;
 int cycles;
-BYTE halted;
-static const BYTE z80_cycles[] = {
+uint8_t halted;
+static const uint8_t z80_cycles[] = {
 4, 12, 8, 8, 4, 4, 8, 4, 20, 8, 8, 8, 4, 4, 8, 4, 
 4, 12, 8, 8, 4, 4, 8, 4, 12, 8, 8, 8, 4, 4, 8, 4,
 8, 12, 8, 8, 4, 4, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4,
@@ -37,7 +37,7 @@ static const BYTE z80_cycles[] = {
 12, 12, 8, 0, 0, 16, 8, 16, 16, 4, 16, 0, 0, 0, 8, 16,
 12, 12, 8, 4, 0, 16, 8, 16, 12, 8, 16, 4, 0, 0, 8, 16
 };
-static const BYTE z80_cb_cycles[] = {
+static const uint8_t z80_cb_cycles[] = {
 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,

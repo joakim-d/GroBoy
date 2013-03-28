@@ -1217,100 +1217,100 @@ void run(){
 							bit(0x08, z80.A);
 							break;
 						case 0x60: //BIT 4,B
-							bit((0x01 << 4),z80.B);
+							bit((0x10),z80.B);
 							break;
 						case 0x61: //BIT 4,C
-							bit((0x01 << 4),z80.C);
+							bit((0x10),z80.C);
 							break;
 						case 0x62: //BIT 4,D
-							bit((0x01 << 4),z80.D);
+							bit((0x10),z80.D);
 							break;
 						case 0x63: //BIT 4,E
-							bit((0x01 << 4),z80.E);
+							bit((0x10),z80.E);
 							break;
 						case 0x64: //BIT 4,H
-							bit((0x01 << 4),z80.H);
+							bit((0x10),z80.H);
 							break;
 						case 0x65: //BIT 4,L
-							bit((0x01 << 4),z80.L);
+							bit((0x10),z80.L);
 							break;
 						case 0x66: //BIT 4,HL
-							bit((0x01 << 4),memory_read((z80.H << 8) + z80.L));
+							bit((0x10),memory_read((z80.H << 8) + z80.L));
 							break;
 						case 0x67: //BIT 4,A
-							bit((0x01 << 4),z80.A);
+							bit((0x10),z80.A);
 							break;
 						case 0x68: //BIT 5,B
-							bit((0x01 << 5),z80.B);
+							bit((0x20),z80.B);
 							break;
 						case 0x69: //BIT 5,C
-							bit((0x01 << 5),z80.C);
+							bit((0x20),z80.C);
 							break;
 						case 0x6A: //BIT 5,D
-							bit((0x01 << 5),z80.D);
+							bit((0x20),z80.D);
 							break;
 						case 0x6B: //BIT 5,E
-							bit((0x01 << 5),z80.E);
+							bit((0x20),z80.E);
 							break;
 						case 0x6C: //BIT 5,H
-							bit((0x01 << 5),z80.H);
+							bit((0x20),z80.H);
 							break;
 						case 0x6D: //BIT 5,L
-							bit((0x01 << 5),z80.L);
+							bit((0x20),z80.L);
 							break;
 						case 0x6E: //BIT 5,HL
-							bit((0x01 << 5),memory_read((z80.H << 8) + z80.L));
+							bit((0x20),memory_read((z80.H << 8) + z80.L));
 							break;
 						case 0x6F: //BIT 5,A
-							bit((0x01 << 5),z80.A);
+							bit((0x20),z80.A);
 							break;
 						case 0x70: //BIT 6,B
-							bit((0x01 << 6),z80.B);
+							bit((0x40),z80.B);
 							break;
 						case 0x71: //BIT 6,C
-							bit((0x01 << 6),z80.C);
+							bit((0x40),z80.C);
 							break;
 						case 0x72: //BIT 6,D
-							bit((0x01 << 6),z80.D);
+							bit((0x40),z80.D);
 							break;
 						case 0x73: //BIT 6,E
-							bit((0x01 << 6),z80.E);
+							bit((0x40),z80.E);
 							break;
 						case 0x74: //BIT 6,H
-							bit((0x01 << 6),z80.H);
+							bit((0x40),z80.H);
 							break;
 						case 0x75: //BIT 6,L
-							bit((0x01 << 6),z80.L);
+							bit((0x40),z80.L);
 							break;
 						case 0x76: //BIT 6,HL
-							bit((0x01 << 6),memory_read((z80.H << 8) + z80.L));
+							bit((0x40),memory_read((z80.H << 8) + z80.L));
 							break;
 						case 0x77: //BIT 6,A
-							bit((0x01 << 6),z80.A);
+							bit((0x40),z80.A);
 							break;
 						case 0x78: //BIT 7,B
-							bit((0x01 << 7),z80.B);
+							bit((0x80),z80.B);
 							break;
 						case 0x79: //BIT 7,C
-							bit((0x01 << 7),z80.C);
+							bit((0x80),z80.C);
 							break;
 						case 0x7A: //BIT 7,D
-							bit((0x01 << 7),z80.D);
+							bit((0x80),z80.D);
 							break;
 						case 0x7B: //BIT 7,E
-							bit((0x01 << 7),z80.E);
+							bit((0x80),z80.E);
 							break;
 						case 0x7C: //BIT 7,H
-							bit((0x01 << 7),z80.H);
+							bit((0x80),z80.H);
 							break;
 						case 0x7D: //BIT 7,L
-							bit((0x01 << 7),z80.L);
+							bit((0x80),z80.L);
 							break;
 						case 0x7E: //BIT 7,HL
-							bit((0x01 << 7),memory_read((z80.H << 8) + z80.L));
+							bit((0x80),memory_read((z80.H << 8) + z80.L));
 							break;
 						case 0x7F: //BIT 7,A
-							bit((0x01 << 7),z80.A);
+							bit((0x80),z80.A);
 							break;
 						case 0x80: //RES 0,B
 							res(0,&z80.B);
@@ -2027,12 +2027,10 @@ static inline void ld_from_a8(unsigned short addr){
 
 static inline void ld_hl_sp_p_r8(){
 	BYTE_S r8 = memory_read(z80.PC);
-	unsigned short a16 = z80.SP + r8;
-	if(z80.SP + r8 > 0xFFFF || z80.SP + r8 < 0) z80.F |= 0x10;
-	if(r8 > 0) halfcarry_16bit_update(z80.SP, a16, ADD);
-	else if (r8 < 0) halfcarry_16bit_update(z80.SP, a16, SUB);
-	z80.H = (a16 & 0xFF00) >> 8 ;
-	z80.L = (a16 & 0xFF);
+	unsigned short op = z80.SP + r8;
+	z80.F = ((((z80.SP^r8^op) & 0x100) == 0x100) ? FLAG_C:0) | ((((z80.SP^r8^op) & 0x10) == 0x10) ? FLAG_H:0);	
+	z80.H = (op & 0xFF00) >> 8 ;
+	z80.L = (op & 0xFF);
 	z80.PC++;
 }
 
@@ -2205,8 +2203,7 @@ static inline void add_dbl(BYTE *reg1, BYTE *reg2, unsigned short data){
 
 static inline void add_sp_r8(BYTE_S data){
 	unsigned short op = z80.SP + data;
-	if(z80.SP + data > 0xFFFF || z80.SP + data < 0) z80.F |= 0x10;
-	halfcarry_16bit_update(z80.SP, op, ADD);
+	z80.F = ((((z80.SP^data^op) & 0x100) == 0x100) ? FLAG_C:0) | ((((z80.SP^data^op) & 0x10) == 0x10) ? FLAG_H:0);
 	z80.SP = op;
 }
 
@@ -2229,9 +2226,7 @@ static inline void inc_dbl(BYTE *reg1, BYTE *reg2){
 //-----------8bit rotations/shifts and bit instructions
 
 static inline void bit(BYTE bit, BYTE data){
-	if(z80.F & 0x10) z80.F = 0x30;
-	else z80.F = 0x20;
-	if(!(data & bit)) z80.F |= 0x80;
+	z80.F = (z80.F&FLAG_C) | FLAG_H | ((data&bit) ? 0:FLAG_Z);
 }
 
 static inline void res(BYTE b, BYTE *a) 
@@ -2247,22 +2242,26 @@ static inline void res_hl(BYTE b)
 }
 
 static inline void rl(BYTE *data){
-	BYTE F = z80.F & 0x10;
-	if ((*data & 0x80) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	*data <<= 1;
-	if(F) *data |= 1;
-	if (*data == 0) z80.F |= 0x80;
+	if(*data & 0x80){
+		*data = (*data << 1) | (((z80.F & FLAG_C) ? 1:0));
+		z80.F = (((*data == 0) ? FLAG_Z:0)) | FLAG_C;
+	}
+	else{
+		*data = (*data << 1) | (((z80.F & FLAG_C) ? 1:0));	
+		z80.F = (((*data == 0) ? FLAG_Z:0));
+	}
 }
 
 static inline void rl_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	BYTE F = z80.F;
-	if ((hl & 0x80) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	hl <<= 1;
-	if(F & 0x10) hl |= 1;
-	if (hl == 0) z80.F |= 0x80;
+	if(hl & 0x80){
+		hl = (hl << 1) | (((z80.F & FLAG_C) ? 1:0));
+		z80.F = (((hl == 0) ? FLAG_Z:0)) | FLAG_C;
+	}
+	else{
+		hl = (hl << 1) | (((z80.F & FLAG_C) ? 1:0));	
+		z80.F = (((hl == 0) ? FLAG_Z:0));
+	}
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
@@ -2273,20 +2272,18 @@ static inline void rla(){
 }
 
 static inline void rlc(BYTE *data){
-	if ((*data & 0x80) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	*data <<= 1;
-	if(z80.F & 0x10) *data |= 1;
-	if (*data == 0) z80.F |= 0x80;
+	z80.F = ((*data & 0x80) ? FLAG_C:0);
+	*data = (*data << 1) | ((z80.F) ? 1:0);
+	z80.F |= ((*data == 0)? FLAG_Z:0);
 }
 
 static inline void rlc_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if ((hl & 0x80) == 0) z80.F = 0x00;
-	else z80.F = 0x10;
-	hl <<= 1;
-	if(z80.F & 0x10) hl |= 1;
-	if (hl == 0) z80.F |= 0x80;
+
+	z80.F = ((hl & 0x80) ? FLAG_C:0);
+	hl = (hl << 1) | ((z80.F) ? 1:0);
+	z80.F |= ((hl == 0)? FLAG_Z:0);
+
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 static inline void rlca(){
@@ -2294,22 +2291,26 @@ static inline void rlca(){
 	z80.A = (z80.A << 1) | ((z80.F)? 1 : 0);
 }
 static inline void rr(BYTE *data){
-	BYTE F = z80.F & 0x10;
-	if ((*data & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	*data >>= 1;
-	if(F) *data |= 0x80;
-	if (*data == 0) z80.F |= 0x80;
+	if(*data & 0x01){
+		*data = (*data >> 1) | (((z80.F & FLAG_C) ? 0x80:0));
+		z80.F = (((*data == 0) ? FLAG_Z:0)) | FLAG_C;
+	}
+	else{
+		*data = (*data >> 1) | (((z80.F & FLAG_C) ? 0x80:0));	
+		z80.F = (((*data == 0) ? FLAG_Z:0));
+	}
 }
 
 static inline void rr_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	BYTE F = z80.F;
-	if ((hl & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	hl >>= 1;
-	if(F & 0x10) hl |= 0x80;
-	if (z80.A == 0) z80.F |= 0x80;
+	if(hl & 0x01){
+		hl = (hl >> 1) | (((z80.F & FLAG_C) ? 0x80:0));
+		z80.F = (((hl == 0) ? FLAG_Z:0)) | FLAG_C;
+	}
+	else{
+		hl = (hl >> 1) | (((z80.F & FLAG_C) ? 0x80:0));	
+		z80.F = (((hl == 0) ? FLAG_Z:0));
+	}
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
@@ -2320,20 +2321,18 @@ static inline void rra(){
 }	
 
 static inline void rrc(BYTE *data){
-	if ((*data & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	*data >>= 1;
-	if(z80.F & 0x10) *data |= 0x80;
-	if (*data == 0) z80.F |= 0x80;
+	z80.F = ((*data & 0x01) ? FLAG_C:0);
+	*data = (*data >> 1) | ((z80.F) ? 0x80:0);
+	z80.F |= ((*data == 0)? FLAG_Z:0);
 }
 
 static inline void rrc_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if ((hl & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	hl >>= 1;
-	if(z80.F & 0x10) hl |= 0x80;
-	if (hl == 0) z80.F |= 0x80;
+
+	z80.F = ((hl & 0x01) ? FLAG_C:0);
+	hl = (hl >> 1) | ((z80.F) ? 0x80:0);
+	z80.F |= ((hl == 0)? FLAG_Z:0);
+
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
@@ -2356,54 +2355,44 @@ static inline void set_hl(BYTE b)
 }
 
 static inline void srl(BYTE *data){
-	if((*data & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
+	z80.F = (((*data & 0x01) ? FLAG_C:0));
 	*data >>= 1;
-	if (*data == 0) z80.F |= 0x80;
+	z80.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
 static inline void srl_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if((hl & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
+	z80.F = (((hl & 0x01) ? FLAG_C:0));
 	hl >>= 1;
-	if (hl == 0) z80.F |= 0x80;
+	z80.F |= ((hl == 0) ? FLAG_Z:0);
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
 static inline void sla(BYTE *data){
-	if ((*data & 0x80) == 0) z80.F = 0;
-	else z80.F = 0x10;
+	z80.F = ((*data & 0x80) ? FLAG_C:0);
 	*data <<= 1;
-	if (*data == 0) z80.F |= 0x80;
+	z80.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
 static inline void sla_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	if ((z80.B & 0x80) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	z80.B <<= 1;
-	if (z80.B == 0) z80.F |= 0x80;
+	z80.F = ((hl & 0x80) ? FLAG_C:0);
+	hl <<= 1;
+	z80.F |= ((hl == 0) ? FLAG_Z:0);
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
 static inline void sra(BYTE *data){
-	BYTE F = *data & 0x80;
-	if((*data & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	*data >>= 1;
-	if (F) z80.B |= 0x80;
-	if (*data == 0) z80.F |= 0x80;
+	z80.F = ((*data & 0x01) ? FLAG_C:0);
+	*data = (*data >> 1) | ((*data & 0x80) ? 0x80:0);
+	z80.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
 static inline void sra_hl(){
 	BYTE hl = memory_read((z80.H << 8) +z80.L);
-	BYTE F = hl & 0x80;
-	if((hl & 0x01) == 0) z80.F = 0;
-	else z80.F = 0x10;
-	hl >>= 1;
-	if (F) hl |= 0x80;
-	if (hl == 0) z80.F |= 0x80;
+	z80.F = ((hl & 0x01) ? FLAG_C:0);
+	hl = (hl >> 1) | ((hl & 0x80) ? 0x80:0);
+	z80.F |= ((hl == 0) ? FLAG_Z:0);
 	memory_write((z80.H << 8) + z80.L, hl);
 }	
 
@@ -2411,17 +2400,17 @@ static inline void swap(BYTE *data){
 	BYTE low_nibble = (*data & 0xF0) >> 4;
 	BYTE high_nibble = (*data & 0x0F) << 4;
 	*data = high_nibble + low_nibble;
-	if(*data == 0) z80.F = 0x80;
-	else z80.F = 0;
+	z80.F = ((*data == 0) ? FLAG_Z:0);
 }
 
 static inline void swap_hl(){
 	BYTE hl = memory_read((z80.H << 8) + z80.L);
-	BYTE low_nibble = (z80.B & 0xF0) >> 4;
-	BYTE high_nibble = (z80.B & 0x0F) << 4;
-	z80.B = high_nibble + low_nibble;
-	if(z80.B == 0) z80.F = 0x80;
-	else z80.F = 0;
+
+	BYTE low_nibble = (hl & 0xF0) >> 4;
+	BYTE high_nibble = (hl & 0x0F) << 4;
+	hl = high_nibble + low_nibble;
+	z80.F = ((hl == 0) ? FLAG_Z:0);
+
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
