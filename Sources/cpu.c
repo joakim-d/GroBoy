@@ -1788,6 +1788,7 @@ void run(){
 					break;
 				case 0xF1: //POP AF
 					pop(&z80.A, &z80.F);
+					z80.F &= 0xF0;
 					break;
 				case 0xF2: //LD A,(C)
 					ld_reg(&z80.A, memory_read(0xFF00 + z80.C));
@@ -2093,36 +2094,43 @@ static inline void cpl(){
 }
 
 static inline void daa(){
+	/*
 	int temp = z80.A;
-	if(!(z80.F & 0x40)){
-		if( (z80.F & (0x20)) || (temp & 0xf) > 9){
+	if(!(z80.F & FLAG_N)){
+		if( (z80.F & FLAG_H) || ((temp & 0xF) > 9) ){
 			temp += 0x06;
 		}
-		if( (z80.F & (0x10)) || temp > 0x9F){
+		if( (z80.F & FLAG_C) || (temp > 0x9F) ){
 			temp += 0x60;
 		}
 	}
 	else {
-		if(z80.F & (0x20)){
-			temp = ((temp - 0x6) & 0xff);
+		if(z80.F & FLAG_H){
+			temp = ((temp - 0x6) & 0xFF);
 		}
-		if(z80.F & (0x10)){
+		if(z80.F & FLAG_C){
 			temp -= 0x60;
 		}
 	}
 
-	//z80.F &= ~(0x20 | 0x80);
-	temp &= ~(0x20 | 0x80);
+	z80.F = ((z80.F & FLAG_N) ? FLAG_N:0);
+
 	if((temp & 0x100) == 0x100){
-		z80.F |= 0x10;
+		z80.F |= FLAG_C;
 	}
 	temp &= 0xff;
-	if(temp == 0x00){
-		z80.F |= 0x80;
-	} else { 
-		z80.F &= ~(0x80);
+	if(temp == 0){
+		z80.F |= FLAG_Z;
 	}
 	z80.A = temp;
+	*/
+	unsigned short temp = z80.A;
+	if(z80.F & FLAG_C) temp |= 256;
+	if(z80.F & FLAG_H) temp |= 512;
+	if(z80.F & FLAG_N) temp |= 1024;
+	temp = daa_table[temp];
+	z80.A = (temp & 0xFF00) >> 8;
+	z80.F = temp & 0xFF;
 }
 
 static inline void dec_at(unsigned short addr){
