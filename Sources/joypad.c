@@ -7,21 +7,12 @@ void joypad_update(int cycles){
 	static BYTE joy_old = 0;
 	static BYTE key_buttons = 0xFF; //
 	static Uint8 *keystate;
-	SDL_Event event;
 
 	joypad_counter += cycles;
 
 	joy_cur = memory_read(0xFF00);
 	if(joypad_counter > 80000){
 		joypad_counter -= 80000;
-		while(SDL_PollEvent(&event)){
-			switch(event.type){
-				case SDL_QUIT:
-					exit(0);
-					break;
-				default:
-					break;
-		}
 		keystate = SDL_GetKeyState(NULL);
 		if(keystate[SDLK_RIGHT]) key_buttons &=0xFE;
 		else key_buttons |= 0x01;
@@ -39,7 +30,6 @@ void joypad_update(int cycles){
 		else key_buttons |= 0x40;
 		if(keystate[SDLK_RETURN]) key_buttons &=0x7F;
 		else key_buttons |= 0x80;
-		}
 	}
 
 	joy_new = 0x0F;

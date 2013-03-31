@@ -1830,7 +1830,7 @@ void run(){
 		gpu_update(cycles);	
 		timer_update(cycles);
 		joypad_update(cycles);
-		update_sound();
+		//update_sound();
 		handle_interrupts(&z80);
 		/*if(Counter<=0)
 		  {

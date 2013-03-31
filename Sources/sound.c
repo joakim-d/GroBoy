@@ -63,10 +63,6 @@ void sound_init(){
 		apu.sound_controller.output_sound_so2[i] = 0;
 		apu.sound_controller.sound_flags[i] = 0;
 	}
-	if(SDL_Init(SDL_INIT_AUDIO) < 0){
-			fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
-			exit(EXIT_FAILURE); // On quitte le programme
-	}
 	desired.freq = (apu.channel1.freq_low);
 	desired.format = AUDIO_S16SYS;
 	desired.channels = 2;

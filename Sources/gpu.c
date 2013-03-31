@@ -9,30 +9,24 @@ void gpu_init(){
 	current_line = 0;
 	//fonctions SDL
 
-	if (SDL_Init(SDL_INIT_VIDEO) == -1) // Démarrage de la SDL. Si erreur :
-	{
-		fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError()); // Écriture de l'erreur
-		exit(EXIT_FAILURE); // On quitte le programme
+	/** //test pour connaitre les resolutions possibles
+	  resolutions =SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+
+	// On verifie si un mode est possible 
+	if(resolutions == (SDL_Rect **)0){
+	printf("Aucune résolution n'est possible!\n");
+	exit(-1);
 	}
 
-	/** //test pour connaitre les resolutions possibles
-	resolutions =SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
- 
-    	// On verifie si un mode est possible 
-    	if(resolutions == (SDL_Rect **)0){
-     	   printf("Aucune résolution n'est possible!\n");
-        	exit(-1);
-    	}
- 
-  	// On verifie si toutes les resolutions sont possibles 
-    	if(resolutions == (SDL_Rect **)-1){
-        	printf("Toutes les resolutions sont possibles.\n");
-    	}
-    	else{
-        	// Print valid modes 
-        	printf("Résolutions possibles :\n");
-        	for(int i=0;resolutions[i];++i)
-        	   printf("  %d x %d\n", resolutions[i]->w, resolutions[i]->h);
+	// On verifie si toutes les resolutions sont possibles 
+	if(resolutions == (SDL_Rect **)-1){
+	printf("Toutes les resolutions sont possibles.\n");
+	}
+	else{
+	// Print valid modes 
+	printf("Résolutions possibles :\n");
+	for(int i=0;resolutions[i];++i)
+	printf("  %d x %d\n", resolutions[i]->w, resolutions[i]->h);
 	}	*/
 
 
@@ -49,9 +43,8 @@ void gpu_update(int cycles){ //fonction appelée en premier
 
 	static unsigned int vblank_clock_counter = 0;
 	static unsigned int line_clock_counter = 0;
-	
+
 	vblank_clock_counter += cycles;
-	event_process();
 	if(vblank_clock_counter >= 70224){//si on dépasse la période de vblank
 		current_line = 0;
 		vblank_clock_counter -= 70224;
@@ -176,7 +169,7 @@ void gpu_drawline(){
 			}
 		}
 	}
-	
+
 	if(lcd_cont & 0x20){ //Si Window établie
 
 		scy = memory_read(0xFF4A);
@@ -224,7 +217,7 @@ void gpu_drawline(){
 			else sprite_size = 8;
 			if(current_line >= (sprites[j].y - 16) && current_line < (sprites[j].y - 16 + sprite_size)){
 				ordered_sprites_num[displyd_sprites_nb++] = j;
-				
+
 			}
 			j++;
 		}
@@ -314,10 +307,10 @@ void get_tile(BYTE num, tile_t *tile, int type){
 		}
 		lig++;
 	}
-	
-	   if(tile->x_flip)tile_flip(tile,0,size);
-	   if(tile->y_flip)tile_flip(tile,1,size);
-	
+
+	if(tile->x_flip)tile_flip(tile,0,size);
+	if(tile->y_flip)tile_flip(tile,1,size);
+
 	tile->size = size;
 }
 
@@ -364,7 +357,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 
 void draw_screen()
 {
-	//event_process();
+	event_process();
 	for(int i=0; i<144; i++)
 	{
 		for(int j=0; j<160; j++)
@@ -406,28 +399,31 @@ static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){
 void event_process()
 {
 	SDL_Event event;
-    	while (SDL_PollEvent(&event))
-    	{
+	while (SDL_PollEvent(&event))
+	{
 		switch (event.type)
 		{
-          		/**case SDL_KEYDOWN:
-	       			if(event.key.keysym.sym==SDLK_ESCAPE)
-	       			{
-					ChangeMode();
-				}
-				break;*/
+			case SDL_QUIT:
+				exit(0);
+				break;
+				/**case SDL_KEYDOWN:
+				  if(event.key.keysym.sym==SDLK_ESCAPE)
+				  {
+				  ChangeMode();
+				  }
+				  break;*/
 			case SDL_VIDEORESIZE:
 				//SDL_Surface *sdl_screen_copie;
 				sdl_screen = SDL_SetVideoMode(event.resize.w, event.resize.h,32,SDL_HWSURFACE | SDL_RESIZABLE);
 				scale(sdl_screenTemp,sdl_screen);
-        			SDL_Flip(sdl_screen);
+				SDL_Flip(sdl_screen);
 				break;
 			default:break;
-			
+
 		}
 	}
 }
-	
+
 void scale(SDL_Surface* in, SDL_Surface* out)
 {
 	int pixel, px, py;
@@ -445,11 +441,11 @@ void scale(SDL_Surface* in, SDL_Surface* out)
 
 static inline Uint32 get_pixel(const SDL_Surface* surface, const int x, const int y) 
 {
-        return *(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4));
+	return *(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4));
 }
 
 static inline void put_pixel(const SDL_Surface* surface, const int x, const int y, const Uint32 pixel) {
-        *(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4)) = pixel;
+	*(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4)) = pixel;
 }
 
 
