@@ -1778,7 +1778,7 @@ void run(){
 					z80.PC += 2;
 					break;
 				case 0xEE: //XOR d8
-					xor(z80.PC++);
+					xor(memory_read(z80.PC++));
 					break;
 				case 0xEF: //RST 28H
 					rst(0x28);
@@ -1831,7 +1831,7 @@ void run(){
 		gpu_update(cycles);	
 		timer_update(cycles);
 		joypad_update(cycles);
-		//update_sound();
+		update_sound();
 		handle_interrupts(&z80);
 		/*if(Counter<=0)
 		  {
@@ -1882,9 +1882,9 @@ static inline void ei(){
 	set_IME();
 }
 static inline void halt(){
-	if(IME){
-		halted = 1;
-	}
+	set_IME();
+	halted = 1;
+
 }
 static inline void stop(){
 	printf("appel de stop\n");
@@ -2194,7 +2194,7 @@ static inline void or(BYTE data){
 }
 
 static inline void xor(BYTE data){
-	z80.A ^= data;
+	z80.A ^= (data);
 	z80.F = (z80.A == 0) ? FLAG_Z:0;
 }
 
