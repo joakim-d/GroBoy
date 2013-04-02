@@ -86,8 +86,6 @@ static inline void swap(BYTE *data);
 static inline void swap_hl();
 
 
-
-
 z80_t z80;
 void cpu_init(){
 	z80.PC = 0x0100;
@@ -101,6 +99,7 @@ void cpu_init(){
 	z80.H = 0x01;
 	z80.L = 0x4D;
 	halted = 0;
+	ime_counter= 0;
 }
 
 void run(){
@@ -113,6 +112,7 @@ void run(){
 	{
 		op_code=memory_read(z80.PC);
 		cycles = z80_cycles[op_code];
+		
 		if(!halted){
 			if(DEBUG){
 				printf("instruction : %d\n", i++);
@@ -1833,40 +1833,17 @@ void run(){
 		joypad_update(cycles);
 		update_sound();
 		handle_interrupts(&z80);
-		/*if(Counter<=0)
-		  {
-		// Check for interrupts and do other
-		// cyclic tasks here                
-		...
-		Counter+=InterruptPeriod;
-		if(ExitRequired) break;
-		}*/
+		if(ime_counter > 0){
+			ime_counter -= cycles;
+			if(ime_counter <= 0){
+				set_IME();
+			}
+		}
 	}
 }
 
-
-static inline void halfcarry_8bit_update(BYTE old_value, BYTE new_value, BYTE type){
-	BYTE old_nibble, new_nibble;
-	old_nibble = old_value & 0xF;
-	new_nibble = new_value & 0xF;
-	if(type == ADD){
-		if(new_nibble < old_nibble) z80.F |= 0x20;
-	}
-	else{
-		if(new_nibble > old_nibble) z80.F |= 0x20;
-	}
-}
-
-static inline void halfcarry_16bit_update(unsigned short old_value, unsigned short new_value, BYTE type){
-	BYTE old_nibble, new_nibble;
-	old_nibble = (old_value & 0xF00)>>8;
-	new_nibble = (new_value & 0xF00)>>8;
-	if(type == ADD){
-		if(new_nibble < old_nibble) z80.F |= 0x20;
-	}
-	else{
-		if(new_nibble > old_nibble) z80.F |= 0x20;
-	}
+BYTE is_halted(){
+	return halted;
 }
 
 void reset_halt(){
@@ -1877,13 +1854,21 @@ void reset_halt(){
 
 static inline void di(){
 	reset_IME();
+	ime_counter = 0;
 }
 static inline void ei(){
 	set_IME();
+	ime_counter = z80_cycles[0xFB] * 4;
 }
 static inline void halt(){
-	set_IME();
-	halted = 1;
+	if( ime_counter > 0){
+		set_IME();
+		ime_counter = 0;
+		z80.PC--;
+	}
+	else{
+		halted = 1;
+	}
 
 }
 static inline void stop(){

@@ -40,6 +40,13 @@ void handle_interrupts(z80_t *z80){
 			execute_interrupt(JOYPAD, z80);
 		}
 	}
+	else if(is_halted()){
+		IE = memory_read(0xFFFF);
+		IF = memory_read(0xFF0F);
+		if(IE & IF & 0x1F){
+			reset_halt();
+		}
+	}
 }
 
 void make_request(BYTE type){

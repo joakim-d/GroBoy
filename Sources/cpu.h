@@ -17,9 +17,12 @@
 void run();
 void cpu_init();
 void reset_halt();
+BYTE is_halted();
 unsigned char *rom_buffer;
 int cycles;
+int ime_counter;
 uint8_t halted;
+uint8_t skip;
 static const uint8_t z80_cycles[] = {
 	4, 12, 8, 8, 4, 4, 8, 4, 20, 8, 8, 8, 4, 4, 8, 4, 
 	4, 12, 8, 8, 4, 4, 8, 4, 12, 8, 8, 8, 4, 4, 8, 4,
