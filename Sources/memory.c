@@ -20,7 +20,10 @@ static void read_rom_info(char* rom_path){
 	fstat(file_d, &file_stat);
 
 	cartridge_rom_buffer = (BYTE *) malloc(file_stat.st_size);
-	read(file_d, cartridge_rom_buffer, file_stat.st_size);
+	if(read(file_d, cartridge_rom_buffer, file_stat.st_size) == -1){
+		printf("Error while reading rom file\n");
+		exit(-1);
+	}	
 	close(file_d);
 
 	if(memcmp(cartridge_rom_buffer + 0x0100, "\x00\xC3", 2) != 0){ //On vérifie si la rom est bien un fichier gb

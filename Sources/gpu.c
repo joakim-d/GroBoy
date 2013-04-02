@@ -367,7 +367,7 @@ static inline void tile_flip(tile_t *tile, int flipx_y, int size)
 
 static inline void draw_screen()
 {
-	static BYTE frame_skip = 1;
+	static BYTE frame_skip = 0;
 	static BYTE frame_counter = 0;
 	event_process();
 	if(frame_counter < frame_skip) frame_counter++;
@@ -389,8 +389,8 @@ static inline void draw_screen()
 		}
 		scale(sdl_screenTemp,sdl_screen);
 		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-		SDL_Delay(16);
 	}
+	SDL_Delay(15);
 }
 
 static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){
