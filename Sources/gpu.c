@@ -367,24 +367,30 @@ static inline void tile_flip(tile_t *tile, int flipx_y, int size)
 
 static inline void draw_screen()
 {
+	static BYTE frame_skip = 1;
+	static BYTE frame_counter = 0;
 	event_process();
-	for(int i=0; i<144; i++)
-	{
-		for(int j=0; j<160; j++)
+	if(frame_counter < frame_skip) frame_counter++;
+	else{
+		frame_counter = 0;
+		for(int i=0; i<144; i++)
 		{
-			if(gpu_screen[i][j] == 0)
-				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 255,255,255);
-			else if(gpu_screen[i][j] == 1)
-				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 170,170,170);
-			else if(gpu_screen[i][j] == 2)
-				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 85,85,85);
-			else 
-				*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
+			for(int j=0; j<160; j++)
+			{
+				if(gpu_screen[i][j] == 0)
+					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 255,255,255);
+				else if(gpu_screen[i][j] == 1)
+					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 170,170,170);
+				else if(gpu_screen[i][j] == 2)
+					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 85,85,85);
+				else 
+					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
+			}
 		}
+		scale(sdl_screenTemp,sdl_screen);
+		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
+		SDL_Delay(16);
 	}
-	scale(sdl_screenTemp,sdl_screen);
-	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-	SDL_Delay(10);
 }
 
 static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){

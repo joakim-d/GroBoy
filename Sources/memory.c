@@ -155,7 +155,7 @@ void memory_init(char *rom_path){
 
 
 
-BYTE memory_read(unsigned short addr){
+inline BYTE memory_read(unsigned short addr){
 	if(addr <= 0x3FFF) 		//demande de lecture dans la banque de rom 0 de la cartouche
 		return cartridge_rom_buffer[addr];
 	else if(addr <= 0x7FFF) 		//demande de lecture dans la banque de rom 1..n de la cartouche
@@ -173,7 +173,7 @@ static void alloc_ram_mem(size_t size){
 	cartridge_ram_buffer = (BYTE *) malloc(size);
 }
 
-void memory_write(unsigned short addr, BYTE data){
+inline void memory_write(unsigned short addr, BYTE data){
 	if((addr <= 0x7FFF) || (addr >= 0xA000 && addr <= 0xBFFF)){
 		if(cartridge_type >= 0x01 || cartridge_type <= 0x03){//MBC1
 			write_mbc1(addr, data);		
