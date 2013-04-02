@@ -16,6 +16,7 @@
 #include "timer.h"
 void run();
 void cpu_init();
+void reset_halt();
 unsigned char *rom_buffer;
 int cycles;
 uint8_t halted;
@@ -316,6 +317,5 @@ static const uint16_t daa_table[2048] =
 	0x9283,0x9387,0x9483,0x9587,0x9687,0x9783,0x988B,0x998F
 };
 
-void reset_halt();
 #endif
 

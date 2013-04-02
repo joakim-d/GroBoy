@@ -1732,7 +1732,7 @@ void run(){
 					rst(0x10);
 					break;
 				case 0xD8: //RET C
-					ret(0x10);
+					ret_cond(FLAG_C);
 					break;
 				case 0xD9: //RETI
 					reti();
@@ -2057,7 +2057,7 @@ static inline void push(BYTE reg1, BYTE reg2){
 static inline void adc(BYTE data){
 	//Z 0 H C
 	BYTE op = z80.A + data + ((z80.F & FLAG_C)? 1:0);
-	z80.F = ((op == 0) ? FLAG_Z:0) | (((z80.A^data^op) & 0x10) ? FLAG_H:0) | ((z80.A + data > 0xFF) ? FLAG_C:0);
+	z80.F = ((op == 0) ? FLAG_Z:0) | (((z80.A^data^op) & 0x10) ? FLAG_H:0) | ((z80.A + data + ((z80.F & FLAG_C)? 1:0) > 0xFF) ? FLAG_C:0);
 	z80.A = op;
 }
 
@@ -2095,48 +2095,48 @@ static inline void cpl(){
 
 static inline void daa(){
 	/*
-	int temp = z80.A;
-	if(!(z80.F & FLAG_N)){
-		if( (z80.F & FLAG_H) || ((temp & 0xF) > 9) ){
-			temp += 0x06;
-		}
-		if( (z80.F & FLAG_C) || (temp > 0x9F) ){
-			temp += 0x60;
-		}
-	}
-	else {
-		if(z80.F & FLAG_H){
-			temp = ((temp - 0x6) & 0xFF);
-		}
-		if(z80.F & FLAG_C){
-			temp -= 0x60;
-		}
-	}
+	   int temp = z80.A;
+	   if(!(z80.F & FLAG_N)){
+	   if( (z80.F & FLAG_H) || ((temp & 0xF) > 9) ){
+	   temp += 0x06;
+	   }
+	   if( (z80.F & FLAG_C) || (temp > 0x9F) ){
+	   temp += 0x60;
+	   }
+	   }
+	   else {
+	   if(z80.F & FLAG_H){
+	   temp = ((temp - 0x6) & 0xFF);
+	   }
+	   if(z80.F & FLAG_C){
+	   temp -= 0x60;
+	   }
+	   }
 
-	z80.F = ((z80.F & FLAG_N) ? FLAG_N:0);
+	   z80.F = ((z80.F & FLAG_N) ? FLAG_N:0);
 
-	if((temp & 0x100) == 0x100){
-		z80.F |= FLAG_C;
-	}
-	temp &= 0xff;
-	if(temp == 0){
-		z80.F |= FLAG_Z;
-	}
-	z80.A = temp;
-	*/
+	   if((temp & 0x100) == 0x100){
+	   z80.F |= FLAG_C;
+	   }
+	   temp &= 0xff;
+	   if(temp == 0){
+	   z80.F |= FLAG_Z;
+	   }
+	   z80.A = temp;
+	 */
 	unsigned short temp = z80.A;
-	if(z80.F & FLAG_C) temp |= 256;
-	if(z80.F & FLAG_H) temp |= 512;
-	if(z80.F & FLAG_N) temp |= 1024;
+	if(z80.F & FLAG_C) {temp |= 256;}
+	if(z80.F & FLAG_H) {temp |= 512;}
+	if(z80.F & FLAG_N) {temp |= 1024;}
 	temp = daa_table[temp];
-	z80.A = (temp & 0xFF00) >> 8;
-	z80.F = temp & 0xFF;
+	z80.A = temp >> 8;
+	z80.F = temp;
 }
 
 static inline void dec_at(unsigned short addr){
 	// Z 1 H -
 	BYTE d8 = memory_read(addr) - 1;
-	z80.F = FLAG_N | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
+	z80.F = FLAG_N | (z80.F & FLAG_C) | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
 	memory_write(addr, d8);
 }
 
@@ -2148,7 +2148,7 @@ static inline void dec_sp(){
 static inline void dec_smpl(BYTE *reg1){
 	// Z 1 H -
 	BYTE d8 = *reg1 - 1;
-	z80.F = FLAG_N | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
+	z80.F = FLAG_N | (z80.F & FLAG_C) | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
 	*reg1 = d8;
 }
 
@@ -2172,7 +2172,7 @@ static inline void inc_sp(){
 }
 static inline void sbc(BYTE data){
 	BYTE op = z80.A - data - ((z80.F & FLAG_C)? 1:0);
-	z80.F = FLAG_N | ((op == 0) ? FLAG_Z:0) | (((z80.A^data^op) & 0x10) ? FLAG_H:0) | ((z80.A - data < 0) ? FLAG_C : 0);
+	z80.F = FLAG_N | ((op == 0) ? FLAG_Z:0) | (((z80.A^data^op) & 0x10) ? FLAG_H:0) | ((z80.A - data - ((z80.F & FLAG_C) ? 1:0) < 0) ? FLAG_C : 0);
 	z80.A = op;
 }
 
