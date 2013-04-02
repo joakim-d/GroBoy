@@ -2094,40 +2094,11 @@ static inline void cpl(){
 }
 
 static inline void daa(){
-	/*
-	   int temp = z80.A;
-	   if(!(z80.F & FLAG_N)){
-	   if( (z80.F & FLAG_H) || ((temp & 0xF) > 9) ){
-	   temp += 0x06;
-	   }
-	   if( (z80.F & FLAG_C) || (temp > 0x9F) ){
-	   temp += 0x60;
-	   }
-	   }
-	   else {
-	   if(z80.F & FLAG_H){
-	   temp = ((temp - 0x6) & 0xFF);
-	   }
-	   if(z80.F & FLAG_C){
-	   temp -= 0x60;
-	   }
-	   }
-
-	   z80.F = ((z80.F & FLAG_N) ? FLAG_N:0);
-
-	   if((temp & 0x100) == 0x100){
-	   z80.F |= FLAG_C;
-	   }
-	   temp &= 0xff;
-	   if(temp == 0){
-	   z80.F |= FLAG_Z;
-	   }
-	   z80.A = temp;
-	 */
 	unsigned short temp = z80.A;
 	if(z80.F & FLAG_C) {temp |= 256;}
 	if(z80.F & FLAG_H) {temp |= 512;}
 	if(z80.F & FLAG_N) {temp |= 1024;}
+	if(z80.F & FLAG_Z) {temp |= 2048;}
 	temp = daa_table[temp];
 	z80.A = temp >> 8;
 	z80.F = temp;
