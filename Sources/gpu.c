@@ -4,6 +4,13 @@ static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2);
 static inline void gpu_drawblackline();
 static inline Uint32 get_pixel(const SDL_Surface* surface, const int x, const int y);
 static inline void put_pixel(const SDL_Surface* surface, const int x, const int y, const Uint32 pixel);
+static inline void gpu_drawline();
+static inline void get_tile(BYTE num, tile_t *tile, int type);
+static inline void tile_flip(tile_t *tile, int flipx_y, int size);
+static inline void draw_screen();
+static inline void ChangeMode();
+static inline void event_process();
+static inline void scale(SDL_Surface* in, SDL_Surface* out);
 
 void gpu_init(){
 	current_line = 0;
@@ -30,7 +37,7 @@ void gpu_init(){
 	}	*/
 
 
-	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible
+	sdl_screen = SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible
 	sdl_screenTemp = SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
 	SDL_WM_SetCaption("Groboy", NULL);
 	screen_mode = 0;
@@ -119,7 +126,7 @@ static inline void gpu_drawblackline(){
 	}
 }
 
-void gpu_drawline(){
+static inline void gpu_drawline(){
 	int bg_y, bg_x;
 	int window_y, window_x;
 	int i,j;
@@ -254,7 +261,7 @@ void gpu_drawline(){
 //type 1 -> sprites
 //type 2 -> background
 //type 3 -> window
-void get_tile(BYTE num, tile_t *tile, int type){
+static inline void get_tile(BYTE num, tile_t *tile, int type){
 	int size;// 8x8 ou 8x16
 	int lig;
 	int i;
@@ -308,6 +315,9 @@ void get_tile(BYTE num, tile_t *tile, int type){
 		lig++;
 	}
 
+	//if(tile->x_flip && tile->y_flip) tile_flip(tile,3,size);
+	//else if(tile->x_flip)tile_flip(tile,1,size);
+	//else if(tile->y_flip)tile_flip(tile,2,size);
 	if(tile->x_flip)tile_flip(tile,0,size);
 	if(tile->y_flip)tile_flip(tile,1,size);
 
@@ -316,7 +326,7 @@ void get_tile(BYTE num, tile_t *tile, int type){
 
 
 //prend en parametre une tile , 0 pour le flip horizontal ou 1 pour le flip vertical, la taille de la tile
-void tile_flip(tile_t *tile, int flipx_y, int size)
+static inline void tile_flip(tile_t *tile, int flipx_y, int size)
 {
 	BYTE tempflip[16][8];
 	int cpt;
@@ -333,7 +343,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 			}
 		}
 	}
-	else if(flipx_y == 1)
+	if(flipx_y == 1)
 	{
 		cpt = 0;
 		for(int i=size-1; i>=0; i--)
@@ -355,7 +365,7 @@ void tile_flip(tile_t *tile, int flipx_y, int size)
 	}
 }
 
-void draw_screen()
+static inline void draw_screen()
 {
 	event_process();
 	for(int i=0; i<144; i++)
@@ -374,7 +384,7 @@ void draw_screen()
 	}
 	scale(sdl_screenTemp,sdl_screen);
 	SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
-	SDL_Delay(16);
+	SDL_Delay(10);
 }
 
 static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){
@@ -396,7 +406,7 @@ static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){
 	spr2->attributes = spr_temp.attributes;
 }
 
-void event_process()
+static inline void event_process()
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -424,7 +434,7 @@ void event_process()
 	}
 }
 
-void scale(SDL_Surface* in, SDL_Surface* out)
+static inline void scale(SDL_Surface* in, SDL_Surface* out)
 {
 	int pixel, px, py;
 	for(int y=0; y<out->h; y++)
@@ -450,7 +460,7 @@ static inline void put_pixel(const SDL_Surface* surface, const int x, const int 
 
 
 //Passer du mode fenetré au mode plein ecran et inversement
-void ChangeMode()
+static inline void ChangeMode()
 {
 	if(screen_mode==0)
 	{	
@@ -467,5 +477,4 @@ void ChangeMode()
 		screen_mode = 0;
 	}
 	SDL_Flip(sdl_screen);
-
 }

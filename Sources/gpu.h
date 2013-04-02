@@ -40,11 +40,4 @@ SDL_Surface *sdl_screenTemp;
 //SDL_Rect **resolutions; //test pour savoir les resolutions possibles
 void gpu_init();
 void gpu_update(int cycles);
-void gpu_drawline();
-void get_tile(BYTE num, tile_t *tile, int type);
-void tile_flip(tile_t *tile, int flipx_y, int size);
-void draw_screen();
-void ChangeMode();
-void event_process();
-void scale(SDL_Surface* in, SDL_Surface* out);
 #endif
