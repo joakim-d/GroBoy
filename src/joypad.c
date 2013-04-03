@@ -1,5 +1,41 @@
 #include "joypad.h"
 
+void joypad_init(){
+	int fd;
+	if( (fd = open("config/joypad-config", O_RDONLY)) == -1){
+		printf("Joypad config file not found. Using default config\nRight:\td\nLeft:\tq\nUp:\tz\nDown:\ts\nB:\tdown_arrow\nA:\tright_arrow\nSelect:\tright_shift\nStart:\treturn\n");
+		joypad_config[right] = SDLK_d;
+		joypad_config[left] = SDLK_q;
+		joypad_config[up] = SDLK_z;
+		joypad_config[down] = SDLK_s;
+		joypad_config[b] = SDLK_DOWN;
+		joypad_config[a] = SDLK_RIGHT;
+		joypad_config[select] = SDLK_RSHIFT;
+		joypad_config[start] = SDLK_RETURN;
+		if( (fd = open("config/joypad-config", O_WRONLY | O_CREAT, 0644)) == -1){
+			printf("Unable to create joypad config file.\n");
+		}
+		else{
+			if(write(fd, joypad_config, sizeof(int) * 8) == -1){
+				printf("Unable to write in the joypad config file.\n");
+			}
+		}
+	}
+	else{
+		if(read(fd, joypad_config, sizeof(int) * 8) == -1){
+			printf("Unable to read the joypad config file. Using default config\nRight:\td\nLeft:\tq\nUp:\tz\nDown:\ts\nB:\tdown_arrow\nA:\tright_arrow\nSelect:\tright_shift\nStart:\treturn\n");
+			joypad_config[right] = SDLK_d;
+			joypad_config[left] = SDLK_q;
+			joypad_config[up] = SDLK_z;
+			joypad_config[down] = SDLK_s;
+			joypad_config[b] = SDLK_DOWN;
+			joypad_config[a] = SDLK_RIGHT;
+			joypad_config[select] = SDLK_RSHIFT;
+			joypad_config[start] = SDLK_RETURN;
+		}
+	}
+}
+
 void joypad_update(int cycles){
 	static int joypad_counter = 0;	
 	static BYTE joy_new;
@@ -14,21 +50,21 @@ void joypad_update(int cycles){
 	if(joypad_counter > 80000){
 		joypad_counter -= 80000;
 		keystate = SDL_GetKeyState(NULL);
-		if(keystate[SDLK_RIGHT]) key_buttons &=0xFE;
+		if(keystate[joypad_config[right]]) key_buttons &=0xFE;
 		else key_buttons |= 0x01;
-		if(keystate[SDLK_LEFT]) key_buttons &=0xFD;
+		if(keystate[joypad_config[left]]) key_buttons &=0xFD;
 		else key_buttons |= 0x02;
-		if(keystate[SDLK_UP]) key_buttons &=0xFB;
+		if(keystate[joypad_config[up]]) key_buttons &=0xFB;
 		else key_buttons |= 0x04;
-		if(keystate[SDLK_DOWN]) key_buttons &=0xF7;
+		if(keystate[joypad_config[down]]) key_buttons &=0xF7;
 		else key_buttons |= 0x08;
-		if(keystate[SDLK_d]) key_buttons &=0xEF;
+		if(keystate[joypad_config[a]]) key_buttons &=0xEF;
 		else key_buttons |= 0x10;
-		if(keystate[SDLK_s]) key_buttons &=0xDF;
+		if(keystate[joypad_config[b]]) key_buttons &=0xDF;
 		else key_buttons |= 0x20;
-		if(keystate[SDLK_RSHIFT]) key_buttons &=0xBF;
+		if(keystate[joypad_config[select]]) key_buttons &=0xBF;
 		else key_buttons |= 0x40;
-		if(keystate[SDLK_RETURN]) key_buttons &=0x7F;
+		if(keystate[joypad_config[start]]) key_buttons &=0x7F;
 		else key_buttons |= 0x80;
 	}
 

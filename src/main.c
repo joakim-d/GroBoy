@@ -19,6 +19,7 @@ int main(int argc, char * argv[]){
 	cpu_init();
 	gpu_init();
 	interrupts_init();
+	joypad_init();
 	run();
 
 	return 0;
