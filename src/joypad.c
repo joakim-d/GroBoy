@@ -1,6 +1,6 @@
 #include "joypad.h"
 
-void joypad_init(){
+void joypad_init(int redefine){
 	int fd;
 	if( (fd = open("config/joypad-config", O_RDONLY)) == -1){
 		printf("Joypad config file not found. Using default config\nRight:\td\nLeft:\tq\nUp:\tz\nDown:\ts\nB:\tdown_arrow\nA:\tright_arrow\nSelect:\tright_shift\nStart:\treturn\n");
