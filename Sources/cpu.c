@@ -1832,7 +1832,6 @@ void run(){
 		timer_update(cycles);
 		joypad_update(cycles);;
 		handle_interrupts(&z80);
-		update_sound();
 		if(ime_counter > 0){
 			ime_counter -= cycles;
 			if(ime_counter <= 0){
