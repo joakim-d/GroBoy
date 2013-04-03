@@ -80,58 +80,60 @@ void sound_init(){
 }
 void sound_out(){
 
-	printf("channel 1 : %x %x %x %x %x %x %x %x %x %x %x %x \n",apu.channel1.sweep_period,
-			apu.channel1.sweep_shift,
-			apu.channel1.sweep_regulation, 
-			apu.channel1.wave_duty,
-			apu.channel1.sound_length,
-			apu.channel1.initial_volume,
-			apu.channel1.nb_sweep_env,
-			apu.channel1.env_direction, 
-			apu.channel1.freq_low,
-			apu.channel1.freq_high,
-			apu.channel1.initier,
-			apu.channel1.counter_consec); 
+	if(DEBUG_SND){
+		printf("channel 1 : %x %x %x %x %x %x %x %x %x %x %x %x \n",apu.channel1.sweep_period,
+				apu.channel1.sweep_shift,
+				apu.channel1.sweep_regulation, 
+				apu.channel1.wave_duty,
+				apu.channel1.sound_length,
+				apu.channel1.initial_volume,
+				apu.channel1.nb_sweep_env,
+				apu.channel1.env_direction, 
+				apu.channel1.freq_low,
+				apu.channel1.freq_high,
+				apu.channel1.initier,
+				apu.channel1.counter_consec); 
 
-	printf("channel 2 : %x %x %x %x %x %x %x %x %x \n",apu.channel2.sound_length,
-			apu.channel2.wave_duty,
-			apu.channel2.initial_env_volume,
-			apu.channel2.env_direction, 
-			apu.channel2.nb_sweep_env,
-			apu.channel2.freq_low,
-			apu.channel2.freq_high,
-			apu.channel2.initier, 
-			apu.channel2.counter_consec); 
+		printf("channel 2 : %x %x %x %x %x %x %x %x %x \n",apu.channel2.sound_length,
+				apu.channel2.wave_duty,
+				apu.channel2.initial_env_volume,
+				apu.channel2.env_direction, 
+				apu.channel2.nb_sweep_env,
+				apu.channel2.freq_low,
+				apu.channel2.freq_high,
+				apu.channel2.initier, 
+				apu.channel2.counter_consec); 
 
-	printf("channel 3 : %x %x %x %x %x %x %x \n",apu.channel3.sound_trigger,
-			apu.channel3.sound_length,
-			apu.channel3.output_level,
-			apu.channel3.freq_low,
-			apu.channel3.freq_high,
-			apu.channel3.initier,
-			apu.channel3.counter_consec); 
+		printf("channel 3 : %x %x %x %x %x %x %x \n",apu.channel3.sound_trigger,
+				apu.channel3.sound_length,
+				apu.channel3.output_level,
+				apu.channel3.freq_low,
+				apu.channel3.freq_high,
+				apu.channel3.initier,
+				apu.channel3.counter_consec); 
 
-	printf("channel 4 : %x %x %x %x %x %x %x %x %x \n",apu.channel4.sound_length,
-			apu.channel4.initial_env_volume,
-			apu.channel4.sweep_number,
-			apu.channel4.env_direction,
-			apu.channel4.freq_shift,
-			apu.channel4.freq_division_ratio,
-			apu.channel4.step_counter, 
-			apu.channel4.initier, 
-			apu.channel4.counter_consec); 
+		printf("channel 4 : %x %x %x %x %x %x %x %x %x \n",apu.channel4.sound_length,
+				apu.channel4.initial_env_volume,
+				apu.channel4.sweep_number,
+				apu.channel4.env_direction,
+				apu.channel4.freq_shift,
+				apu.channel4.freq_division_ratio,
+				apu.channel4.step_counter, 
+				apu.channel4.initier, 
+				apu.channel4.counter_consec); 
 
-	printf("sound controller : %x %x %x %x %x \n",apu.sound_controller.so2_output_level,
-			apu.sound_controller.so1_output_level,
-			apu.sound_controller.output_to_so2, 
-			apu.sound_controller.output_to_so1, 
-			apu.sound_controller.all_sounds_trigger); 
+		printf("sound controller : %x %x %x %x %x \n",apu.sound_controller.so2_output_level,
+				apu.sound_controller.so1_output_level,
+				apu.sound_controller.output_to_so2, 
+				apu.sound_controller.output_to_so1, 
+				apu.sound_controller.all_sounds_trigger); 
 
-	for(int i=0;i<4;i++){
-		printf("output so1 so2 flag : %d - %x %x %x\n",i,apu.sound_controller.output_sound_so1[i],
-		apu.sound_controller.output_sound_so2[i],
-		apu.sound_controller.sound_flags[i]);
-	} 
+		for(int i=0;i<4;i++){
+			printf("output so1 so2 flag : %d - %x %x %x\n",i,apu.sound_controller.output_sound_so1[i],
+					apu.sound_controller.output_sound_so2[i],
+					apu.sound_controller.sound_flags[i]);
+		}
+	}
 }
 
 void write_sound(unsigned short addr, BYTE data){
@@ -287,21 +289,21 @@ void update_sound(){
 		ampl += delta;
 		blip_add_delta(blip,length,delta);
 		phase = -1 * phase;
-		printf("PERIOD : %f \n", period);
+		if(DEBUG_SND) printf("PERIOD : %f \n", period);
 	}
 	length -= sound_cycles;
 
 	/*ampl = apu.channel2.freq_high - apu.channel2.freq_low;
-	length = apu.channel2.sound_length;
-	volume = apu.channel2.initial_env_volume * 65536 / 2 + 0.5;
-	phase = apu.channel2.nb_sweep_env;
-	for( ; length < sound_cycles; length += apu.channel1.sweep_period){
-		int delta = phase * volume - ampl;
-		ampl += delta;
-		blip_add_delta(blip,length,delta);
-		phase = -1 * phase;
-	}
-	length -= sound_cycles;*/
+	  length = apu.channel2.sound_length;
+	  volume = apu.channel2.initial_env_volume * 65536 / 2 + 0.5;
+	  phase = apu.channel2.nb_sweep_env;
+	  for( ; length < sound_cycles; length += apu.channel1.sweep_period){
+	  int delta = phase * volume - ampl;
+	  ampl += delta;
+	  blip_add_delta(blip,length,delta);
+	  phase = -1 * phase;
+	  }
+	  length -= sound_cycles;*/
 
 
 
