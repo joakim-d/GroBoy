@@ -162,6 +162,6 @@ typedef struct{
 SDL_AudioSpec desired;
 SDL_AudioSpec obtained;
 void sound_init();
-void sound_run(unsigned short address);
+void write_sound(unsigned short addr, BYTE data);
 void update_sound();
 #endif
