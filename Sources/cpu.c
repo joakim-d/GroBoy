@@ -112,7 +112,7 @@ void run(){
 	{
 		op_code=memory_read(z80.PC);
 		cycles = z80_cycles[op_code];
-		
+
 		if(!halted){
 			if(DEBUG){
 				printf("instruction : %d\n", i++);
@@ -1830,9 +1830,9 @@ void run(){
 		}
 		gpu_update(cycles);	
 		timer_update(cycles);
-		joypad_update(cycles);
-		update_sound();
+		joypad_update(cycles);;
 		handle_interrupts(&z80);
+		update_sound();
 		if(ime_counter > 0){
 			ime_counter -= cycles;
 			if(ime_counter <= 0){
@@ -1985,12 +1985,9 @@ static inline void rst(BYTE addr){
 //--------8bit load/store/move instructions
 
 static inline void ld_reg(BYTE *reg, BYTE data){
-	//printf("%d\n",data);
 	*reg = data;
 }
 static inline void ld_mem(unsigned short addr, BYTE data){
-	//LD (reg1),reg2
-	//LD (reg1), d
 	memory_write(addr, data);
 
 }

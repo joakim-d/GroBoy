@@ -11,6 +11,8 @@ static inline void draw_screen();
 static inline void ChangeMode();
 static inline void event_process();
 static inline void scale(SDL_Surface* in, SDL_Surface* out);
+static inline void set_speed(uint16_t fps);
+static inline void sleep_SDL();
 
 void gpu_init(){
 	current_line = 0;
@@ -41,6 +43,7 @@ void gpu_init(){
 	sdl_screenTemp = SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
 	SDL_WM_SetCaption("Groboy", NULL);
 	screen_mode = 0;
+	set_speed(60);
 }
 
 void gpu_update(int cycles){ //fonction appelée en premier
@@ -389,8 +392,22 @@ static inline void draw_screen()
 		}
 		scale(sdl_screenTemp,sdl_screen);
 		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
+		sleep_SDL();
 	}
-	SDL_Delay(15);
+}
+
+static inline void set_speed(uint16_t fps){
+	cycle_length = 1000/fps;
+	timer1 = SDL_GetTicks();
+}
+
+static inline void sleep_SDL(){
+	while(1){
+		timer2 = SDL_GetTicks() - timer1;
+		if(timer2 >= cycle_length) break;
+		else SDL_Delay(2);
+	}
+	timer1 = SDL_GetTicks() - (timer2 % cycle_length);
 }
 
 static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2){
