@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<project name="GroBoy" company="" manager="" phase="" project-start="20130101T000000Z" mrproject-version="2" calendar="1">
+  <properties/>
+  <phases/>
+  <calendars>
+    <day-types>
+      <day-type id="0" name="Travaill&#xE9;" description="Un jour de travail normal"/>
+      <day-type id="1" name="Ch&#xF4;m&#xE9;" description="Un jour ch&#xF4;m&#xE9; normal"/>
+      <day-type id="2" name="Utiliser la base" description="Utilise un jour du calendrier de base"/>
+    </day-types>
+    <calendar id="1" name="D&#xE9;faut">
+      <default-week mon="0" tue="0" wed="0" thu="0" fri="0" sat="1" sun="1"/>
+      <overridden-day-types>
+        <overridden-day-type id="0">
+          <interval start="0800" end="1200"/>
+          <interval start="1300" end="1700"/>
+        </overridden-day-type>
+      </overridden-day-types>
+      <days/>
+    </calendar>
+  </calendars>
+  <tasks>
+    <task id="1" name="Lecture documentation" note="" work="2851200" start="20130101T000000Z" end="20130517T170000Z" work-start="20130101T080000Z" percent-complete="67" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="2" name="R&#xE9;daction rapport" note="" work="2304000" start="20130128T000000Z" end="20130517T170000Z" work-start="20130128T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="must-start-on" time="20130128T000000Z"/>
+    </task>
+    <task id="3" name="Comportement CPU" note="" work="628200" start="20130128T000000Z" end="20130226T153000Z" work-start="20130128T080000Z" percent-complete="99" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="must-start-on" time="20130128T000000Z"/>
+    </task>
+    <task id="4" name="Lecture de Roms" note="" work="201600" start="20130128T000000Z" end="20130205T170000Z" work-start="20130128T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130128T000000Z"/>
+    </task>
+    <task id="5" name="Gestion de la m&#xE9;moire" note="" work="835200" start="20130206T000000Z" end="20130318T170000Z" work-start="20130206T080000Z" percent-complete="80" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130206T000000Z"/>
+    </task>
+    <task id="6" name="Gestion des interruptions" note="" work="691200" start="20130213T000000Z" end="20130318T170000Z" work-start="20130213T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130213T000000Z"/>
+    </task>
+    <task id="7" name="Comportement PPU" note="" work="678600" start="20130213T000000Z" end="20130318T133000Z" work-start="20130213T080000Z" percent-complete="90" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130213T000000Z"/>
+    </task>
+    <task id="8" name="Sortie Sonore" note="" work="678600" start="20130213T000000Z" end="20130318T133000Z" work-start="20130213T080000Z" percent-complete="85" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130213T000000Z"/>
+    </task>
+    <task id="9" name="Autres E/S (touches...)" note="" work="230400" start="20130318T000000Z" end="20130327T170000Z" work-start="20130318T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130318T000000Z"/>
+    </task>
+    <task id="10" name="Interface graphique" note="" work="1091700" start="20130327T000000Z" end="20130517T161500Z" work-start="20130327T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130327T000000Z"/>
+    </task>
+    <task id="11" name="Gestion r&#xE9;seau 2 joueurs" note="" work="1088100" start="20130327T000000Z" end="20130517T151500Z" work-start="20130327T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130327T000000Z"/>
+    </task>
+    <task id="12" name="Filtres vid&#xE9;o" note="" work="1091700" start="20130327T000000Z" end="20130517T161500Z" work-start="20130327T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="start-no-earlier-than" time="20130327T000000Z"/>
+    </task>
+  </tasks>
+  <resource-groups/>
+  <resources>
+    <resource id="1" name="BERGER Micka&#xEB;l" short-name="" type="1" units="0" email="" note="" std-rate="0"/>
+    <resource id="2" name="DIVET Joachim" short-name="" type="1" units="0" email="" note="" std-rate="0"/>
+    <resource id="3" name="VINARD Florian" short-name="" type="1" units="0" email="" note="" std-rate="0"/>
+  </resources>
+  <allocations>
+    <allocation task-id="6" resource-id="1" units="34"/>
+    <allocation task-id="5" resource-id="1" units="33"/>
+    <allocation task-id="12" resource-id="1" units="33"/>
+    <allocation task-id="11" resource-id="1" units="34"/>
+    <allocation task-id="10" resource-id="1" units="33"/>
+    <allocation task-id="9" resource-id="1" units="33"/>
+    <allocation task-id="8" resource-id="1" units="100"/>
+    <allocation task-id="4" resource-id="1" units="34"/>
+    <allocation task-id="3" resource-id="1" units="33"/>
+    <allocation task-id="2" resource-id="1" units="33"/>
+    <allocation task-id="1" resource-id="1" units="34"/>
+    <allocation task-id="6" resource-id="2" units="33"/>
+    <allocation task-id="5" resource-id="2" units="33"/>
+    <allocation task-id="12" resource-id="2" units="33"/>
+    <allocation task-id="11" resource-id="2" units="33"/>
+    <allocation task-id="10" resource-id="2" units="33"/>
+    <allocation task-id="9" resource-id="2" units="34"/>
+    <allocation task-id="7" resource-id="2" units="50"/>
+    <allocation task-id="4" resource-id="2" units="33"/>
+    <allocation task-id="3" resource-id="2" units="33"/>
+    <allocation task-id="2" resource-id="2" units="34"/>
+    <allocation task-id="1" resource-id="2" units="33"/>
+    <allocation task-id="6" resource-id="3" units="33"/>
+    <allocation task-id="5" resource-id="3" units="34"/>
+    <allocation task-id="12" resource-id="3" units="34"/>
+    <allocation task-id="11" resource-id="3" units="33"/>
+    <allocation task-id="10" resource-id="3" units="34"/>
+    <allocation task-id="9" resource-id="3" units="33"/>
+    <allocation task-id="7" resource-id="3" units="50"/>
+    <allocation task-id="4" resource-id="3" units="33"/>
+    <allocation task-id="3" resource-id="3" units="34"/>
+    <allocation task-id="2" resource-id="3" units="33"/>
+    <allocation task-id="1" resource-id="3" units="33"/>
+  </allocations>
+</project>
