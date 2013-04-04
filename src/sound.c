@@ -273,6 +273,7 @@ void write_sound(unsigned short addr, BYTE data){
 	}
 	sound_out();
 	SDL_PauseAudio(1);
+	blip_delete(blip);
 }
 
 
