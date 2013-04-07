@@ -252,7 +252,7 @@ static inline void gpu_drawline(){
 			cur_tile_px_y = current_line + 16 - sprites[ordered_sprites_num[i]].y; 
 			for(j = 0; j < 8; j++){
 				if(tile.px[cur_tile_px_y][j] != 4){ // Si le sprite n'est pas transparent
-					if(!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0)	//si le sprite est dessus ou que le background est à 0
+					if(sprites[ordered_sprites_num[i]].x + j > 7 && (!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0))	//si le sprite est dessus ou que le background est à 0
 						gpu_screen[current_line][sprites[ordered_sprites_num[i]].x - 8 +j] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
 				}
 			}
@@ -390,7 +390,7 @@ static inline void draw_screen()
 					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
 			}
 		}
-		scale(sdl_screenTemp,sdl_screen);
+		SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
 		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
 		sleep_SDL();
 	}
@@ -448,7 +448,7 @@ static inline void event_process()
 			case SDL_VIDEORESIZE:
 				//SDL_Surface *sdl_screen_copie;
 				sdl_screen = SDL_SetVideoMode(event.resize.w, event.resize.h,32,SDL_HWSURFACE | SDL_RESIZABLE);
-				scale(sdl_screenTemp,sdl_screen);
+				SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
 				SDL_Flip(sdl_screen);
 				break;
 			default:break;

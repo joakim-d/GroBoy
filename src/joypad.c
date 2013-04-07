@@ -3,13 +3,13 @@
 void joypad_init(int redefine){
 	int fd;
 	if( (fd = open("config/joypad-config", O_RDONLY)) == -1){
-		printf("Joypad config file not found. Using default config\nRight:\td\nLeft:\tq\nUp:\tz\nDown:\ts\nB:\tdown_arrow\nA:\tright_arrow\nSelect:\tright_shift\nStart:\treturn\n");
-		joypad_config[right] = SDLK_d;
-		joypad_config[left] = SDLK_q;
-		joypad_config[up] = SDLK_z;
-		joypad_config[down] = SDLK_s;
-		joypad_config[b] = SDLK_DOWN;
-		joypad_config[a] = SDLK_RIGHT;
+		printf("Joypad config file not found. Using default config\nRight:\tright_arrow\nLeft:\tleft_arrow\nUp:\tup_arrow\nDown:\tdown_arrow\nB:\ts\nA:\td\nSelect:\tright_shift\nStart:\treturn\n");
+		joypad_config[right] = SDLK_RIGHT;
+		joypad_config[left] = SDLK_LEFT;
+		joypad_config[up] = SDLK_UP;
+		joypad_config[down] = SDLK_DOWN;
+		joypad_config[b] = SDLK_s;
+		joypad_config[a] = SDLK_d;
 		joypad_config[select] = SDLK_RSHIFT;
 		joypad_config[start] = SDLK_RETURN;
 		if( (fd = open("config/joypad-config", O_WRONLY | O_CREAT, 0644)) == -1){
@@ -23,13 +23,13 @@ void joypad_init(int redefine){
 	}
 	else{
 		if(read(fd, joypad_config, sizeof(int) * 8) == -1){
-			printf("Unable to read the joypad config file. Using default config\nRight:\td\nLeft:\tq\nUp:\tz\nDown:\ts\nB:\tdown_arrow\nA:\tright_arrow\nSelect:\tright_shift\nStart:\treturn\n");
-			joypad_config[right] = SDLK_d;
-			joypad_config[left] = SDLK_q;
-			joypad_config[up] = SDLK_z;
-			joypad_config[down] = SDLK_s;
-			joypad_config[b] = SDLK_DOWN;
-			joypad_config[a] = SDLK_RIGHT;
+			printf("Joypad config file not found. Using default config\nRight:\tright_arrow\nLeft:\tleft_arrow\nUp:\tup_arrow\nDown:\tdown_arrow\nB:\ts\nA:\td\nSelect:\tright_shift\nStart:\treturn\n");
+			joypad_config[right] = SDLK_RIGHT;
+			joypad_config[left] = SDLK_LEFT;
+			joypad_config[up] = SDLK_UP;
+			joypad_config[down] = SDLK_DOWN;
+			joypad_config[b] = SDLK_s;
+			joypad_config[a] = SDLK_d;
 			joypad_config[select] = SDLK_RSHIFT;
 			joypad_config[start] = SDLK_RETURN;
 		}
