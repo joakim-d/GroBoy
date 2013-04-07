@@ -2,15 +2,12 @@
 
 static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2);
 static inline void gpu_drawblackline();
-static inline Uint32 get_pixel(const SDL_Surface* surface, const int x, const int y);
-static inline void put_pixel(const SDL_Surface* surface, const int x, const int y, const Uint32 pixel);
 static inline void gpu_drawline();
 static inline void get_tile(BYTE num, tile_t *tile, int type);
 static inline void tile_flip(tile_t *tile, int flipx_y, int size);
 static inline void draw_screen();
 static inline void ChangeMode();
 static inline void event_process();
-static inline void scale(SDL_Surface* in, SDL_Surface* out);
 static inline void set_speed(uint16_t fps);
 static inline void sleep_SDL();
 
@@ -457,30 +454,6 @@ static inline void event_process()
 	}
 }
 
-static inline void scale(SDL_Surface* in, SDL_Surface* out)
-{
-	int pixel, px, py;
-	for(int y=0; y<out->h; y++)
-	{
-		for(int x=0; x<out->w; x++)
-		{
-			px= x*in->w/out->w;
-			py= y*in->h/out->h;
-			pixel = get_pixel(in,px,py);
-			put_pixel(out,x,y,pixel);	
-		}
-	}
-}
-
-static inline Uint32 get_pixel(const SDL_Surface* surface, const int x, const int y) 
-{
-	return *(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4));
-}
-
-static inline void put_pixel(const SDL_Surface* surface, const int x, const int y, const Uint32 pixel) {
-	*(Uint32 *)((Uint8 *)surface->pixels + (y * surface->pitch) + (x * 4)) = pixel;
-}
-
 
 //Passer du mode fenetré au mode plein ecran et inversement
 static inline void ChangeMode()
@@ -490,13 +463,13 @@ static inline void ChangeMode()
 		sdl_screen = SDL_SetVideoMode(0, 0, 32, SDL_VIDEO_FLAGS ^ SDL_FULLSCREEN); /* Passe en mode plein écran */
 		if(sdl_screen == NULL) sdl_screen = SDL_SetVideoMode(0, 0, 0, SDL_VIDEO_FLAGS); /* Si le changement échoue, réinitialise la fenêtre avec la configuration précédente */
 		if(sdl_screen == NULL) exit(1); /* Si la réinitialisation échoue, alors c'est un échec */
-		scale(sdl_screenTemp,sdl_screen);
+		SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
 		screen_mode = 1;
 	}
 	else
 	{
 		sdl_screen = SDL_SetVideoMode(160,144,32,SDL_VIDEO_FLAGS);
-		scale(sdl_screenTemp,sdl_screen);
+		SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
 		screen_mode = 0;
 	}
 	SDL_Flip(sdl_screen);
