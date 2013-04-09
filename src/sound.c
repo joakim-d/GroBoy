@@ -88,7 +88,7 @@ void sound_init(){
 	blip = blip_new(sample_rate / 10);
 	blip_set_rates(blip,clock_rate,sample_rate);
 
-	//SDL_PauseAudio(0);
+	SDL_PauseAudio(0);
 }
 void sound_out(){
 
@@ -289,14 +289,30 @@ void write_sound(unsigned short addr, BYTE data){
 }
 
 
+void update_channel1(){
+
+}
+
+void update_channel2(){
+
+}
+
+void update_channel3(){
+
+}
+
+void update_channel4(){
+
+}
+
 void update_sound(){
 	//int delta = ; //phase * volume - amplitude
 	//blip_add_delta(blip, apu.channel1.sound_length, apu.channel1.initial_volume);
-	double period = (clock_rate / ((44100) / 2 +0.5));
+	/*double period = (clock_rate / ((44100) / 2 +0.5));
 	double ampl = (apu.channel1.freq_high << 8) + apu.channel1.freq_low;
 	double length = apu.channel1.sound_length;
 	double volume = apu.channel1.initial_volume;// * 65536 / 2 + 0.5;
-	int phase = apu.channel1.nb_sweep_env;
+	int phase = apu.channel4.freq_shift;
 	for( ; length < sound_cycles; length += period){
 		int delta = phase * volume - ampl;
 		ampl += delta;
@@ -308,7 +324,7 @@ void update_sound(){
 	period = (clock_rate / ((44100) / 2 + 0.5));
 	ampl = apu.channel2.freq_high - apu.channel2.freq_low;
 	length = apu.channel2.sound_length;
-	volume = apu.channel2.initial_env_volume * 65536 / 2 + 0.5;
+	volume = apu.sound_controller.so1_output_level * 65536 / 2 + 0.5;
 	phase = apu.channel2.nb_sweep_env;
 	for( ; length < sound_cycles; length += period){
 		int delta = phase * volume - ampl;
@@ -316,9 +332,11 @@ void update_sound(){
 		blip_add_delta(blip,length,delta);
 		phase = -1 * phase;
 	}
-	length -= sound_cycles;
-
-
+	length -= sound_cycles;*/
+	update_channel1();
+	update_channel2();
+	update_channel3();
+	update_channel4();
 
 }
 
@@ -348,7 +366,27 @@ void sc4_freq(){
 static void callback(void* data, Uint8 *stream, int len){
 	Sint16 *buffer = (Sint16 *)stream;
 	sound_cycles = blip_clocks_needed(blip, len/4);
-	update_sound();
+	//update_sound();
+	double step = 1/(double)clock_rate;
+	double x=0;
+	int nbytes=2;
+	sc1_freq();
+	//len = len/256;
+	for(int i=0;i<len;i++){
+		double s=sin(2*M_PI*x*apu.channel1.freq);
+		int maxi = (1<<(nbytes*8-1))-1;
+		int n = (int)(maxi*s);
+
+		blip_add_delta(blip,apu.channel1.sound_length,n);
+		//SDL_MixAudio((Uint8 *)buffer, n, len, SDL_MIX_MAXVOLUME);
+		for(int j=0;j<nbytes;j++){
+			buffer[i] = (BYTE)((n>>(j*8))&0xFF);
+		}
+		x+=step;
+
+	}
+
+
 	blip_end_frame(blip, sound_cycles);
 	blip_read_samples(blip, buffer, len, 1);
 }

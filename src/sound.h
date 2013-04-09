@@ -7,10 +7,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <SDL/SDL.h>
+#include <math.h>
 #include "def.h"
 #include "memory.h"
 #include "blip_buf.h"
 
+#define M_PI 3.141592
 //Registres du Canal de son 1
 #define NR10 0xff10 //Registre de balayage (R/W)
 #define NR11 0xff11 //Longueur de son et duty d'une forme d'onde (R/W)
