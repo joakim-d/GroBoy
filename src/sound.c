@@ -3,6 +3,18 @@
 apu_t apu;
 int sound_cycles = 0;
 static blip_t* blip;
+
+static const int freqtab[8] = {
+	(1<<14)*2,
+		(1<<14),
+		(1<<14)/2,
+		(1<<14)/3,
+		(1<<14)/4,
+		(1<<14)/5,
+		(1<<14)/6,
+		(1<<14)/7,
+};
+
 static int sample_rate = 44100;
 static int clock_rate = 4194304;
 static void callback(void* data, Uint8 *stream, int len);
@@ -148,12 +160,12 @@ void write_sound(unsigned short addr, BYTE data){
 			apu.channel1.sweep_period = ((value & 0x70) >> 4);
 			apu.channel1.sweep_shift = (value & 0x07);
 			if((value & BIT_3) > 0)apu.channel1.sweep_regulation = 1;else apu.channel1.sweep_regulation = 0;
-			internal_ram[addr] = value | 0x80;	
+			internal_ram[addr] = value;	
 			break;
 		case NR11:
 			apu.channel1.wave_duty = ((value & 0xC0) >> 6);
 			apu.channel1.sound_length = (value & 0x3F);
-			internal_ram[addr] = value | 0x3f;	
+			internal_ram[addr] = value;	
 			break;
 		case NR12:
 			apu.channel1.initial_volume = ((value & 0xF0) >> 4);
@@ -164,20 +176,20 @@ void write_sound(unsigned short addr, BYTE data){
 		case NR13:
 			// REMPLIR NR13
 			apu.channel1.freq_low = value;
-			internal_ram[addr] = 0xff;
+			internal_ram[addr] = value;
 			break;
 		case NR14:
 			//REMPLIR NR14
 			apu.channel1.freq_high = (value & 0x07);
 			if((value & BIT_7)>0) apu.channel1.initier = 1;else apu.channel1.initier = 0;
 			if((value & BIT_6)>0) apu.channel1.counter_consec = 1;else apu.channel1.counter_consec = 0;
-			internal_ram[addr] = value | 0xbf;
+			internal_ram[addr] = value;
 			break;
 			//SC2
 		case NR21:
 			apu.channel2.wave_duty = ((value & 0xC0) >> 6);
 			apu.channel2.sound_length = (value & 0x3F);
-			internal_ram[addr] = value | 0x3f;
+			internal_ram[addr] = value;
 			break;
 		case NR22:
 			apu.channel2.initial_env_volume = ((value & 0xF0) >> 4);
@@ -187,41 +199,41 @@ void write_sound(unsigned short addr, BYTE data){
 			break;
 		case NR23:
 			apu.channel2.freq_low = value;
-			internal_ram[addr] = 0xff;
+			internal_ram[addr] = value;
 			break;
 		case NR24:
 			apu.channel2.freq_high = (value & 0x07);
 			if((value & BIT_7)>0) apu.channel2.initier = 1;else apu.channel2.initier = 0;
 			if((value & BIT_6)>0) apu.channel2.counter_consec = 1;else apu.channel2.counter_consec = 0;
-			internal_ram[addr] = value | 0xbf;
+			internal_ram[addr] = value;
 			break;
 			//SC3
 		case NR30:
 			if((value & BIT_7)>0) apu.channel3.sound_trigger = 1;else apu.channel3.sound_trigger = 0;
-			internal_ram[addr] = value | 0x7f;
+			internal_ram[addr] = value;
 			break;
 		case NR31:
 			apu.channel3.sound_length = value;
-			internal_ram[addr] = 0xff;
+			internal_ram[addr] = value;
 			break;
 		case NR32:
 			apu.channel3.output_level = ((value & 0x60) >> 4);
-			internal_ram[addr] = value | 0x9f;
+			internal_ram[addr] = value;
 			break;
 		case NR33:
 			apu.channel3.freq_low = value;
-			internal_ram[addr] = 0xff;
+			internal_ram[addr] = value;
 			break;
 		case NR34:
 			apu.channel3.freq_high = (value & 0x07);
 			if((value & BIT_7)>0) apu.channel3.initier = 1;else apu.channel3.initier = 0;
 			if((value & BIT_6)>0) apu.channel3.counter_consec = 1;else apu.channel3.counter_consec = 0;
-			internal_ram[addr] = value | 0xbf;
+			internal_ram[addr] = value;
 			break;
 			//SC4
 		case NR41:
 			apu.channel4.sound_length = (value & 0x3F);
-			internal_ram[addr] = 0xff;
+			internal_ram[addr] = value;
 			break;
 		case NR42:
 			apu.channel4.initial_env_volume = ((value & 0xF0) >> 4);
@@ -238,7 +250,7 @@ void write_sound(unsigned short addr, BYTE data){
 		case NR44:
 			if((value & BIT_7)>0) apu.channel4.initier = 1;else apu.channel4.initier = 0;
 			if((value & BIT_6)>0) apu.channel4.counter_consec = 1;else apu.channel4.counter_consec = 0;
-			internal_ram[addr] = value | 0xbf;
+			internal_ram[addr] = value;
 			break;
 			//SOUND CONTROLL
 		case NR50:
@@ -266,7 +278,7 @@ void write_sound(unsigned short addr, BYTE data){
 			apu.sound_controller.sound_flags[2] = (value & BIT_2);
 			apu.sound_controller.sound_flags[3] = (value & BIT_3);
 			if((value & BIT_7)>0) apu.sound_controller.all_sounds_trigger = 1;else apu.sound_controller.all_sounds_trigger = 0;
-			internal_ram[addr] = (value & 0x80) | 0x70;
+			internal_ram[addr] = value;
 			break;
 		default:
 			break;
@@ -281,32 +293,55 @@ void update_sound(){
 	//int delta = ; //phase * volume - amplitude
 	//blip_add_delta(blip, apu.channel1.sound_length, apu.channel1.initial_volume);
 	double period = (clock_rate / ((44100) / 2 +0.5));
-	double ampl = apu.channel1.freq_high - apu.channel1.freq_low;
+	double ampl = (apu.channel1.freq_high << 8) + apu.channel1.freq_low;
 	double length = apu.channel1.sound_length;
-	double volume = apu.channel1.initial_volume * 65536 / 2 + 0.5;
+	double volume = apu.channel1.initial_volume;// * 65536 / 2 + 0.5;
 	int phase = apu.channel1.nb_sweep_env;
 	for( ; length < sound_cycles; length += period){
 		int delta = phase * volume - ampl;
 		ampl += delta;
 		blip_add_delta(blip,length,delta);
 		phase = -1 * phase;
-		if(DEBUG_SND) printf("PERIOD : %f \n", period);
 	}
 	length -= sound_cycles;
 
-	/*ampl = apu.channel2.freq_high - apu.channel2.freq_low;
-	  length = apu.channel2.sound_length;
-	  volume = apu.channel2.initial_env_volume * 65536 / 2 + 0.5;
-	  phase = apu.channel2.nb_sweep_env;
-	  for( ; length < sound_cycles; length += apu.channel1.sweep_period){
-	  int delta = phase * volume - ampl;
-	  ampl += delta;
-	  blip_add_delta(blip,length,delta);
-	  phase = -1 * phase;
-	  }
-	  length -= sound_cycles;*/
+	period = (clock_rate / ((44100) / 2 + 0.5));
+	ampl = apu.channel2.freq_high - apu.channel2.freq_low;
+	length = apu.channel2.sound_length;
+	volume = apu.channel2.initial_env_volume * 65536 / 2 + 0.5;
+	phase = apu.channel2.nb_sweep_env;
+	for( ; length < sound_cycles; length += period){
+		int delta = phase * volume - ampl;
+		ampl += delta;
+		blip_add_delta(blip,length,delta);
+		phase = -1 * phase;
+	}
+	length -= sound_cycles;
 
 
+
+}
+
+void sc1_freq(){
+	int d= 2048 - ( (apu.channel1.freq_high << 8) + apu.channel1.freq_low );
+	apu.channel1.freq = (sample_rate > (d << 4))?0:(sample_rate << 17 / d);
+}
+
+void sc2_freq(){
+	int d= 2048 - ( (apu.channel2.freq_high << 8) + apu.channel2.freq_low );
+	apu.channel2.freq = (sample_rate > (d << 4))?0:(sample_rate << 17 / d);
+
+}
+
+void sc3_freq(){
+	int d= 2048 - ( (apu.channel3.freq_high << 8) + apu.channel3.freq_low );
+	apu.channel3.freq = (sample_rate > (d << 4))?0:(sample_rate << 17 / d);
+
+}
+
+void sc4_freq(){
+	apu.channel4.freq = (freqtab[apu.channel4.freq_division_ratio] >> (apu.channel4.freq_shift) * sample_rate);
+	if(apu.channel4.freq >> 18)apu.channel4.freq = 1 << 18;
 
 }
 

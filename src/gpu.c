@@ -134,13 +134,13 @@ static inline void gpu_drawline(){
 	BYTE current_pixel = 0; 		//compteur allant de 0 à 160 pour savoir lorsque l'on finit la ligne
 	BYTE cur_tile_px_x; 			//compteur pour savoir quel pixel récupérer sur la tuile et pour passer à la suivante lorsque > 7
 	BYTE cur_tile_px_y; 			//Permet de savoir quelle ligne du pixel choisir
-	BYTE ordered_sprites_num[40];
+	static BYTE ordered_sprites_num[40];
 	BYTE displyd_sprites_nb;
 	BYTE sprite_size;
 	BYTE scy;
 	BYTE scx;
-	tile_t tile; 				//tuile courante
-	sprite_t sprites[40];
+	static tile_t tile; 				//tuile courante
+	static sprite_t sprites[40];
 
 	lcd_cont = memory_read(0xFF40);
 
@@ -224,7 +224,6 @@ static inline void gpu_drawline(){
 			else sprite_size = 8;
 			if(current_line >= (sprites[j].y - 16) && current_line < (sprites[j].y - 16 + sprite_size)){
 				ordered_sprites_num[displyd_sprites_nb++] = j;
-
 			}
 			j++;
 		}
@@ -248,9 +247,10 @@ static inline void gpu_drawline(){
 			get_tile(sprites[ordered_sprites_num[i]].pattern_nb, &tile, SPRITES);
 			cur_tile_px_y = current_line + 16 - sprites[ordered_sprites_num[i]].y; 
 			for(j = 0; j < 8; j++){
-				if(tile.px[cur_tile_px_y][j] != 4){ // Si le sprite n'est pas transparent
-					if(sprites[ordered_sprites_num[i]].x + j > 7 && (!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0))	//si le sprite est dessus ou que le background est à 0
+				if(tile.px[cur_tile_px_y][j] != 4 && sprites[ordered_sprites_num[i]].x + j > 7 && sprites[ordered_sprites_num[i]].x - 8 + j < 160){ // Si le sprite n'est pas transparent
+					if((!(sprites[ordered_sprites_num[i]].attributes & 0x80) || gpu_screen[current_line][sprites[ordered_sprites_num[i]].x -8 + j] == 0)){	//si le sprite est dessus ou que le background est à 0
 						gpu_screen[current_line][sprites[ordered_sprites_num[i]].x - 8 +j] = tile.px[cur_tile_px_y][j]; // on dessine le pixel
+					}
 				}
 			}
 		}

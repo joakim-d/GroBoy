@@ -13,5 +13,7 @@ debug:
 	$(CC) -o $(EXEC) $(SRC) $(GFLAGS) 
 fac: 
 	$(CC) -o $(EXEC) $(SRC) $(CFLAGS) $(LIBRARY)
+fac-debug:
+	$(CC) -o $(EXEC) $(SRC) $(GFLAGS) $(LIBRARY) -g
 clean: 
 	rm groboy 2> /dev/null

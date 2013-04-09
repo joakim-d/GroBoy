@@ -10,7 +10,7 @@ void joypad_init(int redefine){
 		joypad_config[down] = SDLK_DOWN;
 		joypad_config[b] = SDLK_s;
 		joypad_config[a] = SDLK_d;
-		joypad_config[select] = SDLK_RSHIFT;
+		joypad_config[select_] = SDLK_RSHIFT;
 		joypad_config[start] = SDLK_RETURN;
 		if( (fd = open("config/joypad-config", O_WRONLY | O_CREAT, 0644)) == -1){
 			printf("Unable to create joypad config file.\n");
@@ -30,7 +30,7 @@ void joypad_init(int redefine){
 			joypad_config[down] = SDLK_DOWN;
 			joypad_config[b] = SDLK_s;
 			joypad_config[a] = SDLK_d;
-			joypad_config[select] = SDLK_RSHIFT;
+			joypad_config[select_] = SDLK_RSHIFT;
 			joypad_config[start] = SDLK_RETURN;
 		}
 	}
@@ -62,7 +62,7 @@ void joypad_update(int cycles){
 		else key_buttons |= 0x10;
 		if(keystate[joypad_config[b]]) key_buttons &=0xDF;
 		else key_buttons |= 0x20;
-		if(keystate[joypad_config[select]]) key_buttons &=0xBF;
+		if(keystate[joypad_config[select_]]) key_buttons &=0xBF;
 		else key_buttons |= 0x40;
 		if(keystate[joypad_config[start]]) key_buttons &=0x7F;
 		else key_buttons |= 0x80;
