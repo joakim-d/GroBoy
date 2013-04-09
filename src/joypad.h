@@ -1,5 +1,6 @@
 #ifndef JOYPAD_H
 #define JOYPAD_H
+	#include "save_manager.h"
 	#include "memory.h"
 	#include "interrupts.h"
 	void joypad_update(int cycles);

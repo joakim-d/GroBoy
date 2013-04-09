@@ -109,6 +109,11 @@ static void read_rom_info(char* rom_path){
 		case 2: alloc_ram_mem(0x2000);break;
 		case 3: alloc_ram_mem(0x8000);break;
 	}
+
+	switch(*(cartridge_rom_buffer + 0x147)){
+		case 5: alloc_ram_mem(0x100);
+		case 6: alloc_ram_mem(0x100);
+	}
 }
 
 void memory_init(char *rom_path){
@@ -213,7 +218,7 @@ inline void memory_write(unsigned short addr, BYTE data){
 
 static inline void write_mbc2(unsigned short addr, BYTE data){
 	if(addr <= 0x1FFF){
-		if(!(data & 0x100)) enable_ram = 1;
+		if(!(addr & 0x100)) enable_ram = 1;
 		else enable_ram = 0;
 	}
 	else if(addr <= 0x3FFF){

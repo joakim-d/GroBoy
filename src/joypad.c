@@ -66,6 +66,8 @@ void joypad_update(int cycles){
 		else key_buttons |= 0x40;
 		if(keystate[joypad_config[start]]) key_buttons &=0x7F;
 		else key_buttons |= 0x80;
+		//test sauvegarde
+		if(keystate[SDLK_F1]) {save_state();}
 	}
 
 	joy_new = 0x0F;
