@@ -66,6 +66,8 @@ typedef struct{
 	int initier; // booleen
 	int counter_consec; // booleen
 
+	int freq;
+
 } sc1_t;
 
 //Sound Channel 2 : Idem que SC1 mais sans enveloppe / sweet
@@ -84,6 +86,8 @@ typedef struct{
 	BYTE freq_high;
 	int initier; //booleen
 	int counter_consec; //booleen
+
+	int freq;
 
 } sc2_t;
 
@@ -110,6 +114,7 @@ typedef struct{
 	 * sous forme de 32 échantillons 4 bits
 	 */
 
+	int freq;
 } sc3_t;
 
 //Canal utilisé pour le bruit
@@ -128,6 +133,7 @@ typedef struct{
 	int initier; //booleen
 	int counter_consec; //booleen
 
+	int freq;
 } sc4_t;
 
 //Registres de controle du son
@@ -162,6 +168,10 @@ typedef struct{
 SDL_AudioSpec desired;
 SDL_AudioSpec obtained;
 void sound_init();
+void sc1_freq();
+void sc2_freq();
+void sc3_freq();
+void sc4_freq();
 void write_sound(unsigned short addr, BYTE data);
 void update_sound();
 #endif
