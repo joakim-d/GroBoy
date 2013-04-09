@@ -2374,3 +2374,16 @@ static inline void swap_hl(){
 	memory_write((z80.H << 8) + z80.L, hl);
 }
 
+/**fonction pour a sauvegarde
+int save_cpu(FILE* fichier)
+{
+	int nb = 0;
+	int size_buffer =4;
+	int buffer[] = { cycles, ime_counter, halted, skip};
+	for(int i=0; i<size_buffer; i++)
+	{
+		nb += fwrite(buffer,sizeof(int),1,fichier);	
+	}
+	if(nb!=size_buffer)printf("erreur d'écriture des variables du cpu");
+	return nb;
+}*/
