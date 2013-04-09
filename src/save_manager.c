@@ -2,10 +2,11 @@
 
 void save_state()
 {
+	printf("yo\n");
 	fichier = fopen(save_path,"w+");
 	if(fichier == NULL)printf("impossible d'ouvrir le fichier");
-	save_cpu();
-	save_gpu();
+	save_cpu(fichier);
+	//save_gpu();
 	fclose(fichier);
 }
 

@@ -1,8 +1,8 @@
 #ifndef JOYPAD_H
 #define JOYPAD_H
+	#include "save_manager.h"
 	#include "memory.h"
 	#include "interrupts.h"
-	//#include "save_manager.h"
 	void joypad_update(int cycles);
 	void joypad_init();
 	enum {right, left, up, down, b, a, select_, start};

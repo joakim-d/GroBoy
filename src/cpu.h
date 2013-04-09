@@ -18,7 +18,7 @@ void run();
 void cpu_init();
 void reset_halt();
 BYTE is_halted();
-//int save_cpu(FILE* fichier);
+int save_cpu(FILE* fichier);
 unsigned char *rom_buffer;
 int cycles;
 int ime_counter;

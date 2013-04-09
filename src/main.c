@@ -13,6 +13,10 @@ void gui_init(){
 }
 
 int main(int argc, char * argv[]){
+	if(argc != 2){
+		printf("Usage: %s <rom_path>\n", argv[0]);
+		exit(1);
+	}
 	gui_init();
 	memory_init(argv[1]);
 	sound_init();
