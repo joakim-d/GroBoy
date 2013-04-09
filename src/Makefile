@@ -1,6 +1,6 @@
 SRC= cpu.c gpu.c memory.c main.c interrupts.c timer.c sound.c joypad.c blip_buf.c
 CC=gcc
-CFLAGS = -std=c99 -lSDL -Wall -O3 -fomit-frame-pointer
+CFLAGS = -std=c99 -lSDL -lm -Wall -O3 -fomit-frame-pointer
 GFLAGS = -std=c99 -lSDL -Wall -O0 -g -fno-inline
 EXEC= groboy
 OBJ= $(SRC: .c=.o)
