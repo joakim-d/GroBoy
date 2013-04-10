@@ -28,4 +28,8 @@ void memory_write(unsigned short addr, BYTE data);
 void set_force_write();
 void reset_force_write();
 void memory_dump(int part); // un dump mémoire, ou part représente la partie de la mémoire à dumper
+int save_memory(FILE *fichier);
+void restore_memory(FILE* fichier);
+int save_cartridge(FILE* fichier);
+void getName(char *buffer);
 #endif

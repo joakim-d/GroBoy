@@ -25,7 +25,7 @@ int load_bmp(char *bmp_path){
 		return -1;
 	}
 
-	bg_color = SDL_MapRGB( bitmap_font->format, 255, 255, 255);
+	bg_color = SDL_MapRGB(bitmap_font->format, 255, 255, 255);
 	cell_w = bitmap_font->w/16;
 	cell_h = bitmap_font->h/16;
 
