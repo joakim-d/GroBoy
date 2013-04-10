@@ -12,7 +12,10 @@
 #include "memory.h"
 #include "blip_buf.h"
 
-#define M_PI 3.141592
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 //Registres du Canal de son 1
 #define NR10 0xff10 //Registre de balayage (R/W)
 #define NR11 0xff11 //Longueur de son et duty d'une forme d'onde (R/W)

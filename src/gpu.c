@@ -36,8 +36,7 @@ void gpu_init(){
 	}	*/
 
 
-	sdl_screen = SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible
-	sdl_screenTemp = SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
+	sdl_screenTemp =SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible 
 	SDL_WM_SetCaption("Groboy", NULL);
 	screen_mode = 0;
 	set_speed(60);
@@ -387,8 +386,8 @@ static inline void draw_screen()
 					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
 			}
 		}
-		SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
-		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
+		//SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
+		SDL_Flip(sdl_screenTemp); /* Mise à jour de l'écran */
 		sleep_SDL();
 	}
 }
