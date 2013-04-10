@@ -111,8 +111,8 @@ static void read_rom_info(char* rom_path){
 	}
 
 	switch(*(cartridge_rom_buffer + 0x147)){
-		case 5: alloc_ram_mem(0x100);
-		case 6: alloc_ram_mem(0x100);
+		case 5: alloc_ram_mem(0x100);break;
+		case 6: alloc_ram_mem(0x100);break;
 	}
 }
 
@@ -457,3 +457,70 @@ void memory_dump(int part){
 			break;
 	}
 }
+
+//save_state
+int save_memory(FILE* fichier)
+{
+	int nb=0;
+	size_t size = 0;
+	switch(*(cartridge_rom_buffer + 0x0149)){
+                case 0:
+                        switch(*(cartridge_rom_buffer + 0x147)){
+                                case 5: size = 0x100;break;
+                                case 6: size = 0x100;break;
+                                }
+                                break;
+                case 1: size = 0x100;break;
+                case 2: size = 0x2000;break;
+                case 3: size = 0x8000;break;
+        }
+	
+	nb = fwrite(&cartridge_type,sizeof(BYTE),1,fichier);
+	nb += fwrite(&enable_ram, sizeof(BYTE),1,fichier);
+	nb += fwrite(&cartridge_ram_enabled,sizeof(BYTE),1,fichier);
+	nb += fwrite(&rom_mode,sizeof(BYTE),1,fichier);
+	nb += fwrite(&rom_selector,sizeof(BYTE),1,fichier);
+	nb += fwrite(&ram_selector,sizeof(BYTE),1,fichier);
+	nb += fwrite(&force_write,sizeof(BYTE),1,fichier);
+	nb += fwrite(cartridge_ram_buffer,sizeof(BYTE),size,fichier);
+	nb += fwrite(internal_ram,sizeof(BYTE),0x10000,fichier);
+	return nb;	
+}
+
+//restore state
+void restore_memory(FILE* fichier)
+{
+	size_t size = 0;
+	fread(&cartridge_type,sizeof(BYTE),1,fichier);
+	fread(&enable_ram, sizeof(BYTE),1,fichier);
+	fread(&cartridge_ram_enabled,sizeof(BYTE),1,fichier);
+	fread(&rom_mode,sizeof(BYTE),1,fichier);
+	fread(&rom_selector,sizeof(BYTE),1,fichier);
+	fread(&ram_selector, sizeof(BYTE),1,fichier);
+	fread(&force_write,sizeof(BYTE),1,fichier);
+	switch(*(cartridge_rom_buffer + 0x0149)){
+                case 0:
+                        switch(*(cartridge_rom_buffer + 0x147)){
+                                case 5: size = 0x100;break;
+                                case 6: size = 0x100;break;
+                                }
+                                break;
+                case 1: size = 0x100;break;
+                case 2: size = 0x2000;break;
+                case 3: size = 0x8000;break;
+        }
+	fread(&cartridge_ram_buffer,sizeof(BYTE),size,fichier);
+	fread(&internal_ram,sizeof(BYTE),0x10000,fichier);
+}
+
+void getName(char *buffer)
+{
+	strcpy(buffer, cartridge_rom_buffer + 0x134);
+}
+
+//sauvegarde normale
+int save_cartridge(FILE* fichier)
+{
+	return 0;
+}
+

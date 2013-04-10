@@ -2378,9 +2378,39 @@ static inline void swap_hl(){
 int save_cpu(FILE* fichier)
 {
 	int nb = 0;
-	int size_buffer =4;
-	int buffer[] = { cycles, ime_counter, halted, skip};
-	nb = fwrite(buffer,sizeof(int),4,fichier);	
-	if(nb!=size_buffer)printf("erreur d'écriture des variables du cpu");
+	int nb_element =14;
+	nb += fwrite(&cycles,sizeof(int),1,fichier);
+        nb += fwrite(&ime_counter,sizeof(int),1,fichier);
+        nb += fwrite(&halted,sizeof(uint8_t),1,fichier);
+        nb += fwrite(&skip,sizeof(uint8_t),1,fichier);
+        nb += fwrite(&z80.PC,sizeof(unsigned short),1,fichier);
+        nb += fwrite(&z80.SP,sizeof(unsigned short),1,fichier);
+        nb += fwrite(&z80.A,sizeof(unsigned char),1,fichier);
+        nb += fwrite(&z80.F,sizeof(unsigned char),1,fichier);
+        nb += fwrite(&z80.B,sizeof(unsigned char),1,fichier);
+        nb += fwrite(&z80.C,sizeof(unsigned char),1,fichier);
+        nb += fwrite(&z80.D,sizeof(unsigned char),1,fichier);
+        nb += fwrite(&z80.E,sizeof(unsigned char),1,fichier);
+        nb += fwrite(&z80.H,sizeof(unsigned char),1,fichier);
+        nb += fwrite(&z80.L,sizeof(unsigned char),1,fichier);
+	if(nb!=nb_element)printf("erreur d'écriture des variables du cpu");
 	return nb;
+}
+
+void restore_cpu(FILE* fichier)
+{
+	fread(&cycles,sizeof(int),1,fichier);
+	fread(&ime_counter,sizeof(int),1,fichier);
+	fread(&halted,sizeof(uint8_t),1,fichier);
+	fread(&skip,sizeof(uint8_t),1,fichier);
+	fread(&z80.PC,sizeof(unsigned short),1,fichier);
+	fread(&z80.SP,sizeof(unsigned short),1,fichier);
+	fread(&z80.A,sizeof(unsigned char),1,fichier);
+	fread(&z80.F,sizeof(unsigned char),1,fichier);
+	fread(&z80.B,sizeof(unsigned char),1,fichier);
+	fread(&z80.C,sizeof(unsigned char),1,fichier);
+	fread(&z80.D,sizeof(unsigned char),1,fichier);
+	fread(&z80.E,sizeof(unsigned char),1,fichier);
+	fread(&z80.H,sizeof(unsigned char),1,fichier);
+	fread(&z80.L,sizeof(unsigned char),1,fichier);
 }

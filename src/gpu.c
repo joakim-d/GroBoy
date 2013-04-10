@@ -34,10 +34,12 @@ void gpu_init(){
 	for(int i=0;resolutions[i];++i)
 	printf("  %d x %d\n", resolutions[i]->w, resolutions[i]->h);
 	}	*/
+	
+/*/	sdl_screen = SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible
+        sdl_screenTemp = SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); //SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
+*/
 
-
-	sdl_screen = SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible
-	sdl_screenTemp = SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
+	sdl_screenTemp =SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible 
 	SDL_WM_SetCaption("Groboy", NULL);
 	screen_mode = 0;
 	set_speed(60);
@@ -387,8 +389,8 @@ static inline void draw_screen()
 					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
 			}
 		}
-		SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
-		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
+		//SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
+		SDL_Flip(sdl_screenTemp); /* Mise à jour de l'écran */
 		sleep_SDL();
 	}
 }
@@ -474,3 +476,30 @@ static inline void ChangeMode()
 	}
 	SDL_Flip(sdl_screen);
 }
+
+int save_gpu(FILE* fichier)
+{
+	int nb=0;
+	int nb_element=7;
+	nb += fwrite(&line_clock_counter,sizeof(int),1,fichier);
+        nb += fwrite(&vblank_clock_counter,sizeof(int),1,fichier);
+        nb += fwrite(&screen_mode,sizeof(int),1,fichier);
+        nb += fwrite(&current_line,sizeof(BYTE),1,fichier);
+        nb += fwrite(&timer1,sizeof(int),1,fichier);
+        nb += fwrite(&timer2,sizeof(int),1,fichier);
+        nb += fwrite(&cycle_length,sizeof(int),1,fichier);
+	if(nb!=nb_element) printf("erreur d'écriture des variables du gpu");
+	return nb;
+}
+
+void restore_gpu(FILE * fichier)
+{
+	fread(&line_clock_counter,sizeof(int),1,fichier);
+	fread(&vblank_clock_counter,sizeof(int),1,fichier);
+	fread(&screen_mode,sizeof(int),1,fichier);
+	fread(&current_line,sizeof(BYTE),1,fichier);
+	fread(&timer1,sizeof(int),1,fichier);
+	fread(&timer2,sizeof(int),1,fichier);
+	fread(&cycle_length,sizeof(int),1,fichier);
+}
+

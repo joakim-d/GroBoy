@@ -1,23 +1,36 @@
 #include "save_manager.h"
 
 void save_state()
-{
-	printf("yo\n");
-	fichier = fopen(save_path,"w+");
+{	
+	char nom[120];
+	char path[120];
+	strcpy(path, "saves/");
+	getName(nom);
+	strcat(path,nom);
+	strcat(path,".save");
+	fichier = fopen(path,"w+");
 	if(fichier == NULL)printf("impossible d'ouvrir le fichier");
 	save_cpu(fichier);
-	//save_gpu();
+	save_gpu(fichier);
+	save_interrupt(fichier);
+	save_memory(fichier);
 	fclose(fichier);
+	//restore();
 }
 
 void restore()
-{
-	fichier = fopen(save_path,"r");
+{	
+	char nom[120];
+	char path[120];
+	strcpy(path,"saves/");
+	getName(nom);
+        strcat(path,nom);
+        strcat(path,".save");
+	fichier = fopen(path,"r");
 	if(fichier == NULL)printf("impossible d'ouvrir le fichier");
-	int buffer;
-	for(int i=0; i<4; i++)
-	{
-		fread(buffer,4,1,fichier);
-		printf("%d\n",buffer);
-	}	
+	restore_cpu(fichier);
+	restore_gpu(fichier);
+	restore_interrupt(fichier);
+	restore_memory(fichier);
+	fclose(fichier);
 }
