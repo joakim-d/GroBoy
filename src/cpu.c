@@ -85,6 +85,8 @@ static inline void sra_hl();
 static inline void swap(BYTE *data);
 static inline void swap_hl();
 
+extern int sound_cycles;
+
 
 z80_t z80;
 void cpu_init(){
@@ -112,6 +114,7 @@ void run(){
 	{
 		op_code=memory_read(z80.PC);
 		cycles = z80_cycles[op_code];
+		sound_cycles -= cycles;
 
 		if(!halted){
 			if(DEBUG){

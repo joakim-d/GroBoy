@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
 #include <SDL/SDL.h>
 #include <math.h>
 #include "def.h"
@@ -50,9 +51,76 @@
 #define NR51 0xff25 //sortie son vers terminal droite / gauche
 #define NR52 0xff26 //son on-off
 
+#define MAX_SAMPLE 32767
+#define MIN_SAMPLE -32767
+#define HI (MAX_SAMPLE /4)
+#define LO  (MIN_SAMPLE /4) 
+#define GRND 0
+#define LFSR_7_S 128
+#define LFSR_15_S 32768
+#define LFSR_15 0
+#define LFSR_7 1
+
+enum terminal_side {LEFT, RIGHT};
+enum type_count {PERIOD, LENGTH, ENVELOPE, SWEEP};
+
+typedef struct {
+	unsigned duty;
+	unsigned i;
+}duty_t;
+
+typedef struct {
+	unsigned i;
+}wave_t;
+
+typedef struct {
+	unsigned i;
+	unsigned size;
+}lfsr_t;
+
+typedef struct {
+	unsigned length;
+	unsigned i;
+	int is_continue;
+	int is_on;
+}length_t;
+
+typedef struct {
+	unsigned volume;
+	unsigned length_count;
+	unsigned length;
+	unsigned i;
+	int zombie_mode;
+	int increase_dir;
+}envelope_t;
+
+typedef struct {
+	unsigned hidden_freq;
+	unsigned time_count;
+	unsigned time;
+	unsigned shift_number;
+	unsigned i;
+	int decrease_dir;
+}sweep_t;
+
 //Sound Channel 1 : Tone & Sweep
 //Onde carrée
 typedef struct{
+	duty_t duty;
+	envelope_t envelope;
+	sweep_t sweep;
+	length_t length;
+	
+	unsigned freq;
+	unsigned period;
+	unsigned period_counter;
+	short last_delta_right;
+	short last_delta_left;
+
+	int is_left;
+	int is_right;
+
+
 	//NR10	
 	BYTE sweep_period;
 	BYTE sweep_shift;
@@ -71,13 +139,26 @@ typedef struct{
 	int initier; // booleen
 	int counter_consec; // booleen
 
-	int freq;
 
 } sc1_t;
 
 //Sound Channel 2 : Idem que SC1 mais sans enveloppe / sweet
 //Onde carrée
 typedef struct{
+	duty_t duty;
+	envelope_t envelope;
+	sweep_t sweep;
+	length_t length;
+	
+	unsigned freq;
+	unsigned period;
+	unsigned period_counter;
+	short last_delta_right;
+	short last_delta_left;
+
+	int is_left;
+	int is_right;
+
 	//NR21
 	BYTE sound_length;
 	BYTE wave_duty;
@@ -92,13 +173,25 @@ typedef struct{
 	int initier; //booleen
 	int counter_consec; //booleen
 
-	int freq;
 
 } sc2_t;
 
 //Sound Channel 3 : Utilisé pour le son digital de sortie et tonalités normales à l'init de l'onde RAM
 //Canal d'échantillons
 typedef struct{
+	wave_t wave;
+	length_t length;
+	unsigned volume;
+	unsigned freq;
+	unsigned period;
+	unsigned period_count;
+	short last_delta_right;
+	short last_delta_left;
+
+	int is_left;
+	int is_right;
+	
+
 	//NR30
 	int sound_trigger; //booleen (on/off)
 	//NR31
@@ -119,11 +212,22 @@ typedef struct{
 	 * sous forme de 32 échantillons 4 bits
 	 */
 
-	int freq;
 } sc3_t;
 
 //Canal utilisé pour le bruit
 typedef struct{
+	envelope_t envelope;
+	length_t length;
+	lfsr_t lfsr;
+	unsigned period;
+	unsigned period_count;
+	short last_delta_right;
+	short last_delta_left;
+
+	int is_left;
+	int is_right;
+
+
 	//NR41
 	BYTE sound_length;
 	//NR42
@@ -143,6 +247,10 @@ typedef struct{
 
 //Registres de controle du son
 typedef struct {
+	int is_on;
+	unsigned right_level;
+	unsigned left_level;
+
 	//NR50
 	BYTE so2_output_level;
 	BYTE so1_output_level;
@@ -173,10 +281,20 @@ typedef struct{
 SDL_AudioSpec desired;
 SDL_AudioSpec obtained;
 void sound_init();
+void sound_fini();
+void stop_sound();
+void start_sound();
+void sound_reset();
+void write_sound(unsigned short addr, BYTE data);
+void write_wave(unsigned short addr, BYTE data);
+void update_sound();
+void update_channel1(int clocks);
+void update_channel2(int clocks);
+void update_channel3(int clocks);
+void update_channel4(int clocks);
+
 void sc1_freq();
 void sc2_freq();
 void sc3_freq();
 void sc4_freq();
-void write_sound(unsigned short addr, BYTE data);
-void update_sound();
 #endif
