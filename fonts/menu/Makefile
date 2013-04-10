@@ -1,2 +1,2 @@
 all:
-	gcc -c bmp_font.c -lSDL -std=c99
+	gcc menu.c bmp_font.c -lSDL -std=c99 -g

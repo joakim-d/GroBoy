@@ -25,7 +25,7 @@ int load_bmp(char *bmp_path){
 		return -1;
 	}
 
-	bg_color = SDL_MapRGB( bitmap_font->format, 0, 0, 0);
+	bg_color = SDL_MapRGB( bitmap_font->format, 255, 255, 255);
 	cell_w = bitmap_font->w/16;
 	cell_h = bitmap_font->h/16;
 
@@ -64,6 +64,7 @@ int load_bmp(char *bmp_path){
 			current_char++;
 		}
 	}
+	return 0;
 }
 
 void write_text(char *text, int x, int y, SDL_Surface *surface){
