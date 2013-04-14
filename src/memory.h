@@ -18,6 +18,7 @@ BYTE rom_mode;
 BYTE rom_selector;				//Permet de savoir quelle banque de rom est sélectionnée
 BYTE ram_selector;				//Permet de savoir quelle banque de ram est sélectionnée
 BYTE force_write;
+char *game_name;
 						//chaque banque contient 0x4000 octets (16384)
 BYTE *cartridge_ram_buffer;			//Le buffer de ram représentant la mémoire vive d'une cartouche
 BYTE *cartridge_rom_buffer;			//Le buffer qui contient toutes les données d'une rom (représentant toutes les banques alignées)
@@ -28,8 +29,8 @@ void memory_write(unsigned short addr, BYTE data);
 void set_force_write();
 void reset_force_write();
 void memory_dump(int part); // un dump mémoire, ou part représente la partie de la mémoire à dumper
-int save_memory(FILE *fichier);
-void restore_memory(FILE* fichier);
-int save_cartridge(FILE* fichier);
-void getName(char *buffer);
+int save_memory(FILE *file);
+void restore_memory(FILE* file);
+int save_cartridge(FILE* file);
+char * getName();
 #endif

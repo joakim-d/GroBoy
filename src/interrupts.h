@@ -15,6 +15,6 @@ void reset_IME();
 void handle_interrupts(z80_t *z80);
 void execute_interrupt(BYTE type, z80_t *z80);
 void make_request(BYTE type);
-int save_interrupt(FILE* fichier);
-void restore_interrupt(FILE *fichier);
+int save_interrupt(FILE* file);
+void restore_interrupt(FILE *file);
 #endif

@@ -477,29 +477,32 @@ static inline void ChangeMode()
 	SDL_Flip(sdl_screen);
 }
 
-int save_gpu(FILE* fichier)
+int save_gpu(FILE* file)
 {
 	int nb=0;
-	int nb_element=7;
-	nb += fwrite(&line_clock_counter,sizeof(int),1,fichier);
-        nb += fwrite(&vblank_clock_counter,sizeof(int),1,fichier);
-        nb += fwrite(&screen_mode,sizeof(int),1,fichier);
-        nb += fwrite(&current_line,sizeof(BYTE),1,fichier);
-        nb += fwrite(&timer1,sizeof(int),1,fichier);
-        nb += fwrite(&timer2,sizeof(int),1,fichier);
-        nb += fwrite(&cycle_length,sizeof(int),1,fichier);
-	if(nb!=nb_element) printf("erreur d'écriture des variables du gpu");
+	int nb_elements=7;
+	nb += fwrite(&line_clock_counter,sizeof(int),1,file);
+        nb += fwrite(&vblank_clock_counter,sizeof(int),1,file);
+        nb += fwrite(&screen_mode,sizeof(int),1,file);
+        nb += fwrite(&current_line,sizeof(BYTE),1,file);
+        nb += fwrite(&timer1,sizeof(int),1,file);
+        nb += fwrite(&timer2,sizeof(int),1,file);
+        nb += fwrite(&cycle_length,sizeof(int),1,file);
+	if(nb!=nb_elements) printf("Error when writing gpu variables\n");
 	return nb;
 }
 
-void restore_gpu(FILE * fichier)
+void restore_gpu(FILE * file)
 {
-	fread(&line_clock_counter,sizeof(int),1,fichier);
-	fread(&vblank_clock_counter,sizeof(int),1,fichier);
-	fread(&screen_mode,sizeof(int),1,fichier);
-	fread(&current_line,sizeof(BYTE),1,fichier);
-	fread(&timer1,sizeof(int),1,fichier);
-	fread(&timer2,sizeof(int),1,fichier);
-	fread(&cycle_length,sizeof(int),1,fichier);
+	int nb=0;
+	int nb_elements = 7;
+	nb+=fread(&line_clock_counter,sizeof(int),1,file);
+	nb+=fread(&vblank_clock_counter,sizeof(int),1,file);
+	nb+=fread(&screen_mode,sizeof(int),1,file);
+	nb+=fread(&current_line,sizeof(BYTE),1,file);
+	nb+=fread(&timer1,sizeof(int),1,file);
+	nb+=fread(&timer2,sizeof(int),1,file);
+	nb+=fread(&cycle_length,sizeof(int),1,file);
+	if(nb!=nb_elements) printf("Error when reading gpu variables\n");
 }
 

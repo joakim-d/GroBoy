@@ -43,6 +43,6 @@ int cycle_length;
 //SDL_Rect **resolutions; //test pour savoir les resolutions possibles
 void gpu_init();
 void gpu_update(int cycles);
-int save_gpu(FILE* fichier);
-void restore_gpu(FILE *fichier);
+int save_gpu(FILE* file);
+void restore_gpu(FILE *file);
 #endif

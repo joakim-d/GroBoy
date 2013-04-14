@@ -12,7 +12,7 @@
 		int pos_x;
 		int pos_y;
 	} menu_elem_t;
-	typedef enum {menu, config, load_rom};
+	typedef enum {menu, config, load_rom} page_e;
 
 
 #endif

@@ -2378,42 +2378,45 @@ static inline void swap_hl(){
 }
 
 //fonction pour a sauvegarde
-int save_cpu(FILE* fichier)
+int save_cpu(FILE* file)
 {
 	int nb = 0;
-	int nb_element =14;
-	nb += fwrite(&cycles,sizeof(int),1,fichier);
-        nb += fwrite(&ime_counter,sizeof(int),1,fichier);
-        nb += fwrite(&halted,sizeof(uint8_t),1,fichier);
-        nb += fwrite(&skip,sizeof(uint8_t),1,fichier);
-        nb += fwrite(&z80.PC,sizeof(unsigned short),1,fichier);
-        nb += fwrite(&z80.SP,sizeof(unsigned short),1,fichier);
-        nb += fwrite(&z80.A,sizeof(unsigned char),1,fichier);
-        nb += fwrite(&z80.F,sizeof(unsigned char),1,fichier);
-        nb += fwrite(&z80.B,sizeof(unsigned char),1,fichier);
-        nb += fwrite(&z80.C,sizeof(unsigned char),1,fichier);
-        nb += fwrite(&z80.D,sizeof(unsigned char),1,fichier);
-        nb += fwrite(&z80.E,sizeof(unsigned char),1,fichier);
-        nb += fwrite(&z80.H,sizeof(unsigned char),1,fichier);
-        nb += fwrite(&z80.L,sizeof(unsigned char),1,fichier);
-	if(nb!=nb_element)printf("erreur d'écriture des variables du cpu");
+	int nb_elements =14;
+	nb += fwrite(&cycles,sizeof(int),1,file);
+        nb += fwrite(&ime_counter,sizeof(int),1,file);
+        nb += fwrite(&halted,sizeof(uint8_t),1,file);
+        nb += fwrite(&skip,sizeof(uint8_t),1,file);
+        nb += fwrite(&z80.PC,sizeof(unsigned short),1,file);
+        nb += fwrite(&z80.SP,sizeof(unsigned short),1,file);
+        nb += fwrite(&z80.A,sizeof(unsigned char),1,file);
+        nb += fwrite(&z80.F,sizeof(unsigned char),1,file);
+        nb += fwrite(&z80.B,sizeof(unsigned char),1,file);
+        nb += fwrite(&z80.C,sizeof(unsigned char),1,file);
+        nb += fwrite(&z80.D,sizeof(unsigned char),1,file);
+        nb += fwrite(&z80.E,sizeof(unsigned char),1,file);
+        nb += fwrite(&z80.H,sizeof(unsigned char),1,file);
+        nb += fwrite(&z80.L,sizeof(unsigned char),1,file);
+	if(nb!=nb_elements) printf("Error when writing cpu variables\n");
 	return nb;
 }
 
-void restore_cpu(FILE* fichier)
+void restore_cpu(FILE* file)
 {
-	fread(&cycles,sizeof(int),1,fichier);
-	fread(&ime_counter,sizeof(int),1,fichier);
-	fread(&halted,sizeof(uint8_t),1,fichier);
-	fread(&skip,sizeof(uint8_t),1,fichier);
-	fread(&z80.PC,sizeof(unsigned short),1,fichier);
-	fread(&z80.SP,sizeof(unsigned short),1,fichier);
-	fread(&z80.A,sizeof(unsigned char),1,fichier);
-	fread(&z80.F,sizeof(unsigned char),1,fichier);
-	fread(&z80.B,sizeof(unsigned char),1,fichier);
-	fread(&z80.C,sizeof(unsigned char),1,fichier);
-	fread(&z80.D,sizeof(unsigned char),1,fichier);
-	fread(&z80.E,sizeof(unsigned char),1,fichier);
-	fread(&z80.H,sizeof(unsigned char),1,fichier);
-	fread(&z80.L,sizeof(unsigned char),1,fichier);
+	int nb = 0;
+	int nb_elements = 14;
+	nb += fread(&cycles,sizeof(int),1,file);
+	nb += fread(&ime_counter,sizeof(int),1,file);
+	nb += fread(&halted,sizeof(uint8_t),1,file);
+	nb += fread(&skip,sizeof(uint8_t),1,file);
+	nb += fread(&z80.PC,sizeof(unsigned short),1,file);
+	nb += fread(&z80.SP,sizeof(unsigned short),1,file);
+	nb += fread(&z80.A,sizeof(unsigned char),1,file);
+	nb += fread(&z80.F,sizeof(unsigned char),1,file);
+	nb += fread(&z80.B,sizeof(unsigned char),1,file);
+	nb += fread(&z80.C,sizeof(unsigned char),1,file);
+	nb += fread(&z80.D,sizeof(unsigned char),1,file);
+	nb += fread(&z80.E,sizeof(unsigned char),1,file);
+	nb += fread(&z80.H,sizeof(unsigned char),1,file);
+	nb += fread(&z80.L,sizeof(unsigned char),1,file);
+	if(nb!=nb_elements) printf("Error when reading cpu variables\n");
 }

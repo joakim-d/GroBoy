@@ -1,12 +1,12 @@
 #include <SDL/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h> 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "bmp_font.h"
 #include "menu.h"
+#include <dirent.h> 
 
 void move_cursor(SDL_Surface *sdl_screen, int where){
 	if(where == UP && cursor_pos > 0){
@@ -36,22 +36,18 @@ int filter(const struct dirent *a)
 	struct stat file_stat;
 
 	stat(a->d_name, &file_stat);
-	if(S_ISDIR(file_stat.st_mode)) return 1;
+	if(S_ISDIR(file_stat.st_mode)){return 1;}
 	else{
-		if(strcmp(a->d_name + strlen(a->d_name) - 3, ".gb") == 0)
-			return 1;
-		else return 0;
+		if(strcmp(a->d_name + strlen(a->d_name) - 3, ".gb") == 0) {return 1;}
+		else {return 0;}
 	}
 }
 
-int compare(const void *a_v, const void *b_v){
-	struct dirent *a = (struct dirent*) a_v;
-	struct dirent *b = (struct dirent*) b_v;
-
+int compare(const struct dirent **a, const struct dirent **b){
 	struct stat a_stat;
 	struct stat b_stat;
-	stat(a->d_name, &a_stat);
-	stat(b->d_name, &b_stat);
+	stat((*a)->d_name, &a_stat);
+	stat((*b)->d_name, &b_stat);
 	if(S_ISDIR(a_stat.st_mode) && !S_ISDIR(b_stat.st_mode)){
 		return -1;
 	}

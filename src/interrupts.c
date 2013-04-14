@@ -95,16 +95,16 @@ void execute_interrupt(BYTE type, z80_t *z80){
 	}
 }
 
-int save_interrupt(FILE* fichier)
+int save_interrupt(FILE* file)
 {
 	int nb=0;
-	int nb_element=1;
-	nb = fwrite(&IME,sizeof(int),1,fichier);
-	if(nb!=nb_element) printf("erreur d'écriture des variables des interruptions");
+	int nb_elements=1;
+	nb = fwrite(&IME,sizeof(BYTE),1,file);
+	if(nb!=nb_elements) printf("Error when writing interrupt variables\n");
 	return nb;
 }
 
-void restore_interrupt(FILE* fichier)
+void restore_interrupt(FILE* file)
 {
-	fread(&IME,sizeof(int),1,fichier);
+	if(fread(&IME,sizeof(BYTE),1,file) == 0) printf("Error when reading interrupt variables\n");
 }
