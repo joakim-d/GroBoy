@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "menu.h"
 #include "cpu.h"
 #include "memory.h"
 #include "interrupts.h"
@@ -13,18 +14,18 @@ void gui_init(){
 }
 
 int main(int argc, char * argv[]){
-	if(argc != 2){
-		printf("Usage: %s <rom_path>\n", argv[0]);
-		exit(1);
-	}
+	char gamepath[4096];
+	SDL_Surface *sdl_screen;
 	gui_init();
-	memory_init(argv[1]);
+	sdl_screen = SDL_SetVideoMode(160*2, 144*2, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_RESIZABLE);
+	load_gui(sdl_screen);
+	get_gamepath(gamepath);
+	memory_init(gamepath);
 	//sound_init();
 	cpu_init();
-	gpu_init();
+	gpu_init(sdl_screen);
 	interrupts_init();
 	joypad_init();
 	run();
-
 	return 0;
 }

@@ -19,6 +19,7 @@ void joypad_init(int redefine){
 			if(write(fd, joypad_config, sizeof(int) * 8) == -1){
 				printf("Unable to write in the joypad config file.\n");
 			}
+			close(fd);
 		}
 	}
 	else{

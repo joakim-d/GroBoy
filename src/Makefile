@@ -1,7 +1,7 @@
-SRC= cpu.c gpu.c memory.c main.c interrupts.c timer.c sound.c joypad.c blip_buf.c save_manager.c
+SRC= cpu.c gpu.c memory.c main.c interrupts.c timer.c sound.c joypad.c blip_buf.c save_manager.c menu.c bmp_font.c
 CC=gcc
-CFLAGS = -std=c99 -lSDL -lm -Wall -O3 -fomit-frame-pointer
-GFLAGS = -std=c99 -lSDL -Wall -O0 -g -fno-inline
+CFLAGS = -std=c99 -lSDL -lm -Wall -O3 -fomit-frame-pointer -D _SVID_SOURCE
+GFLAGS = -std=c99 -lSDL -Wall -O0 -g -fno-inline -D _SVID_SOURCE
 EXEC= groboy
 OBJ= $(SRC: .c=.o)
 LIBRARY= `sdl-config --cflags --libs` -lSDLmain -lSDL -I /auto_home/fvinard/LIB/include -L /auto_home/fvinard/LIB/lib

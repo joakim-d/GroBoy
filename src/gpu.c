@@ -11,7 +11,7 @@ static inline void event_process();
 static inline void set_speed(uint16_t fps);
 static inline void sleep_SDL();
 
-void gpu_init(){
+void gpu_init(SDL_Surface *sdl_scr){
 	current_line = 0;
 	//fonctions SDL
 
@@ -34,12 +34,8 @@ void gpu_init(){
 	for(int i=0;resolutions[i];++i)
 	printf("  %d x %d\n", resolutions[i]->w, resolutions[i]->h);
 	}	*/
-	
-/*/	sdl_screen = SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible
-        sdl_screenTemp = SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); //SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
-*/
-
-	sdl_screenTemp =SDL_SetVideoMode(160*2, 144*2, 32, SDL_VIDEO_FLAGS); // remplacer 160 et 144 par resolustions[0]->w et resolutions[0]->h pour avoir la résolution la plus grande possible 
+	sdl_screen = sdl_scr;	
+        sdl_screenTemp = SDL_CreateRGBSurface(SDL_SWSURFACE,160,144,32, 0, 0, 0, 0);
 	SDL_WM_SetCaption("Groboy", NULL);
 	screen_mode = 0;
 	set_speed(60);
@@ -389,8 +385,8 @@ static inline void draw_screen()
 					*((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
 			}
 		}
-		//SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
-		SDL_Flip(sdl_screenTemp); /* Mise à jour de l'écran */
+		SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
+		SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
 		sleep_SDL();
 	}
 }
@@ -445,7 +441,6 @@ static inline void event_process()
 				  }
 				  break;*/
 			case SDL_VIDEORESIZE:
-				//SDL_Surface *sdl_screen_copie;
 				sdl_screen = SDL_SetVideoMode(event.resize.w, event.resize.h,32,SDL_HWSURFACE | SDL_RESIZABLE);
 				SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
 				SDL_Flip(sdl_screen);

@@ -127,7 +127,7 @@ void navigate(char *path_name, char *destination){
 	choice = 0;
 	current_index = 0;
 	SDL_Flip(sdl_screen);//update graphics
-	strcpy(destination, "");		//init buffer to verify if the user choose something or quit
+	strcpy(buffer, "");		//init buffer to verify if the user choose something or quit
 	while(!choice){
 		SDL_PumpEvents();		//To grab the last events
 		keystate = SDL_GetKeyState(NULL);
@@ -315,7 +315,7 @@ int main(int argc, char *argv[]){
 	}   
 
 	sdl_screen = SDL_SetVideoMode(160, 144, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
-	if(load_bmp(argv[1]) == -1){
+	if(load_bmp("fonts/gui_font.bmp") == -1){
 		printf("Loading bmp font error\n");
 	}
 	bg_color = SDL_MapRGB(sdl_screen->format, 255, 255, 255);
@@ -327,7 +327,10 @@ int main(int argc, char *argv[]){
 		if(keystate[SDLK_UP]){
 			move_cursor(sdl_screen, UP);
 		}
-		if(keystate[SDLK_DOWN]) move_cursor(sdl_screen, DOWN);
+		if(keystate[SDLK_DOWN]){
+			if(strcmp(selected_game, "") == 0 && cursor_pos < 2) move_cursor(sdl_screen, DOWN);
+			else if (strcmp(selected_game, "") != 0 && cursor_pos < 3) move_cursor(sdl_screen, DOWN);
+		}
 		if(keystate[SDLK_RETURN]) menu_action();
 		if(keystate[SDLK_ESCAPE]) break;
 		SDL_Flip(sdl_screen);
