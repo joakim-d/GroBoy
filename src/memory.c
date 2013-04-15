@@ -522,7 +522,7 @@ void restore_memory(FILE* file)
 	if(fread(&ram_selector, sizeof(BYTE),1,file) != 1) print_error(1);
 	if(fread(&force_write,sizeof(BYTE),1,file) != 1) print_error(1);
 	if(size != 0){
-		if(fread(&cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
+		if(fread(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
 	}
 	if(fread(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(1);
 }
