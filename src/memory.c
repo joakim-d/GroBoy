@@ -13,18 +13,10 @@ void reset_force_write(){
 	force_write = 0;
 }
 
-static void set_game_name(char* rom_path){
-	char *temp;
-	temp = strrchr(rom_path, '/');
-	game_name = malloc(strlen(temp)); //on veut la position après le '/' donc pas besoin de rajouter 1 pour le '\0'
-	strcpy(game_name,temp + 1);
-}
-
 static void read_rom_info(char* rom_path){
 	int file_d;
 	struct stat file_stat;
 		
-	set_game_name(rom_path);
 	file_d = open(rom_path, O_RDONLY);
 	fstat(file_d, &file_stat);
 
@@ -467,44 +459,61 @@ void memory_dump(int part){
 	}
 }
 
+static inline void print_error(int type){
+	if(type == 0) {printf("Error when writing memory variables\n");}
+	else {printf("Error when reading memory variables\n");}
+}
+
 //save_state
 int save_memory(FILE* file)
 {
 	int nb=0;
-	size_t size = 0;
+	size_t size;
 	switch(*(cartridge_rom_buffer + 0x0149)){
                 case 0:
                         switch(*(cartridge_rom_buffer + 0x147)){
                                 case 5: size = 0x100;break;
                                 case 6: size = 0x100;break;
+				default: size = 0;break;
+                                }
+                                break;
+                case 1: size = 0x100;break;
+                case 2: size = 0x2000;break;
+                case 3: size = 0x8000;break;
+		default: size = 0;
+        }
+	
+	if(fwrite(&cartridge_type,sizeof(BYTE),1,file) != 1) print_error(0);
+	if(fwrite(&enable_ram, sizeof(BYTE),1,file) != 1) print_error(0);
+	if(fwrite(&cartridge_ram_enabled,sizeof(BYTE),1,file) != 1) print_error(0);
+	if(fwrite(&rom_mode,sizeof(BYTE),1,file) != 1) print_error(0);
+	if(fwrite(&rom_selector,sizeof(BYTE),1,file) != 1) print_error(0);
+	if(fwrite(&ram_selector,sizeof(BYTE),1,file) != 1) print_error(0);
+	if(fwrite(&force_write,sizeof(BYTE),1,file) != 1) print_error(0);
+	if(size != 0){
+		if(fwrite(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(0);
+	}
+	if(fwrite(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(0);
+	return nb;	
+}
+
+
+//restore state
+void restore_memory(FILE* file)
+{
+	size_t size;
+	switch(*(cartridge_rom_buffer + 0x0149)){
+                case 0:
+                        switch(*(cartridge_rom_buffer + 0x147)){
+                                case 5: size = 0x100;break;
+                                case 6: size = 0x100;break;
+				default: size = 0;break;
                                 }
                                 break;
                 case 1: size = 0x100;break;
                 case 2: size = 0x2000;break;
                 case 3: size = 0x8000;break;
         }
-	
-	nb = fwrite(&cartridge_type,sizeof(BYTE),1,file);
-	nb += fwrite(&enable_ram, sizeof(BYTE),1,file);
-	nb += fwrite(&cartridge_ram_enabled,sizeof(BYTE),1,file);
-	nb += fwrite(&rom_mode,sizeof(BYTE),1,file);
-	nb += fwrite(&rom_selector,sizeof(BYTE),1,file);
-	nb += fwrite(&ram_selector,sizeof(BYTE),1,file);
-	nb += fwrite(&force_write,sizeof(BYTE),1,file);
-	if(size != 0) nb += fwrite(cartridge_ram_buffer,sizeof(BYTE),size,file);
-	nb += fwrite(internal_ram,sizeof(BYTE),0x10000,file);
-	return nb;	
-}
-
-static inline void print_error(int type){
-	if(type == 0) {printf("Error when writing memory variables\n");}
-	else {printf("Error when reading memory variables\n");}
-}
-
-//restore state
-void restore_memory(FILE* file)
-{
-	size_t size = 0;
 	if(fread(&cartridge_type,sizeof(BYTE),1,file) != 1) print_error(1);
 	if(fread(&enable_ram, sizeof(BYTE),1,file) != 1) print_error(1);
 	if(fread(&cartridge_ram_enabled,sizeof(BYTE),1,file) != 1) print_error(1);
@@ -512,26 +521,10 @@ void restore_memory(FILE* file)
 	if(fread(&rom_selector,sizeof(BYTE),1,file) != 1) print_error(1);
 	if(fread(&ram_selector, sizeof(BYTE),1,file) != 1) print_error(1);
 	if(fread(&force_write,sizeof(BYTE),1,file) != 1) print_error(1);
-	switch(*(cartridge_rom_buffer + 0x0149)){
-                case 0:
-                        switch(*(cartridge_rom_buffer + 0x147)){
-                                case 5: size = 0x100;break;
-                                case 6: size = 0x100;break;
-                                }
-                                break;
-                case 1: size = 0x100;break;
-                case 2: size = 0x2000;break;
-                case 3: size = 0x8000;break;
-        }
 	if(size != 0){
 		if(fread(&cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
 	}
 	if(fread(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(1);
-}
-
-char * getName()
-{
-	return game_name;
 }
 
 //sauvegarde normale

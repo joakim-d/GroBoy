@@ -314,6 +314,12 @@ void get_gamepath(char *gamepath){
 	strcpy(gamepath, selected_game);
 }	
 
+void get_gamename(char *gamename){
+	char *temp;
+	temp = strrchr(selected_game, '/');
+	strcpy(gamename,temp + 1); 
+}
+
 void load_gui(SDL_Surface *sdl_screen){
 	static Uint8 *keystate;
 	int play = 0;

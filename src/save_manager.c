@@ -5,7 +5,7 @@ void save_state()
 	char name[0x10000];
 	char path[0x1000C];
 	strcpy(path, "saves/");
-	strcpy(name, getName());
+	get_gamename(name);
 	strcat(path,name);
 	strcat(path,".save");
 	fichier = fopen(path,"w+");
@@ -25,7 +25,7 @@ void restore()
 	char name[0x10000];
 	char path[0x1000C];
 	strcpy(path,"saves/");
-	strcpy(name, getName());
+	get_gamename(name);
 	strcat(path,name);
 	strcat(path,".save");
 	fichier = fopen(path,"r");
