@@ -2,8 +2,8 @@
 
 void save_state()
 {	
-	char name[120];
-	char path[131];
+	char name[0x10000];
+	char path[0x1000C];
 	strcpy(path, "saves/");
 	strcpy(name, getName());
 	strcat(path,name);
@@ -22,8 +22,8 @@ void save_state()
 
 void restore()
 {	
-	char name[120];
-	char path[131];
+	char name[0x10000];
+	char path[0x1000C];
 	strcpy(path,"saves/");
 	strcpy(name, getName());
 	strcat(path,name);

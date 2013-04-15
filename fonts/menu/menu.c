@@ -22,20 +22,24 @@ void move_cursor(SDL_Surface *sdl_screen, int where){
 }
 void upper(char *src, char *dst){
 	int i;
-	for(i = 0; i < strlen(src); i++){
+	for(i = 0; i < strlen(src) && i < 12; i++){
 		if(src[i] >= 97 && src[i] <= 122){
 			dst[i] = src[i] - 32;
 		}
 		else dst[i] = src[i];
 	}
-	dst[i] = '\0';
+	if(i == 12 && strlen(src) != 12) memcpy(dst+12, "...\0", 4);
+	else dst[i] = '\0';
 }
 
 int filter(const struct dirent *a)
 {
+	char path[PATH_MAX];
 	struct stat file_stat;
-
-	stat(a->d_name, &file_stat);
+	strcpy(path, cwd);
+	strcat(path, "/");
+	strcat(path, a->d_name);
+	stat(path, &file_stat);
 	if(S_ISDIR(file_stat.st_mode)){return 1;}
 	else{
 		if(strcmp(a->d_name + strlen(a->d_name) - 3, ".gb") == 0) {return 1;}
@@ -46,8 +50,19 @@ int filter(const struct dirent *a)
 int compare(const struct dirent **a, const struct dirent **b){
 	struct stat a_stat;
 	struct stat b_stat;
-	stat((*a)->d_name, &a_stat);
-	stat((*b)->d_name, &b_stat);
+	char path_a[PATH_MAX];
+	char path_b[PATH_MAX];
+
+	strcpy(path_a, cwd);
+	strcat(path_a, "/");
+	strcat(path_a, (*a)->d_name);
+
+	strcpy(path_b, cwd);
+	strcat(path_b, "/");
+	strcat(path_b, (*b)->d_name);
+
+	stat(path_a, &a_stat);
+	stat(path_b, &b_stat);
 	if(S_ISDIR(a_stat.st_mode) && !S_ISDIR(b_stat.st_mode)){
 		return -1;
 	}
@@ -56,70 +71,150 @@ int compare(const struct dirent **a, const struct dirent **b){
 	}
 	else return alphasort(a,b);
 }
-
-void navigate(char *path_name){
-	static Uint8 *keystate;
-	SDL_FillRect(sdl_screen, NULL, bg_color);
-	struct dirent **files;
-	struct stat file_stat;
-	DIR *rep;
-	int drawed_file = 0;
-	int nb_files;
-	char buffer[0xFFFF];
-
-	nb_files = scandir(path_name,&files,filter, compare);
-	if(nb_files < 0){
-		printf("error\n");
+void display_menu(SDL_Surface *sdl_screen){
+	if(strcmp(selected_game, "") == 0){
+		SDL_FillRect(sdl_screen, NULL, bg_color);
+		current_window = menu;
+		write_text("GROBOY", sdl_screen->w/2 - 30, 0, sdl_screen);
+		write_text("LOAD ROM", 15, 20, sdl_screen);
+		write_text("CONFIG JOYPAD", 15, 30, sdl_screen);
+		write_text("EXIT", 15, 40, sdl_screen);
+		write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
 	}
 	else{
-		for(int i = 0; i < nb_files; i++){
+		SDL_FillRect(sdl_screen, NULL, bg_color);
+		current_window = menu;
+		write_text("GROBOY", sdl_screen->w/2 - 30, 0, sdl_screen);
+		write_text("PLAY", 15,20,sdl_screen);
+		write_text("LOAD ROM", 15, 30, sdl_screen);
+		write_text("CONFIG JOYPAD", 15, 40, sdl_screen);
+		write_text("EXIT", 15, 50, sdl_screen);
+		write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
+	}
+}
+
+void navigate(char *path_name, char *destination){
+	static Uint8 *keystate;
+	struct dirent **files;
+	struct stat file_stat;
+	int nb_files;
+	char buffer[PATH_MAX];
+	int choice;
+	SDL_Event event;
+	int key_down;		//init key_down
+	int buf_len;
+	int current_index;
+	int i,j;
+
+	SDL_FillRect(sdl_screen, NULL, bg_color);//Empty the sdl_screen
+	nb_files = scandir(path_name,&files,filter, compare);//scanning the dir path_name
+
+	write_text("\1", 5, cursor_pos*10 + 20, sdl_screen);
+	cursor_pos = 0;
+	write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
+
+	if(nb_files < 0){
+		printf("Error when reading path_name %s\n", path_name);
+		exit(1);
+	}
+	else{
+		for(i = 0; i < nb_files && i < 12; i++){ //display files on sdl_screen
 			upper(files[i]->d_name, buffer);
 			write_text(buffer, 15, i*10 + 20, sdl_screen);	
 		}
 	}
-	SDL_Flip(sdl_screen);
-	int key_down = 0;
-	SDL_Event event;
-	strcpy(buffer, "");
-	for(;;){
-		SDL_PumpEvents();
+	key_down = 0;
+	choice = 0;
+	current_index = 0;
+	SDL_Flip(sdl_screen);//update graphics
+	strcpy(destination, "");		//init buffer to verify if the user choose something or quit
+	while(!choice){
+		SDL_PumpEvents();		//To grab the last events
 		keystate = SDL_GetKeyState(NULL);
-		if(keystate[SDLK_UP]){
-			move_cursor(sdl_screen, UP);
+		if(keystate[SDLK_UP]){	
+			if(cursor_pos != 0){
+				current_index--;
+				move_cursor(sdl_screen, UP);
+				SDL_Flip(sdl_screen);
+			}
+			else if(current_index != 0){
+				current_index--;
+				SDL_FillRect(sdl_screen, NULL, bg_color);//Empty the sdl_screen
+				j = 0;
+				write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
+				for(i = current_index; i < nb_files && i < current_index + 12; i++){ //display files on sdl_screen
+					upper(files[i]->d_name, buffer);
+					write_text(buffer, 15, j*10 + 20, sdl_screen);
+					j++;
+				}
+				SDL_Flip(sdl_screen);
+			}
 		}
-		if(keystate[SDLK_DOWN]) move_cursor(sdl_screen, DOWN);
-		if(keystate[SDLK_RETURN]) {
-			stat(files[cursor_pos]->d_name, &file_stat);
-			if(S_ISDIR(file_stat.st_mode)){
+		if(keystate[SDLK_DOWN]){
+			if(cursor_pos != 11 && cursor_pos != nb_files - 1){
+				current_index++;
+				move_cursor(sdl_screen, DOWN);
+				SDL_Flip(sdl_screen);
+			}
+			else if(current_index != nb_files - 1){
+				current_index++;
+				SDL_FillRect(sdl_screen, NULL, bg_color);//Empty the sdl_screen
+				j = 0;
+				write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
+				for(i = current_index - 11; i < nb_files && i <= current_index; i++){
+					upper(files[i]->d_name, buffer);
+					write_text(buffer, 15, j*10 + 20, sdl_screen);
+					j++;
+				}
+				SDL_Flip(sdl_screen);
+			}
+		}
+		if(keystate[SDLK_RETURN]) {	//if user select a file
+			stat(files[current_index]->d_name, &file_stat);
+			if(S_ISDIR(file_stat.st_mode)){	
+				if(strcmp(files[current_index]->d_name, ".") == 0){
+					cursor_pos = 0;
+					SDL_Flip(sdl_screen);
+				}
+				else if(strcmp(files[current_index]->d_name, "..") ==0){
+					if(strrchr(path_name,'/') != path_name){ //if the previous dir is not the root
+						buf_len = strlen(path_name) - strlen(strrchr(path_name, '/'));
+						strncpy(buffer, path_name, buf_len);
+						buffer[buf_len] = '\0';
+						choice = 1;
+					}
+					else{
+						strcpy(buffer, "/");
+						choice = 1;
+					}
+				}
+				else{
+					strcpy(buffer, path_name);
+					strcat(buffer,"/");
+					strcat(buffer, files[current_index]->d_name);
+					choice = 1;
+				}
+			}
+			else{
 				strcpy(buffer, path_name);
 				strcat(buffer,"/");
-				strcat(buffer, files[cursor_pos]->d_name);
-				printf("%s\n", buffer);
+				strcat(buffer, files[current_index]->d_name);
+				choice = 1;
 			}
-
-			break;
-
 		}
-		if(keystate[SDLK_ESCAPE]) break;
-		SDL_Flip(sdl_screen);
-		SDL_Delay(100);
+		if(keystate[SDLK_ESCAPE]) choice = 1;
+		SDL_Delay(50);
 	}
-	SDL_Delay(100);
-	if(strcmp(buffer, "") != 0) navigate(buffer);
-
+	if(strcmp(buffer, "") != 0){
+		strcpy(destination, buffer);
+	}
+	for(i = 0; i < nb_files; i++){
+		free(files[i]);
+	}
+	free(files);
 	SDL_Delay(100);
 }
 
-void init_menu(SDL_Surface *sdl_screen){
-	SDL_FillRect(sdl_screen, NULL, bg_color);
-	current_window = menu;
-	cursor_pos = 0;
-	write_text("GROBOY", sdl_screen->w/2 - 30, 0, sdl_screen);
-	write_text("LOAD ROM", 15, 20, sdl_screen);
-	write_text("CONFIG JOYPAD", 15, 30, sdl_screen);
-	write_text("EXIT", 15, 40, sdl_screen);
-	write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
-}
 
 
 void joy_conf(){
@@ -171,18 +266,38 @@ void joy_conf(){
 		SDL_Flip(sdl_screen);
 		SDL_Delay(500);	
 	}
-	init_menu(sdl_screen);
-
+	cursor_pos = 0;
+	display_menu(sdl_screen);
 }
 
 void menu_action(){
-	if(cursor_pos == 0){
-		navigate(".");	
+	char destination[0xFFFF];
+	int action;
+	action = (strcmp(selected_game, "") != 0)? cursor_pos: cursor_pos + 1;
+	if(action == 0){
+		printf("not implemented\n");
 	}
-	else if(cursor_pos == 1){
+	if(action == 1){
+		if(getcwd(cwd, sizeof(cwd)) != NULL){
+			navigate(cwd, destination);	
+			while(strcmp(destination, "") != 0 && strcmp(destination + strlen(destination) - 3, ".gb") != 0){
+				strcpy(cwd, destination);
+				navigate(cwd, destination);
+			}
+			if(strcmp(destination + strlen(destination) - 3, ".gb") == 0){
+				strcpy(selected_game,destination);
+			}
+			cursor_pos = 0;
+			display_menu(sdl_screen);
+		}
+		else{
+			printf("Error when getting current directory\n");
+		}
+	}
+	else if(action == 2){
 		joy_conf();
 	}
-	else if(cursor_pos == 2){
+	else if(action == 3){
 		exit(1);
 	}
 }
@@ -204,7 +319,8 @@ int main(int argc, char *argv[]){
 		printf("Loading bmp font error\n");
 	}
 	bg_color = SDL_MapRGB(sdl_screen->format, 255, 255, 255);
-	init_menu(sdl_screen);	
+	display_menu(sdl_screen);	
+	cursor_pos = 0;
 	for(;;){
 		SDL_PumpEvents();
 		keystate = SDL_GetKeyState(NULL);
