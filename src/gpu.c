@@ -112,7 +112,8 @@ void gpu_update(int cycles){ //fonction appelée en premier
 				if(lcdstat & 0x08){
 					make_request(LCD_STAT);
 				}
-				gpu_drawline();
+				if(lcdc & 0x80) gpu_drawline();
+				else gpu_drawblackline();
 			}
 		}
 	}

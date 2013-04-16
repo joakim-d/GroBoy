@@ -4,7 +4,7 @@ CFLAGS = -std=c99 -lSDL -lm -Wall -O3 -fomit-frame-pointer -D _SVID_SOURCE
 GFLAGS = -std=c99 -lSDL -Wall -O0 -g -fno-inline -D _SVID_SOURCE
 EXEC= groboy
 OBJ= $(SRC: .c=.o)
-LIBRARY= `sdl-config --cflags --libs` -lSDLmain -lSDL -I /auto_home/fvinard/LIB/include -L /auto_home/fvinard/LIB/lib
+LIBRARY= `sdl-config --cflags --libs` -lSDLmain -lSDL -I /auto_home/jdivet/LIB/include -L /auto_home/jdivet/LIB/lib
 all:
 	echo "make, trois options possibles : groboy, debug et clean"
 groboy:
