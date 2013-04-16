@@ -26,7 +26,7 @@ int main(int argc, char * argv[]){
 	load_gui(sdl_screen);
 	get_gamepath(gamepath);
 	memory_init(gamepath);
-	//sound_init();
+	sound_init();
 	cpu_init();
 	gpu_init(sdl_screen);
 	interrupts_init();

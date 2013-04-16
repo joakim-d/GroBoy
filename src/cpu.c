@@ -114,7 +114,7 @@ void run(){
 	{
 		op_code=memory_read(z80.PC);
 		cycles = z80_cycles[op_code];
-		sound_cycles -= cycles;
+		sound_cycles -= cycles % 8 ;
 
 		if(!halted){
 			if(DEBUG){
@@ -1833,14 +1833,15 @@ void run(){
 		}
 		gpu_update(cycles);	
 		timer_update(cycles);
+		joypad_update(cycles);
 		handle_interrupts(&z80);
+		sound_cycles += cycles;
 		if(ime_counter > 0){
 			ime_counter -= cycles;
 			if(ime_counter <= 0){
 				set_IME();
 			}
 		}
-		joypad_update(cycles);;
 	}
 }
 
