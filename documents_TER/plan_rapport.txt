@@ -1,0 +1,32 @@
+Intro/
+	-cadre
+	-motivation du sujet
+	-def emulation
+
+I/Organisation du projet
+	-choix des outils
+	-documentation
+	-etude de l'existant
+	-articles de recherche
+
+II/Description du Hardware
+	-CPU
+	-GPU
+	-MMU
+	-APU
+	-interruptions
+	-synchronisation
+
+III/Adaptation Logicielle
+	-calque du hardware
+	-fonctionnalités additionnelles(sauvegarde d'état, GUI)
+
+Conclusion/
+	-travail réalisé
+	-ajout de fonctionnalités
+	-emulation ajd
+
+Annexes:
+	-générer son en temps réel sans fichier avec SDL
+	-charger et créer une police au format BMP sans recours à une librarie externe avec SDL
+	-méthodes de debug + roms de test
