@@ -265,64 +265,43 @@ void write_sound(unsigned short addr, BYTE data){
 
 	switch(addr){
 		case NR10:
-			//apu.channel1.sweep_period = ((value & 0x70) >> 4);
-			//apu.channel1.sweep_shift = (value & 0x07);
-			if((value & BIT_3) > 0)apu.channel1.sweep_regulation = 1;else apu.channel1.sweep_regulation = 0;
-			internal_ram[addr] = value;	
 
-			//apu.channel1.sweep.time = apu.channel1.sweep_period;
-			//apu.channel1.sweep.shift_number = apu.channel1.sweep_shift;
-			//apu.channel1.sweep.decrease_dir = apu.channel1.sweep_regulation;
-			apu.channel1.sweep.time = ((value & 0x70) >> 4);
-			apu.channel1.sweep.shift_number = (value & 0x07);
-			apu.channel1.sweep.decrease_dir = apu.channel1.sweep_regulation;
+			apu.channel1.sweep_regulation = (value & BIT_3)?1:0;
+			apu.channel1.sweep.time = ((value & 0x70) >> 4); //Sweep period
+			apu.channel1.sweep.shift_number = (value & 0x07); //Sweep shift
+			apu.channel1.sweep.decrease_dir = apu.channel1.sweep_regulation; //Sweep direction
+			internal_ram[addr] = value;	
 			break;
 		case NR11:
-			//apu.channel1.wave_duty = ((value & 0xC0) >> 6);
-			//apu.channel1.sound_length = (value & 0x3F);
-			internal_ram[addr] = value;	
 
-			//apu.channel1.length.length = 64 - apu.channel1.sound_length;
-			//apu.channel1.duty.duty = apu.channel1.wave_duty;
-			apu.channel1.length.length = 64 - (value & 0x3F);
-			apu.channel1.duty.duty = ((value & 0xC0) >> 6);
+			apu.channel1.length.length = 64 - (value & 0x3F); //Sound length
+			apu.channel1.duty.duty = ((value & 0xC0) >> 6); //Wave duty
+			internal_ram[addr] = value;	
 			break;
 		case NR12:
-			//apu.channel1.initial_volume = ((value & 0xF0) >> 4);
-			//apu.channel1.nb_sweep_env = (value & 0x07);
 			if((value & BIT_3)>0) apu.channel1.env_direction = 1;else apu.channel1.env_direction = 0;
-			internal_ram[addr] = value;
 
-			//apu.channel1.envelope.length = apu.channel1.nb_sweep_env;
-			//apu.channel1.envelope.volume = apu.channel1.initial_volume;
-			//apu.channel1.envelope.increase_dir = apu.channel1.env_direction;
-			apu.channel1.envelope.length = (value & 0x07);
-			apu.channel1.envelope.volume = ((value & 0xF0) >> 4);
-			apu.channel1.envelope.increase_dir = apu.channel1.env_direction;
+			apu.channel1.envelope.length = (value & 0x07); //Number of sweep envelope
+			apu.channel1.envelope.volume = ((value & 0xF0) >> 4); //Initial Volume
+			apu.channel1.envelope.increase_dir = apu.channel1.env_direction; //Envelope direction
+			internal_ram[addr] = value;
 			break;
 		case NR13:
-			//apu.channel1.freq_low = value;
-			internal_ram[addr] = value;
 
-			//sc1_freq();
-
-			freq = (apu.channel1.freq & 0x700) | value;
+			//Calcul de la fréquence et de la période, à partir des composantes basses
+			freq = (apu.channel1.freq & 0x700) | value; //Partie gauche = composantes basses
 			apu.channel1.freq = freq;
 			apu.channel1.period = 2048 - freq;
-
-			//sc1_freq();
+			internal_ram[addr] = value;
 			break;
 		case NR14:
-			//apu.channel1.freq_high = (value & 0x07);
 			if((value & BIT_7)>0) apu.channel1.initier = 1;else apu.channel1.initier = 0;
 			if((value & BIT_6)>0) apu.channel1.counter_consec = 1;else apu.channel1.counter_consec = 0;
-			internal_ram[addr] = value;
 
-			//sc1_freq();
-			freq = (apu.channel1.freq & 0xFF) | ((value & 0x07) << 8);
+			//Calcul de la fréquence et de la période du premier canal, à partir des composantes hautes
+			freq = (apu.channel1.freq & 0xFF) | ((value & 0x07) << 8); //Partie droite = composantes hautes
 			apu.channel1.freq = freq;
 			apu.channel1.period = 2048 - freq;
-			//sc1_freq();
 
 			apu.channel1.length.is_continue = apu.channel1.counter_consec;
 			if(apu.channel1.initier){
@@ -341,47 +320,46 @@ void write_sound(unsigned short addr, BYTE data){
 				if(apu.channel1.sweep.time && apu.channel1.sweep.shift_number)
 					sweep_freq();
 			}
+			internal_ram[addr] = value;
 			break;
 			//SC2
 		case NR21:
-			apu.channel2.wave_duty = ((value & 0xC0) >> 6);
-			apu.channel2.sound_length = (value & 0x3F);
-			internal_ram[addr] = value;
+			//apu.channel2.wave_duty = ((value & 0xC0) >> 6);
+			//apu.channel2.sound_length = (value & 0x3F);
 
-			apu.channel2.length.length = 64 - apu.channel2.sound_length;
-			apu.channel2.duty.duty = apu.channel2.wave_duty;
+			apu.channel2.length.length = 64 - (value & 0x3F); //64 - sound_length
+			apu.channel2.duty.duty = ((value & 0xC0) >> 6); //Wave duty
+			internal_ram[addr] = value;
 			break;
 		case NR22:
-			apu.channel2.initial_env_volume = ((value & 0xF0) >> 4);
-			apu.channel2.nb_sweep_env = (value & 0x07);
+			//apu.channel2.initial_env_volume = ((value & 0xF0) >> 4);
+			//apu.channel2.nb_sweep_env = (value & 0x07);
 			if((value & BIT_3)>0) apu.channel2.env_direction = 1;else apu.channel2.env_direction = 0;
-			internal_ram[addr] = value;
 
-			apu.channel2.envelope.length = apu.channel2.nb_sweep_env;
+			apu.channel2.envelope.length = (value & 0x07); //Nb sweep envelope
+			apu.channel2.envelope.volume = ((value & 0xF0) >> 4); //Initial envelope volume
 			apu.channel2.envelope.increase_dir = apu.channel2.env_direction;
-			apu.channel2.envelope.volume = apu.channel2.initial_env_volume;
+			internal_ram[addr] = value;
 			break;
 		case NR23:
-			apu.channel2.freq_low = value;
-			internal_ram[addr] = value;
+			//apu.channel2.freq_low = value;
 
-			//sc2_freq();
-			freq = (apu.channel2.freq & 0x700) | value;
+			//Calcul de la fréquence du deuxième canal à partir des fréquences basses
+			freq = (apu.channel2.freq & 0x700) | value; //Value = fréquences basses
 			apu.channel2.freq = freq;
 			apu.channel2.period = 2048 - freq;
-			//sc2_freq();
+			internal_ram[addr] = value;
 			break;
 		case NR24:
-			apu.channel2.freq_high = (value & 0x07);
+			//apu.channel2.freq_high = (value & 0x07);
 			if((value & BIT_7)>0) apu.channel2.initier = 1;else apu.channel2.initier = 0;
 			if((value & BIT_6)>0) apu.channel2.counter_consec = 1;else apu.channel2.counter_consec = 0;
-			internal_ram[addr] = value;
 
-			//sc2_freq();
-			freq = (apu.channel2.freq & 0xFF) | ((value & 0x07) << 8);
+			//Calcul de la fréquence du deuxième canal à partir des fréquences hautes
+			freq = (apu.channel2.freq & 0xFF) | ((value & 0x07) << 8); //Partie droite = fréquences hautes
 			apu.channel2.freq = freq;
 			apu.channel2.period = 2048 - freq;
-			//sc2_freq();
+
 			apu.channel2.length.is_continue = apu.channel2.counter_consec;
 			if(apu.channel2.initier){
 				apu.channel2.envelope.volume = memory_read(NR22) >> 4;
@@ -393,48 +371,49 @@ void write_sound(unsigned short addr, BYTE data){
 					apu.channel2.length.length = 63;
 				channel_on(2);
 			}
+			internal_ram[addr] = value;
 			break;
 			//SC3
 		case NR30:
 			if((value & BIT_7)>0) apu.channel3.sound_trigger = 1;else apu.channel3.sound_trigger = 0;
-			internal_ram[addr] = value;
 
 			apu.channel3.length.is_on = apu.channel3.sound_trigger;
+			internal_ram[addr] = value;
 			break;
 		case NR31:
-			apu.channel3.sound_length = value;
-			internal_ram[addr] = value;
+			//apu.channel3.sound_length = value;
 
-			apu.channel3.length.length = 256 - apu.channel3.sound_length;
+			apu.channel3.length.length = 256 - value; //256 - Sound length
+			internal_ram[addr] = value;
 			break;
 		case NR32:
-			apu.channel3.output_level = ((value & 0x60) >> 4);
-			internal_ram[addr] = value;
+			//apu.channel3.output_level = ((value & 0x60) >> 4);
 
-			apu.channel3.volume = apu.channel3.output_level;
+			apu.channel3.volume = ((value & 0x60) >> 4); //Output level
 			if(apu.channel3.volume == -1)
 				apu.channel3.volume = 16;
+			internal_ram[addr] = value;
 			break;
 		case NR33:
-			apu.channel3.freq_low = value;
-			internal_ram[addr] = value;
-			//sc3_freq();
-			freq = (apu.channel3.freq & 0x700) | value;
+			//apu.channel3.freq_low = value;
+
+			//Calcul de la fréquence du troisieme canal à partir des fréquences basses 
+			freq = (apu.channel3.freq & 0x700) | value; //Partie droite = fréquences basses
 			apu.channel3.freq = freq;
 			apu.channel3.period = (2048 - freq) << 1;
-			//sc3_freq();
+
+			internal_ram[addr] = value;
 			break;
 		case NR34:
-			apu.channel3.freq_high = (value & 0x07);
+			//apu.channel3.freq_high = (value & 0x07);
 			if((value & BIT_7)>0) apu.channel3.initier = 1;else apu.channel3.initier = 0;
 			if((value & BIT_6)>0) apu.channel3.counter_consec = 1;else apu.channel3.counter_consec = 0;
-			internal_ram[addr] = value;
 
-			//sc3_freq();
-			freq = (apu.channel3.freq & 0XFF) | ((value & 0X07) << 8);
+			//Calcul de la fréquence du troisième canal à partir des fréquences hautes
+			freq = (apu.channel3.freq & 0XFF) | ((value & 0X07) << 8); //Partie droite = fréquences hautes
 			apu.channel3.freq = freq;
 			apu.channel3.period = (2048 - freq) << 1;
-			//sc3_freq();
+
 			apu.channel3.length.is_continue = apu.channel3.counter_consec;
 			if(apu.channel3.initier){
 				apu.channel3.length.is_on = 1;
@@ -444,36 +423,37 @@ void write_sound(unsigned short addr, BYTE data){
 					apu.channel3.length.length = 255;
 				channel_on(3);
 			}
+			internal_ram[addr] = value;
 			break;
 			//SC4
 		case NR41:
-			apu.channel4.sound_length = (value & 0x3F);
+			//apu.channel4.sound_length = (value & 0x3F);
+			apu.channel4.length.length = 64 - (value & 0x3F); //64 - Sound length
 			internal_ram[addr] = value;
-			apu.channel4.length.length = 64 - apu.channel4.sound_length;
 			break;
 		case NR42:
-			apu.channel4.initial_env_volume = ((value & 0xF0) >> 4);
-			apu.channel4.sweep_number = (value & 0x07);
+			//apu.channel4.initial_env_volume = ((value & 0xF0) >> 4);
+			//apu.channel4.sweep_number = (value & 0x07);
 			if((value & BIT_3)>0) apu.channel4.env_direction = 1;else apu.channel4.env_direction = 0;
-			internal_ram[addr] = value;
 
-			apu.channel4.envelope.volume = apu.channel4.initial_env_volume;
-			apu.channel4.envelope.length = apu.channel4.sweep_number;
+			apu.channel4.envelope.volume = ((value & 0xF0) >> 4); //Initial envelope volume
+			apu.channel4.envelope.length = (value & 0x07); //Sweep Number
 			apu.channel4.envelope.increase_dir = apu.channel4.env_direction;
+			internal_ram[addr] = value;
 			break;
 		case NR43:
 			apu.channel4.freq_shift = ((value & 0xF0) >> 4);
 			apu.channel4.freq_division_ratio = (value & 0x07);
 			if((value & BIT_3)>0) apu.channel4.step_counter = 1;else apu.channel4.step_counter = 0;
-			internal_ram[addr] = value;
 
 			apu.channel4.lfsr.size = (value >> 3) & 0x01;
 			apu.channel4.period = 4 * ((apu.channel4.freq_division_ratio + 1) << (((value >> 4 ) & 0x0F) + 1) );
+
+			internal_ram[addr] = value;
 			break;
 		case NR44:
 			if((value & BIT_7)>0) apu.channel4.initier = 1;else apu.channel4.initier = 0;
 			if((value & BIT_6)>0) apu.channel4.counter_consec = 1;else apu.channel4.counter_consec = 0;
-			internal_ram[addr] = value;
 
 			apu.channel4.length.is_continue = apu.channel4.counter_consec;
 			if(apu.channel4.initier){
@@ -486,46 +466,47 @@ void write_sound(unsigned short addr, BYTE data){
 					apu.channel4.length.length = 63;
 				channel_on(4);
 			}
+			internal_ram[addr] = value;
 			break;
 			//SOUND CONTROLL
 		case NR50:
-			apu.sound_controller.so2_output_level = ((value & 0x70) >> 4);
-			apu.sound_controller.so1_output_level = (value & 0x07);
+			//apu.sound_controller.so2_output_level = ((value & 0x70) >> 4);
+			//apu.sound_controller.so1_output_level = (value & 0x07);
 			if((value & BIT_7)>0) apu.sound_controller.output_to_so2 = 1;else apu.sound_controller.output_to_so2 = 0;
 			if((value & BIT_3)>0) apu.sound_controller.output_to_so1 = 1;else apu.sound_controller.output_to_so1 = 0;
-			internal_ram[addr] = value;
 
-			apu.sound_controller.left_level = apu.sound_controller.so2_output_level;
-			apu.sound_controller.right_level = apu.sound_controller.so1_output_level;
+			apu.sound_controller.left_level = ((value & 0x70) >> 4); //SO2 Output level
+			apu.sound_controller.right_level = (value & 0x07); //SO1 Output level
+
+			internal_ram[addr] = value;
 			break;
 		case NR51:
-			apu.sound_controller.output_sound_so1[0] = (value & BIT_0); 
+			/*apu.sound_controller.output_sound_so1[0] = (value & BIT_0); 
 			apu.sound_controller.output_sound_so1[1] = (value & BIT_1);
 			apu.sound_controller.output_sound_so1[2] = (value & BIT_2);
 			apu.sound_controller.output_sound_so1[3] = (value & BIT_3);
 			apu.sound_controller.output_sound_so2[0] = (value & BIT_4);
 			apu.sound_controller.output_sound_so2[1] = (value & BIT_5);
 			apu.sound_controller.output_sound_so2[2] = (value & BIT_6);
-			apu.sound_controller.output_sound_so2[3] = (value & BIT_7);
+			apu.sound_controller.output_sound_so2[3] = (value & BIT_7);*/
+
+			apu.channel1.is_right = (value & BIT_0); //Channel 1 to SO1
+			apu.channel2.is_right = (value & BIT_1);
+			apu.channel3.is_right = (value & BIT_2);
+			apu.channel4.is_right = (value & BIT_3);
+			apu.channel1.is_left = (value & BIT_4);
+			apu.channel2.is_left = (value & BIT_5);
+			apu.channel3.is_left = (value & BIT_6);
+			apu.channel4.is_left = (value & BIT_7);
+
 			internal_ram[addr] = value;
-
-			apu.channel1.is_right = apu.sound_controller.output_sound_so2[0];
-			apu.channel2.is_right = apu.sound_controller.output_sound_so2[1];
-			apu.channel3.is_right = apu.sound_controller.output_sound_so2[2];
-			apu.channel4.is_right = apu.sound_controller.output_sound_so2[3];
-			apu.channel1.is_left = apu.sound_controller.output_sound_so1[0];
-			apu.channel2.is_left = apu.sound_controller.output_sound_so1[1];
-			apu.channel3.is_left = apu.sound_controller.output_sound_so1[2];
-			apu.channel4.is_left = apu.sound_controller.output_sound_so1[3];
-
 			break;
 		case NR52:
-			apu.sound_controller.sound_flags[0] = (value & BIT_0);
-			apu.sound_controller.sound_flags[1] = (value & BIT_1);
-			apu.sound_controller.sound_flags[2] = (value & BIT_2);
-			apu.sound_controller.sound_flags[3] = (value & BIT_3);
+			//apu.sound_controller.sound_flags[0] = (value & BIT_0);
+			//apu.sound_controller.sound_flags[1] = (value & BIT_1);
+			//apu.sound_controller.sound_flags[2] = (value & BIT_2);
+			//apu.sound_controller.sound_flags[3] = (value & BIT_3);
 			if((value & BIT_7)>0) apu.sound_controller.all_sounds_trigger = 1;else apu.sound_controller.all_sounds_trigger = 0;
-			internal_ram[addr] = value;
 
 			if(!apu.sound_controller.all_sounds_trigger){
 				memory_write(NR10,0x80);
@@ -554,6 +535,7 @@ void write_sound(unsigned short addr, BYTE data){
 
 			}
 			apu.sound_controller.is_on = apu.sound_controller.all_sounds_trigger;
+			internal_ram[addr] = value;
 			break;
 		default:
 			break;
@@ -561,42 +543,42 @@ void write_sound(unsigned short addr, BYTE data){
 	//sound_out();
 }
 
-static int get_soonest_clock(unsigned a, unsigned b, unsigned c, unsigned d, int *clocks){
+static int frame_sequencer(unsigned period_counter, unsigned length, unsigned envelope, unsigned sweep, int *clocks){
 	int soonest;
-	if( a < b){
-		if (a < c){
-			if (a < d){
+	if( period_counter < length){
+		if (period_counter < envelope){
+			if (period_counter < sweep){
 				soonest = PERIOD;
-				*clocks = a;
+				*clocks = period_counter;
 			} else {
 				soonest = SWEEP;
-				*clocks = d;
+				*clocks = sweep;
 			}
 		} else {
-			if (c < d){
+			if (envelope < sweep){
 				soonest = ENVELOPE;
-				*clocks = c;
+				*clocks = envelope;
 			} else {
 				soonest = SWEEP;
-				*clocks = d;
+				*clocks = sweep;
 			}
 		}
 	} else {
-		if (b < c){
-			if (b < d){
+		if (length < envelope){
+			if (length < sweep){
 				soonest = LENGTH;
-				*clocks = b;
+				*clocks = length;
 			} else {
 				soonest = SWEEP;
-				*clocks = d;
+				*clocks = sweep;
 			}	
 		} else {
-			if(c < d){
+			if(envelope < sweep){
 				soonest = ENVELOPE;
-				*clocks = c;
+				*clocks = envelope;
 			} else {
 				soonest = SWEEP;
-				*clocks = d;
+				*clocks = sweep;
 			}
 		}
 	}
@@ -625,7 +607,7 @@ static inline void update_channel1(int clocks){
 	if(!apu.channel1.length.is_on)
 		return;
 	while(1){
-		soonest = get_soonest_clock(apu.channel1.period_counter, apu.channel1.length.i, apu.channel1.envelope.i, apu.channel1.sweep.i, &cycle_tmp);
+		soonest = frame_sequencer(apu.channel1.period_counter, apu.channel1.length.i, apu.channel1.envelope.i, apu.channel1.sweep.i, &cycle_tmp);
 		if(cycle_tmp > clocks){
 			apu.channel1.period_counter -= clocks;
 			apu.channel1.length.i -= clocks;
@@ -668,7 +650,7 @@ static inline void update_channel2(int clocks){
 		return;
 	
 	while(1){
-		soonest = get_soonest_clock(apu.channel2.period_counter, apu.channel2.length.i, apu.channel2.envelope.i, -1, &cycle_tmp);
+		soonest = frame_sequencer(apu.channel2.period_counter, apu.channel2.length.i, apu.channel2.envelope.i, -1, &cycle_tmp);
 		if(cycle_tmp > clocks){
 			apu.channel2.period_counter -= clocks;
 			apu.channel2.length.i -= clocks;
@@ -710,7 +692,7 @@ static inline void update_channel3(int clocks){
 		return;
 
 	while(1){
-		soonest = get_soonest_clock(apu.channel3.period_count, apu.channel3.length.i, -1,-1,&cycle_tmp);
+		soonest = frame_sequencer(apu.channel3.period_count, apu.channel3.length.i, -1,-1,&cycle_tmp);
 		if(cycle_tmp > clocks){
 			apu.channel3.period_count -= clocks;
 			apu.channel3.length.i -= clocks;
@@ -739,7 +721,7 @@ static inline void update_channel4(int clocks){
 	if(!apu.channel4.length.is_on)
 		return;
 	while(1){
-		soonest = get_soonest_clock(apu.channel4.period_count, apu.channel4.length.i, apu.channel4.envelope.i, -1, &cycle_tmp);
+		soonest = frame_sequencer(apu.channel4.period_count, apu.channel4.length.i, apu.channel4.envelope.i, -1, &cycle_tmp);
 		if(cycle_tmp > clocks){
 			apu.channel4.period_count -= clocks;
 			apu.channel4.length.i -= clocks;
@@ -769,34 +751,6 @@ static inline void update_channel4(int clocks){
 }		
 
 void update_sound(){
-	//int delta = ; //phase * volume - amplitude
-	//blip_add_delta(blip, apu.channel1.sound_length, apu.channel1.initial_volume);
-	/*double period = (clock_rate / ((44100) / 2 +0.5));
-	  double ampl = (apu.channel1.freq_high << 8) + apu.channel1.freq_low;
-	  double length = apu.channel1.sound_length;
-	  double volume = apu.channel1.initial_volume;// * 65536 / 2 + 0.5;
-	  int phase = apu.channel4.freq_shift;
-	  for( ; length < sound_cycles; length += period){
-	  int delta = phase * volume - ampl;
-	  ampl += delta;
-	  blip_add_delta(blip,length,delta);
-	  phase = -1 * phase;
-	  }
-	  length -= sound_cycles;
-
-	  period = (clock_rate / ((44100) / 2 + 0.5));
-	  ampl = apu.channel2.freq_high - apu.channel2.freq_low;
-	  length = apu.channel2.sound_length;
-	  volume = apu.sound_controller.so1_output_level * 65536 / 2 + 0.5;
-	  phase = apu.channel2.nb_sweep_env;
-	  for( ; length < sound_cycles; length += period){
-	  int delta = phase * volume - ampl;
-	  ampl += delta;
-	  blip_add_delta(blip,length,delta);
-	  phase = -1 * phase;
-	  }
-	  length -= sound_cycles;*/
-
 	if(sound_cycles == 0)
 		return ;
 
@@ -806,8 +760,6 @@ void update_sound(){
 	update_channel3(sound_cycles);
 	update_channel4(sound_cycles);
 	SDL_UnlockMutex(mut_sound);
-
-
 }
 
 static inline void channel1_clock_square(sc1_t *sc1, int time_lap){
