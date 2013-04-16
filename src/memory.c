@@ -213,7 +213,10 @@ inline void memory_write(unsigned short addr, BYTE data){
 		if(!force_write){
 			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr] = 0;}	//reset counter
 			else if(addr >= 0xFF10 && addr <= 0xFF26){
-			//	write_sound(addr,data);	
+				write_sound(addr,data);	
+			}
+			else if(addr >= 0xFF30 && addr <= 0xFF3F){
+				write_wave(addr,data);
 			}
 			else if(addr == 0xFF46) {dma_transfer(data);}					//dma transfer
 			else {internal_ram[addr] = data;}

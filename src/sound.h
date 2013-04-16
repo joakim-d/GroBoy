@@ -288,10 +288,6 @@ void sound_reset();
 void write_sound(unsigned short addr, BYTE data);
 void write_wave(unsigned short addr, BYTE data);
 void update_sound();
-void update_channel1(int clocks);
-void update_channel2(int clocks);
-void update_channel3(int clocks);
-void update_channel4(int clocks);
 
 void sc1_freq();
 void sc2_freq();
