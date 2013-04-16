@@ -29,8 +29,6 @@ typedef struct{
 	BYTE attributes;
 }sprite_t;
 
-int line_clock_counter;//line counter permet de savoir où en est le GPU sur la ligne en cours
-int vblank_clock_counter;
 int screen_mode; //0 pour fenetré , 1 pour plein ecran
 BYTE current_line;
 BYTE gpu_screen[144][160];
@@ -40,6 +38,11 @@ SDL_Surface *sdl_screenTemp;
 int timer1;
 int timer2;
 int cycle_length;
+unsigned int vblank_clock_counter;
+unsigned int line_clock_counter;
+BYTE frame_skip;
+BYTE frame_counter;
+
 //SDL_Rect **resolutions; //test pour savoir les resolutions possibles
 void gpu_init(SDL_Surface *sdl_scr);
 void gpu_update(int cycles);

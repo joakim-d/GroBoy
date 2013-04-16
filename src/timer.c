@@ -1,8 +1,11 @@
 #include "timer.h"
 
+void timer_init(){
+	div_timer = 0;
+	tac_timer = 0;
+}
+
 void timer_update(BYTE cycles){
-	static unsigned int div_timer = 0;
-	static unsigned int tac_timer = 0;
 	BYTE timer_control;
 	BYTE timer_counter;
 	div_timer += cycles;
@@ -26,4 +29,14 @@ void timer_update(BYTE cycles){
 			memory_write(0xFF05, timer_counter);
 		}
 	}
+}
+
+void save_timer(FILE *file){
+	if(fwrite(&div_timer, sizeof(unsigned int), 1, file) != 1) printf("Error when writing timer variable\n");
+	if(fwrite(&tac_timer, sizeof(unsigned int), 1, file) != 1) printf("Error when writing timer variable\n");
+}
+
+void restore_timer(FILE *file){
+	if(fread(&div_timer, sizeof(unsigned int), 1, file) != 1) printf("Error when reading timer variable\n");
+	if(fread(&tac_timer, sizeof(unsigned int), 1, file) != 1) printf("Error when reading timer variable\n");
 }

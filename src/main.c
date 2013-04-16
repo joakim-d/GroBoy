@@ -31,6 +31,7 @@ int main(int argc, char * argv[]){
 	gpu_init(sdl_screen);
 	interrupts_init();
 	joypad_init();
+	timer_init();
 	run();
 	return 0;
 }

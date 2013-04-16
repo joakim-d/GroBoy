@@ -2,6 +2,7 @@
 
 void joypad_init(int redefine){
 	int fd;
+	joy_old = 0;
 	if(SDL_NumJoysticks() != 0){
 		joystick = SDL_JoystickOpen(0);
 		SDL_JoystickEventState(SDL_ENABLE);
@@ -44,11 +45,10 @@ void joypad_init(int redefine){
 
 void joypad_update(int cycles){
 	static int joypad_counter = 0;	
+	static Uint8 *keystate;
+	static BYTE key_buttons = 0xFF; //
 	static BYTE joy_new;
 	static BYTE joy_cur;
-	static BYTE joy_old = 0;
-	static BYTE key_buttons = 0xFF; //
-	static Uint8 *keystate;
 
 	joypad_counter += cycles;
 
@@ -95,3 +95,10 @@ void joypad_update(int cycles){
 	}
 }
 
+void save_joypad(FILE *file){
+	if(fwrite(&joy_old,sizeof(BYTE),1,file) != 1) printf("Error when writing joypad variables\n");
+}
+
+void restore_joypad(FILE *file){
+	if(fread(&joy_old,sizeof(BYTE),1,file) != 1) printf("Error when writing joypad variables\n");
+}

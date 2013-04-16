@@ -5,8 +5,11 @@
 #include "cpu.h"
 #include "memory.h"
 #include "menu.h"
+#include "gpu.h"
+#include "joypad.h"
+#include "interrupts.h"
 
-FILE *fichier;
+FILE *file;
 void save_state();
 void restore();
 #endif

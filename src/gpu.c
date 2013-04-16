@@ -13,6 +13,10 @@ static inline void sleep_SDL();
 
 void gpu_init(SDL_Surface *sdl_scr){
 	current_line = 0;
+	vblank_clock_counter = 0;
+	line_clock_counter = 0;
+	frame_skip = 0;
+	frame_counter = 0;
 	//fonctions SDL
 
 	/** //test pour connaitre les resolutions possibles
@@ -45,9 +49,6 @@ void gpu_update(int cycles){ //fonction appelée en premier
 	BYTE lcdc;		//FF40 lcdcontrol
 	BYTE lcdstat;		//FF41 lcdstat
 	BYTE lyc;		//FF45 ly compare
-
-	static unsigned int vblank_clock_counter = 0;
-	static unsigned int line_clock_counter = 0;
 
 	vblank_clock_counter += cycles;
 	if(vblank_clock_counter >= 70224){//si on dépasse la période de vblank
@@ -365,8 +366,6 @@ static inline void tile_flip(tile_t *tile, int flipx_y, int size)
 
 static inline void draw_screen()
 {
-	static BYTE frame_skip = 0;
-	static BYTE frame_counter = 0;
 	event_process();
 	if(frame_counter < frame_skip) frame_counter++;
 	else{
@@ -475,7 +474,7 @@ static inline void ChangeMode()
 int save_gpu(FILE* file)
 {
 	int nb=0;
-	int nb_elements=7;
+	int nb_elements=11;
 	nb += fwrite(&line_clock_counter,sizeof(int),1,file);
         nb += fwrite(&vblank_clock_counter,sizeof(int),1,file);
         nb += fwrite(&screen_mode,sizeof(int),1,file);
@@ -483,6 +482,10 @@ int save_gpu(FILE* file)
         nb += fwrite(&timer1,sizeof(int),1,file);
         nb += fwrite(&timer2,sizeof(int),1,file);
         nb += fwrite(&cycle_length,sizeof(int),1,file);
+	nb += fwrite(&vblank_clock_counter, sizeof(int), 1, file);
+	nb += fwrite(&line_clock_counter, sizeof(int), 1, file);
+	nb += fwrite(&frame_counter, sizeof(BYTE), 1, file);
+	nb += fwrite(&frame_skip, sizeof(BYTE), 1, file);
 	if(nb!=nb_elements) printf("Error when writing gpu variables\n");
 	return nb;
 }
@@ -490,7 +493,7 @@ int save_gpu(FILE* file)
 void restore_gpu(FILE * file)
 {
 	int nb=0;
-	int nb_elements = 7;
+	int nb_elements = 11;
 	nb+=fread(&line_clock_counter,sizeof(int),1,file);
 	nb+=fread(&vblank_clock_counter,sizeof(int),1,file);
 	nb+=fread(&screen_mode,sizeof(int),1,file);
@@ -498,6 +501,10 @@ void restore_gpu(FILE * file)
 	nb+=fread(&timer1,sizeof(int),1,file);
 	nb+=fread(&timer2,sizeof(int),1,file);
 	nb+=fread(&cycle_length,sizeof(int),1,file);
+	nb += fread(&vblank_clock_counter, sizeof(unsigned int), 1, file);
+	nb += fread(&line_clock_counter, sizeof(unsigned int), 1, file);
+	nb += fread(&frame_counter, sizeof(BYTE), 1, file);
+	nb += fread(&frame_skip, sizeof(BYTE), 1, file);
 	if(nb!=nb_elements) printf("Error when reading gpu variables\n");
 }
 

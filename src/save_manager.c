@@ -8,16 +8,17 @@ void save_state()
 	get_gamename(name);
 	strcat(path,name);
 	strcat(path,".save");
-	fichier = fopen(path,"w+");
-	if(fichier == NULL)printf("Error when creating save file\n");
+	file = fopen(path,"w+");
+	if(file == NULL)printf("Error when creating save file\n");
 	else{
-		save_cpu(fichier);
-		save_gpu(fichier);
-		save_interrupt(fichier);
-		save_memory(fichier);
-		fclose(fichier);
+		save_cpu(file);
+		save_gpu(file);
+		save_interrupt(file);
+		save_memory(file);
+		save_timer(file);
+		save_joypad(file);
+		fclose(file);
 	}
-	//restore();
 }
 
 void restore()
@@ -28,13 +29,15 @@ void restore()
 	get_gamename(name);
 	strcat(path,name);
 	strcat(path,".save");
-	fichier = fopen(path,"r");
-	if(fichier == NULL) printf("Error when opening save file\n");
+	file = fopen(path,"r");
+	if(file == NULL) printf("Error when opening save file\n");
 	else{
-		restore_cpu(fichier);
-		restore_gpu(fichier);
-		restore_interrupt(fichier);
-		restore_memory(fichier);
-		fclose(fichier);
+		restore_cpu(file);
+		restore_gpu(file);
+		restore_interrupt(file);
+		restore_memory(file);
+		restore_timer(file);
+		restore_joypad(file);
+		fclose(file);
 	}
 }
