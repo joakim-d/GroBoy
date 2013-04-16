@@ -77,8 +77,9 @@ void display_menu(SDL_Surface *sdl_screen){
 		current_window = menu;
 		write_text("GROBOY", sdl_screen->w/2 - 30, 0, sdl_screen);
 		write_text("LOAD ROM", 15, 20, sdl_screen);
-		write_text("CONFIG JOYPAD", 15, 30, sdl_screen);
-		write_text("EXIT", 15, 40, sdl_screen);
+		write_text("CONFIG KEYBOARD", 15, 30, sdl_screen);
+		write_text("CONFIG JOYSTICK", 15, 40, sdl_screen);
+		write_text("EXIT", 15, 50, sdl_screen);
 		write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
 	}
 	else{
@@ -87,8 +88,9 @@ void display_menu(SDL_Surface *sdl_screen){
 		write_text("GROBOY", sdl_screen->w/2 - 30, 0, sdl_screen);
 		write_text("PLAY", 15,20,sdl_screen);
 		write_text("LOAD ROM", 15, 30, sdl_screen);
-		write_text("CONFIG JOYPAD", 15, 40, sdl_screen);
-		write_text("EXIT", 15, 50, sdl_screen);
+		write_text("CONFIG KEYBOARD", 15, 40, sdl_screen);
+		write_text("CONFIG JOYSTICK", 15, 50, sdl_screen);
+		write_text("EXIT", 15, 60, sdl_screen);
 		write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
 	}
 }
@@ -214,7 +216,7 @@ void navigate(SDL_Surface *sdl_screen, char *path_name, char *destination){
 
 
 
-void joy_conf(SDL_Surface *sdl_screen){
+void keyboard_conf(SDL_Surface *sdl_screen){
 	int fd;
 	int key_down = 0;
 	char touch_string[8][20];
@@ -277,6 +279,77 @@ void joy_conf(SDL_Surface *sdl_screen){
 	display_menu(sdl_screen);
 }
 
+void joystick_conf(SDL_Surface *sdl_screen){
+	int fd;
+	int key_down = 0;
+	char touch_string[8][20];
+	SDL_Event event;
+	uint8_t touch_type[8];
+	strcpy(touch_string[0], "RIGHT:");
+	strcpy(touch_string[1], "LEFT:");
+	strcpy(touch_string[2], "UP:");
+	strcpy(touch_string[3], "DOWN:");
+	strcpy(touch_string[4], "B:");
+	strcpy(touch_string[5], "A:");
+	strcpy(touch_string[6], "SELECT:");
+	strcpy(touch_string[7], "START:");
+
+	current_window = config;
+	SDL_FillRect(sdl_screen, NULL, bg_color);
+	SDL_Flip(sdl_screen);
+
+	while(!key_down){
+		while (SDL_PollEvent(&event)){
+			switch (event.type)
+			{
+				case SDL_KEYDOWN:
+					key_down = 1;
+					break;
+			}
+		}
+	}
+	key_down = 0;
+	for(int i = 0; i < 8; i++){
+		write_text(touch_string[i], 5, i*10 + 10, sdl_screen);
+		SDL_Flip(sdl_screen);
+		while(!key_down){
+			while (SDL_PollEvent(&event)){
+				switch (event.type)
+				{
+					case SDL_JOYBUTTONDOWN:
+						key_down = 1;
+						joypad_config[i] = event.jbutton.button;
+						touch_type[i] = 0;
+						break;
+					case SDL_JOYHATMOTION:
+						if(event.jhat.value != SDL_HAT_CENTERED){
+							joypad_config[i] = event.jhat.hat;
+							key_down = 1;
+							touch_type[i] = 1;
+						}
+						break;
+				}
+			}
+			SDL_Delay(60);
+		}
+		key_down = 0;
+		strcat(touch_string[i], "...OK!");
+		write_text(touch_string[i], 5, i*10 + 10, sdl_screen);
+		SDL_Flip(sdl_screen);
+		SDL_Delay(500);	
+	}
+	if((fd = open("config/joystick-config", O_WRONLY | O_CREAT, 0644)) == -1){
+		printf("Error when creating joystick-config file\n");
+	}
+	else{
+		if(write(fd, joypad_config, sizeof(int) * 8) == -1){
+			printf("Unable to write in the joystick config file.\n");
+		}   
+		close(fd);
+	}
+	cursor_pos = 0;
+	display_menu(sdl_screen);
+}
 int menu_action(SDL_Surface *sdl_screen){
 	char destination[0xFFFF];
 	int action;
@@ -302,9 +375,12 @@ int menu_action(SDL_Surface *sdl_screen){
 		}
 	}
 	else if(action == 2){
-		joy_conf(sdl_screen);
+		keyboard_conf(sdl_screen);
 	}
 	else if(action == 3){
+		joystick_conf(sdl_screen);
+	}
+	else if(action == 4){
 		exit(1);
 	}
 	return 0;
@@ -313,6 +389,12 @@ int menu_action(SDL_Surface *sdl_screen){
 void get_gamepath(char *gamepath){
 	strcpy(gamepath, selected_game);
 }	
+
+void get_gamename(char *gamename){
+	char *temp;
+	temp = strrchr(selected_game, '/');
+	strcpy(gamename,temp + 1); 
+}
 
 void load_gui(SDL_Surface *sdl_screen){
 	static Uint8 *keystate;
@@ -332,8 +414,8 @@ void load_gui(SDL_Surface *sdl_screen){
 			move_cursor(sdl_screen, UP);
 		}
 		if(keystate[SDLK_DOWN]){
-			if(strcmp(selected_game, "") == 0 && cursor_pos < 2) move_cursor(sdl_screen, DOWN);
-			else if (strcmp(selected_game, "") != 0 && cursor_pos < 3) move_cursor(sdl_screen, DOWN);
+			if(strcmp(selected_game, "") == 0 && cursor_pos < 3) move_cursor(sdl_screen, DOWN);
+			else if (strcmp(selected_game, "") != 0 && cursor_pos < 4) move_cursor(sdl_screen, DOWN);
 		}
 		if(keystate[SDLK_RETURN]) play = menu_action(sdl_screen);
 		if(keystate[SDLK_ESCAPE]) break;
