@@ -23,9 +23,14 @@ int main(int argc, char * argv[]){
 		SDL_JoystickEventState(SDL_ENABLE);
 	}   
 	else joystick = NULL;
+	if(argc == 1){
 	load_gui(sdl_screen);
 	get_gamepath(gamepath);
 	memory_init(gamepath);
+	}
+	else{
+		memory_init(argv[1]);
+	}
 	sound_init();
 	cpu_init();
 	gpu_init(sdl_screen);
