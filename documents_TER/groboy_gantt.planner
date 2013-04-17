@@ -20,8 +20,8 @@
     </calendar>
   </calendars>
   <tasks>
-    <task id="1" name="Lecture documentation" note="" work="2851200" start="20130101T000000Z" end="20130517T170000Z" work-start="20130101T080000Z" percent-complete="67" priority="0" type="normal" scheduling="fixed-work"/>
-    <task id="2" name="R&#xE9;daction rapport" note="" work="2304000" start="20130128T000000Z" end="20130517T170000Z" work-start="20130128T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+    <task id="1" name="Lecture documentation" note="" work="2851200" start="20130101T000000Z" end="20130517T170000Z" work-start="20130101T080000Z" percent-complete="78" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="2" name="R&#xE9;daction rapport" note="" work="2304000" start="20130128T000000Z" end="20130517T170000Z" work-start="20130128T080000Z" percent-complete="5" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="must-start-on" time="20130128T000000Z"/>
     </task>
     <task id="3" name="Comportement CPU" note="" work="628200" start="20130128T000000Z" end="20130226T153000Z" work-start="20130128T080000Z" percent-complete="99" priority="0" type="normal" scheduling="fixed-work">
@@ -30,22 +30,22 @@
     <task id="4" name="Lecture de Roms" note="" work="201600" start="20130128T000000Z" end="20130205T170000Z" work-start="20130128T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130128T000000Z"/>
     </task>
-    <task id="5" name="Gestion de la m&#xE9;moire" note="" work="835200" start="20130206T000000Z" end="20130318T170000Z" work-start="20130206T080000Z" percent-complete="80" priority="0" type="normal" scheduling="fixed-work">
+    <task id="5" name="Gestion de la m&#xE9;moire" note="" work="2102400" start="20130206T000000Z" end="20130517T170000Z" work-start="20130206T080000Z" percent-complete="80" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130206T000000Z"/>
     </task>
     <task id="6" name="Gestion des interruptions" note="" work="691200" start="20130213T000000Z" end="20130318T170000Z" work-start="20130213T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130213T000000Z"/>
     </task>
-    <task id="7" name="Comportement PPU" note="" work="678600" start="20130213T000000Z" end="20130318T133000Z" work-start="20130213T080000Z" percent-complete="90" priority="0" type="normal" scheduling="fixed-work">
+    <task id="7" name="Comportement PPU" note="" work="678600" start="20130213T000000Z" end="20130318T133000Z" work-start="20130213T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130213T000000Z"/>
     </task>
-    <task id="8" name="Sortie Sonore" note="" work="678600" start="20130213T000000Z" end="20130318T133000Z" work-start="20130213T080000Z" percent-complete="85" priority="0" type="normal" scheduling="fixed-work">
+    <task id="8" name="Sortie Sonore" note="" work="1929600" start="20130213T000000Z" end="20130516T170000Z" work-start="20130213T080000Z" percent-complete="95" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130213T000000Z"/>
     </task>
     <task id="9" name="Autres E/S (touches...)" note="" work="230400" start="20130318T000000Z" end="20130327T170000Z" work-start="20130318T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130318T000000Z"/>
     </task>
-    <task id="10" name="Interface graphique" note="" work="1091700" start="20130327T000000Z" end="20130517T161500Z" work-start="20130327T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+    <task id="10" name="Interface graphique" note="" work="152064" start="20130327T000000Z" end="20130417T170000Z" work-start="20130327T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130327T000000Z"/>
     </task>
     <task id="11" name="Gestion r&#xE9;seau 2 joueurs" note="" work="1088100" start="20130327T000000Z" end="20130517T151500Z" work-start="20130327T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
@@ -53,6 +53,12 @@
     </task>
     <task id="12" name="Filtres vid&#xE9;o" note="" work="1091700" start="20130327T000000Z" end="20130517T161500Z" work-start="20130327T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
       <constraint type="start-no-earlier-than" time="20130327T000000Z"/>
+    </task>
+    <task id="13" name="Sauvegarde d'&#xE9;tat" note="" work="1094400" start="20130327T000000Z" end="20130517T170000Z" work-start="20130327T080000Z" percent-complete="80" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="must-start-on" time="20130327T000000Z"/>
+    </task>
+    <task id="14" name="Sauvegarde cartouche" note="" work="849600" start="20130408T000000Z" end="20130517T120000Z" work-start="20130408T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <constraint type="must-start-on" time="20130408T000000Z"/>
     </task>
   </tasks>
   <resource-groups/>
@@ -66,7 +72,6 @@
     <allocation task-id="5" resource-id="1" units="33"/>
     <allocation task-id="12" resource-id="1" units="33"/>
     <allocation task-id="11" resource-id="1" units="34"/>
-    <allocation task-id="10" resource-id="1" units="33"/>
     <allocation task-id="9" resource-id="1" units="33"/>
     <allocation task-id="8" resource-id="1" units="100"/>
     <allocation task-id="4" resource-id="1" units="34"/>
@@ -84,11 +89,12 @@
     <allocation task-id="3" resource-id="2" units="33"/>
     <allocation task-id="2" resource-id="2" units="34"/>
     <allocation task-id="1" resource-id="2" units="33"/>
+    <allocation task-id="14" resource-id="3" units="100"/>
+    <allocation task-id="13" resource-id="3" units="100"/>
     <allocation task-id="6" resource-id="3" units="33"/>
     <allocation task-id="5" resource-id="3" units="34"/>
     <allocation task-id="12" resource-id="3" units="34"/>
     <allocation task-id="11" resource-id="3" units="33"/>
-    <allocation task-id="10" resource-id="3" units="34"/>
     <allocation task-id="9" resource-id="3" units="33"/>
     <allocation task-id="7" resource-id="3" units="50"/>
     <allocation task-id="4" resource-id="3" units="33"/>
