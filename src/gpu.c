@@ -433,6 +433,7 @@ static inline void event_process()
 		{
 			case SDL_QUIT:
 				save();
+				clear_apu();
 				exit(0);
 				break;
 				/**case SDL_KEYDOWN:
