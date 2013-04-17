@@ -81,7 +81,7 @@ void joypad_update(int cycles){
 		if(keystate[SDLK_F3]) {save_state(3);SDL_Delay(100);}
 		if(keystate[SDLK_F4]) {save_state(4);SDL_Delay(100);}
 		
-		if(keystate[SDLK_F5]) {restore(1);SDL_Delay(100);}
+		if(keystate[SDLK_F5]) {restore(1);SDL_Delay(1000);}
 		if(keystate[SDLK_F6]) {restore(2);SDL_Delay(100);}
 		if(keystate[SDLK_F7]) {restore(3);SDL_Delay(100);}
 		if(keystate[SDLK_F8]) {restore(4);SDL_Delay(100);}

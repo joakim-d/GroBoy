@@ -562,7 +562,6 @@ void restore_cartridge(size_t size)
         strcpy(path, "saves/");
         get_gamename(name);
         strcat(path,name);
-        strcat(path,"1");
         strcat(path,".save");
         file = fopen(path,"r");
         if(file == NULL) printf("Error when opening save file\n");
@@ -571,8 +570,7 @@ void restore_cartridge(size_t size)
 		if(size != 0){
         	        if(fread(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
 	        }
-
+		fclose(file);
 	}
-	fclose(file);
 }
 

@@ -63,7 +63,6 @@ void save()
         strcpy(path, "saves/");
         get_gamename(name);
         strcat(path,name);
-        strcat(path,"1");
         strcat(path,".save");
         file = fopen(path,"w+");
         if(file == NULL)printf("Error when creating save file\n");
