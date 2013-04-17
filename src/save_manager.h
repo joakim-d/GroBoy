@@ -10,7 +10,7 @@
 #include "interrupts.h"
 
 FILE *file;
-void save_state();
-void restore();
+void save_state(int num);
+void restore(int num);
 #endif
 

@@ -1,12 +1,19 @@
 #include "save_manager.h"
 
-void save_state()
+void save_state(int num)
 {	
 	char name[0x10000];
 	char path[0x1000C];
 	strcpy(path, "saves/");
 	get_gamename(name);
 	strcat(path,name);
+	switch(num){
+		case 1: strcat(path,"1");break;
+		case 2: strcat(path,"2");break;
+		case 3: strcat(path,"3");break;
+		case 4: strcat(path,"4");break;
+		default: break;
+	}
 	strcat(path,".save");
 	file = fopen(path,"w+");
 	if(file == NULL)printf("Error when creating save file\n");
@@ -21,13 +28,20 @@ void save_state()
 	}
 }
 
-void restore()
+void restore(int num)
 {	
 	char name[0x10000];
 	char path[0x1000C];
 	strcpy(path,"saves/");
 	get_gamename(name);
 	strcat(path,name);
+	switch(num){
+		case 1: strcat(path,"1");break;
+		case 2: strcat(path,"2");break;
+		case 3: strcat(path,"3");break;
+		case 4: strcat(path,"4");break;
+		default: break;
+	}
 	strcat(path,".save");
 	file = fopen(path,"r");
 	if(file == NULL) printf("Error when opening save file\n");

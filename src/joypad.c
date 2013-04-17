@@ -76,8 +76,15 @@ void joypad_update(int cycles){
 			if(SDL_JoystickGetButton(joystick, 0)) key_buttons &=0xFE;
 		}
 		//test sauvegarde
-		if(keystate[SDLK_F1]) {save_state();SDL_Delay(100);}
-		if(keystate[SDLK_F2]) {restore();SDL_Delay(100);}
+		if(keystate[SDLK_F1]) {save_state(1);SDL_Delay(100);}
+		if(keystate[SDLK_F2]) {save_state(2);SDL_Delay(100);}
+		if(keystate[SDLK_F3]) {save_state(3);SDL_Delay(100);}
+		if(keystate[SDLK_F4]) {save_state(4);SDL_Delay(100);}
+		
+		if(keystate[SDLK_F5]) {restore(1);SDL_Delay(100);}
+		if(keystate[SDLK_F6]) {restore(2);SDL_Delay(100);}
+		if(keystate[SDLK_F7]) {restore(3);SDL_Delay(100);}
+		if(keystate[SDLK_F8]) {restore(4);SDL_Delay(100);}
 	}
 
 	joy_new = 0x0F;
