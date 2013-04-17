@@ -123,7 +123,7 @@ void memory_init(char *rom_path){
 	rom_selector = 1;
 	ram_selector = 0;
 	force_write = 0;
-	for(i = 0; i < 32768; i++){
+	for(i = 0; i < 0x10000; i++){
 		internal_ram[i] = 0;
 	}
 	memory_write(0xFF05,0x00);
@@ -205,10 +205,10 @@ inline void memory_write(unsigned short addr, BYTE data){
 		if(!force_write){
 			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr] = 0;}	//reset counter
 			else if(addr >= 0xFF10 && addr <= 0xFF26){
-			//	write_sound(addr,data);	
+				//write_sound(addr,data);	
 			}
 			else if(addr >= 0xFF30 && addr <= 0xFF3F){
-				write_wave(addr,data);
+				//write_wave(addr,data);
 			}
 			else if(addr == 0xFF46) {dma_transfer(data);}					//dma transfer
 			else {internal_ram[addr] = data;}
@@ -486,6 +486,7 @@ int save_memory(FILE* file)
 		default: size = 0;
         }
 	
+	if(fwrite(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(0);
 	if(fwrite(&cartridge_type,sizeof(BYTE),1,file) != 1) print_error(0);
 	if(fwrite(&enable_ram, sizeof(BYTE),1,file) != 1) print_error(0);
 	if(fwrite(&cartridge_ram_enabled,sizeof(BYTE),1,file) != 1) print_error(0);
@@ -496,7 +497,6 @@ int save_memory(FILE* file)
 	if(size != 0){
 		if(fwrite(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(0);
 	}
-	if(fwrite(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(0);
 	return nb;	
 }
 
@@ -517,6 +517,7 @@ void restore_memory(FILE* file)
                 case 2: size = 0x2000;break;
                 case 3: size = 0x8000;break;
         }
+	if(fread(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(1);
 	if(fread(&cartridge_type,sizeof(BYTE),1,file) != 1) print_error(1);
 	if(fread(&enable_ram, sizeof(BYTE),1,file) != 1) print_error(1);
 	if(fread(&cartridge_ram_enabled,sizeof(BYTE),1,file) != 1) print_error(1);
@@ -527,7 +528,6 @@ void restore_memory(FILE* file)
 	if(size != 0){
 		if(fread(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
 	}
-	if(fread(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(1);
 }
 
 //sauvegarde normale
