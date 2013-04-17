@@ -180,6 +180,7 @@ inline BYTE memory_read(unsigned short addr){
 static void alloc_ram_mem(size_t size){
 	cartridge_ram_enabled = 1;
 	cartridge_ram_buffer = (BYTE *) malloc(size);
+	restore_cartridge(size);
 }
 
 inline void memory_write(unsigned short addr, BYTE data){
@@ -531,8 +532,47 @@ void restore_memory(FILE* file)
 }
 
 //sauvegarde normale
-int save_cartridge(FILE* file)
+void save_cartridge(FILE* file)
 {
-	return 0;
+	size_t size;
+        switch(*(cartridge_rom_buffer + 0x0149)){
+                case 0:
+                        switch(*(cartridge_rom_buffer + 0x147)){
+                                case 5: size = 0x100;break;
+                                case 6: size = 0x100;break;
+                                default: size = 0;break;
+                                }
+                                break;
+                case 1: size = 0x100;break;
+                case 2: size = 0x2000;break;
+                case 3: size = 0x8000;break;
+                default: size = 0;
+        }
+
+	if(size != 0){
+                if(fwrite(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(0);
+        }
+}
+
+void restore_cartridge(size_t size)
+{
+	FILE* file;
+	char name[0x10000];
+        char path[0x1000C];
+        strcpy(path, "saves/");
+        get_gamename(name);
+        strcat(path,name);
+        strcat(path,"1");
+        strcat(path,".save");
+        file = fopen(path,"r");
+        if(file == NULL) printf("Error when opening save file\n");
+        else
+	{
+		if(size != 0){
+        	        if(fread(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
+	        }
+
+	}
+	fclose(file);
 }
 

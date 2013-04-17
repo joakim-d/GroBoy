@@ -12,5 +12,6 @@
 FILE *file;
 void save_state(int num);
 void restore(int num);
+void save();
 #endif
 

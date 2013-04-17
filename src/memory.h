@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "def.h"
 #include "sound.h"
+#include "menu.h"
 enum type_mem{ALL,FIRST_CART, SWITCH_CART, VRAM, EXTRAM, FIRST_WRAM, SWITCH_WRAM,ECHO, OAM, NONUSED, IO, HRAM, IER, DETAIL_VIDEO, DETAIL_SOUND, DETAIL_JOY, DETAIL_TIMER, DETAIL_INTERRUPTS};
 BYTE cartridge_type;
 BYTE enable_ram;
@@ -31,6 +32,7 @@ void reset_force_write();
 void memory_dump(int part); // un dump mémoire, ou part représente la partie de la mémoire à dumper
 int save_memory(FILE *file);
 void restore_memory(FILE* file);
-int save_cartridge(FILE* file);
+void save_cartridge(FILE* file);
+void restore_cartridge(size_t size);
 char * getName();
 #endif

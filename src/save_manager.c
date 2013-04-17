@@ -14,7 +14,7 @@ void save_state(int num)
 		case 4: strcat(path,"4");break;
 		default: break;
 	}
-	strcat(path,".save");
+	strcat(path,".savestate");
 	file = fopen(path,"w+");
 	if(file == NULL)printf("Error when creating save file\n");
 	else{
@@ -42,7 +42,7 @@ void restore(int num)
 		case 4: strcat(path,"4");break;
 		default: break;
 	}
-	strcat(path,".save");
+	strcat(path,".savestate");
 	file = fopen(path,"r");
 	if(file == NULL) printf("Error when opening save file\n");
 	else{
@@ -54,4 +54,21 @@ void restore(int num)
 		restore_joypad(file);
 		fclose(file);
 	}
+}
+
+void save()
+{
+	char name[0x10000];
+        char path[0x1000C];
+        strcpy(path, "saves/");
+        get_gamename(name);
+        strcat(path,name);
+        strcat(path,"1");
+        strcat(path,".save");
+        file = fopen(path,"w+");
+        if(file == NULL)printf("Error when creating save file\n");
+        else{
+                save_cartridge(file);
+        }
+	fclose(file);
 }

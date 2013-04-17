@@ -432,6 +432,7 @@ static inline void event_process()
 		switch (event.type)
 		{
 			case SDL_QUIT:
+				save();
 				exit(0);
 				break;
 				/**case SDL_KEYDOWN:
