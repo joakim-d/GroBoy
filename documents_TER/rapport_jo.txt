@@ -1,0 +1,105 @@
+Ce rapport respecte les conventions d'écriture suivantes:
+- "0xHHHH" reprèsente le nombre HHHH sous forme hexadécimale
+- "(0xHHHH)" reprèsente la valeur lue à l'adresse 0xHHHH
+- Un octet contient 8 bits, le bit de poids faible est appelé "bit 0" et le bit de poids fort est appelé "bit 7".
+
+choix des outils:
+Ce projet a été réalisé grâce à de nombreux outils, les voici, avec les raisons qui ont motivés nos choix.
+
+Environnement de travail:
+Linux, 
+
+Langage:
+C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des executables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
+
+Compilateur:
+gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'executable compilé.
+
+Librairie:
+SDL, une des librairies les plus utilisées en C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions etc...
+
+Dépot:
+Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version.
+
+IDE:
+Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception d'un projet il est propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
+
+Documentation:
+
+Etude de l'existant:
+Il existe actuellement de nombreux émulateurs de Game Boy, pour rappel(si on l'a déjà dit dans l'intro) le but de ce projet n'était pas de rendre groboy un émulateur de renommée, mais bien de comprendre les rouages d'un émulateur.
+Tous ces émulateurs ont leurs avantages par rapport aux autres:
+
+(Liste des émulateurs + avantages)
+
+articles de recherches:
+
+Description du hardware:
+CPU:
+Caractèristiques générales:
+Le CPU de la GameBoy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la GameBoy, son vrai nom est Sharp LR35902.
+Une de ses spécificités est qu'il est capable de faire des opérations 16 bits.
+Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 opérations possibles.
+Il a un espace d'addressage de 16 bits, il peut donc écrire et lire de l'adresse 0x0000 à l'adresse 0xFFFF.
+
+Registres:
+Un registre est un espace mémoire interne au CPU, ce qui fait qu'il y accède directement en temps réel, aucun autre composant ne peut y accèder.
+Le LR35902 possède 10 registres, 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
+Ce CPU est capable pour certaines opérations de coupler certains registres tels A et F, B et C, D et E, H et L, pour en faire des registres 16 bits, AF, BC, DE, HL.
+Pratiquement tous les registres ont des rôles spécifiques:
+
+Le registre PC appelé "Program Counter" est le registre pointant vers la prochaine opération à lire en mémoire.
+
+Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet de la pile.
+
+Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.
+
+Le registre F appelé "Flags" est modifié par certaines circonstances.
+Il possède 4 drapeaux, Z, N, H, C.
+Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux:
+ils sont disposés tels quels: ZNHC----
+Les 4 bits de bas niveaux sont eux toujours à 0.
+Généralement,
+Le drapeau Z est à 1 lorsque le résultat d'une opération vaut 0, 0 sinon.
+Le drapeau N est à 1 lorsque l'opération est une soustraction, 0 pour une addition, sinon il garde son état.
+Le drapeau H est à 1 après une opération où les 4 bits de poids faibles de l'opérande ont subi un "débordement", dépassant 0xF, le drapeau est à 0 sinon.
+Le drapeau C est à 1 après une opération où l'opérande a subi un débordement, dépassant 0xFF, le drapeau est à 0 sinon.
+
+Les autres registres n'ont pas vraiment de rôles spécifiques mais servent pour beaucoup d'opérations.
+
+Opérations:
+Une instruction est un calcul ou un ordre que va exécuter/commander le processeur, ces instructions peuvent être classées officieusement de la manière suivante, et afin de mieux comprendre un exemple sera donné pour chaque classe d'instruction:
+
+instructions en 8 bits d'arithmétique/logique | exemple: "INC B", soit incrémenter le registre B. Si B vaut 0x04 avant l'opération B vaudra 0x05 après.
+
+instructions en 16 bits d'arithmétique/logique | exemple: "INC BC", soit incrémenter le couple de registres BC. Si BC vaut 0x01FF avant l'opération BC vaudra 0x0200 après, donc B vaudra 0x02 et C vaudra 0x00.
+
+instructions en 8 bits de chargement/sauvegarde/déplacement | exemple: "LD A,C", soit charger le registre C dans le registre A. après l'opération le registre A aura la même valeur que le registre C.
+
+instructions en 16 bits de chargement/sauvegarde/déplacement | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.
+
+instructions de sauts et d'appels | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.
+
+instructions de contrôles/diverses | exemple: "NOP", soit, ne rien faire.
+
+Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre maximum d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant: 
+Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x2000) = 0x00, (0x2001) = 0xCA, (0x2002) = 0xEF, (0x2003) = 0xBE.
+Le processeur lit d'abord 0x00 ce qui correspond à l'instruction "NOP", ne rien faire. 
+Le processeur ne lira donc qu'un octet pour cette instruction, le registre PC sera incrémenté et vaudra 0x2001.
+Ensuite le processeur va lire 0xCA ce qui correspond à l'opération "JP Z,0xHHHH", dans cette opération le processeur a besoin de la valeur 0xHHHH, le processeur va donc lire les 2 octets supplémentaires. Ce qui donne dans ce cas, "JP Z,0xBEEF".
+Comme le flag Z est à un, le registre PC vaut 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.
+
+Les instructions ont des coûts en temps, ces coûts sont représentés en cycles d'exécutions.
+Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH BC" coûte 16 cycles.
+Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
+Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
+
+Schéma minimaliste réprésentant Le LR35902:
+
+________________________________	0xFFFF__________________
+|	LR35902			|	|Espace adressage	|
+|_______________________________|<----->|			|
+|PC_____________|SP_____________|	|			|
+|A______|F______|B______|C______|	|			|
+|D______|E______|H______|L______|	0x0000__________________|
+

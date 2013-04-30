@@ -281,7 +281,7 @@ typedef struct{
 SDL_AudioSpec desired;
 SDL_AudioSpec obtained;
 void sound_init();
-void sound_fini();
+void clear_apu();
 void stop_sound();
 void start_sound();
 void sound_reset();

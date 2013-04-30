@@ -7,6 +7,7 @@
 #include "cpu.h"
 #include "memory.h"
 #include "interrupts.h"
+#include "sound.h"
 //#include "save_manager.h"
 #define LY_VISIBLE_MAX 144
 #define LY_MAX 154

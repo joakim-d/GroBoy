@@ -173,11 +173,14 @@ void sound_init(){
 
 }
 
-void sound_fini(){
+void clear_apu(){
 	if(sound_enabled == 1){
 		stop_sound();
 	}
 	SDL_CloseAudio();
+	blip_delete(blip_left);
+	blip_delete(blip_right);
+	SDL_DestroyMutex(mut_sound);
 	free(lfsr[LFSR_7]);
 	free(lfsr[LFSR_15]);
 }
