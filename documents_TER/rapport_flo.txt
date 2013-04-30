@@ -1,0 +1,55 @@
+GPU:
+
+Fonctionnement de l'écran:
+
+L'affichage de la Gameboy se fait via un ecran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.
+Ces périodes de VBlank ou de HBlank ont un nombre de cycles défini, c'est
+durant ces périodes que l'accés au différentes matrices en écriture va être
+débloqué pour que le CPU puisse modifier les éléments à afficher.
+->schéma d'affichage
+
+Génération d'une ligne:
+
+Trois types de couches peuvent être affichés: la couche background, la couche
+window et la couche sprites, les deux première peuvent être activées ou
+désactivées selon les jeu en modifiant un registre ( à l'adresse FF40 ).
+
+Ces trois couches ont des rôles différents et servent à séparer différents
+éléments graphiques d'un jeu.
+
+La couche Background:
+	Cette couche comprends tout les éléments qui appartiennent au décor du
+jeu. Elle est représentée par deux matrice de 256*256 pixels, soit 32*32
+tuiles (carré de 8*8 pixels). La Gameboy peut donc passer d'une matrice à
+l'autre pour afficher les différents éléments du décor. Ces matrices étant
+d'une taille supérieure à celle de l'écran lors de l'affichage, la positionne
+l'écran sur une zone d'une des matrices via la modification des valeurs de
+deux registres. L'écran peut ainsi naviguer sur ces matrices pour modifier
+l'affichage.
+
+La couche Window:
+	Cette couche est généralement utilisée pour tous les éléments statique
+d'un jeu, comme la barre de menu ou les scores. Elle a un comportement
+similaire à celui de la couche Background si ce n'est qu'elle ne possède qu'une seule
+matrice et qu'elle est positionnée par rapport à l'écran et non l'inverse.
+
+La couche Sprites:
+	Cette couche est utilisées pour représenter les objets d'intérets d'un
+jeu (personnages, objets, etc). Elle est représentée en mémoire par un maximum
+de 40 tuiles différentes. Ces tuiles sont positionnées à l'écran via un registre indiquant leur position absolue, ainsi que diverses options d'affichage comme la possibilité d'appliquer une symétrie verticale ou horizontale sur la tuile.
+
+Les couleurs:
+
+Les couches Background et Window utilisent un registre (palette monochrome) pour gérer les
+couleurs des différents pixels, dans le cas de la Gameboy ce registre contient
+4 niveaux de gris codés sur 2 bits.
+
+La couche Sprite peux utiliser deux palettes qui diffèrent en un point de la
+palette précédente, la valeur 00 ne correspond pas au blanc mais au fait que
+le pixel soit transparent.
+
+
+
+Exemple d'affichage:
+
+->schéma
