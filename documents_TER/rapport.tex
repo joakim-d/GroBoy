@@ -17,14 +17,134 @@
 
 \chapter{Organisation du projet}
 \section{Choix des outils}
+Ce projet a été réalisé grâce à de nombreux outils, les voici, avec les raisons qui ont motivés nos choix.\\
+
+\subsection{Environnement de travail}
+Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques un ensemble d'outils pour développer tel que gcc, gdb etc...
+
+\subsection{Langage}
+C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des executables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
+
+\subsection{Compilateur}
+gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'executable compilé.
+
+\subsection{Librairie}
+SDL, une librairie multimedia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions etc...
+
+\subsection{Dépot}
+Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version.
+
+\subsection{IDE}
+Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception d'un projet il est propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
 \section{Documentation}
 \section{Etude de l'existant}
+Il existe actuellement de nombreux émulateurs de GameBoy, pour rappel(si on l'a déjà dit dans l'intro) le but de ce projet n'était pas de rendre groboy un émulateur de renommée, mais bien de comprendre les rouages d'un émulateur de console de jeu.
+Tous ces émulateurs ont leurs avantages par rapport aux autres:
+
+(Liste des émulateurs principaux + avantages)
+\subsection{Gambatte}
+http://sourceforge.net/projects/gambatte/\\
+Emulateur open source écrit en c++, un des émulateurs les plus fidèles au comportement de la GameBoy, il se base sur des tests réalisés directement sur une GameBoy.
 \section{Articles de recherches}
 
 \chapter{Etude du Hardware}
 \section{CPU}
+\subsection{Caractèristiques générales}
+Le CPU de la GameBoy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la GameBoy, son vrai nom est Sharp LR35902.
+Une de ses spécificités est qu'il est capable de faire des opérations 16 bits.
+Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 opérations possibles.
+\subsection{Registres}
+
+Un registre est un espace mémoire interne au CPU, ce qui donne un accès en temps réel par le CPU à cet espace mémoire, aucun autre composant ne peut y accèder.
+Le LR35902 possède 10 registres, 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
+Ce CPU est capable pour certaines opérations de coupler certains registres tels A et F, B et C, D et E, H et L, pour en faire des registres 16 bits, AF, BC, DE, HL.
+Pratiquement tous les registres ont des rôles spécifiques:\\
+Le registre PC appelé "Program Counter" est le registre pointant vers la prochaine opération à lire en mémoire.\\
+Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet de la pile.\\
+Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.\\
+Le registre F appelé "Flags" est modifié par certaines circonstances.
+Il possède 4 drapeaux, Z, N, H, C.
+Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux:
+ils sont disposés tels quels: Z N H C - - - -. Les 4 bits de bas niveaux sont eux toujours à 0.
+Généralement, \\Le drapeau Z est à 1 lorsque le résultat d'une opération vaut 0, 0 sinon.\\
+Le drapeau N est à 1 lorsque l'opération est une soustraction, 0 pour une addition, sinon il garde son état.\\
+Le drapeau H est à 1 après une opération où les 4 bits de poids faibles de l'opérande ont subi un "débordement", dépassant 0xF, le drapeau est à 0 sinon.\\
+Le drapeau C est à 1 après une opération où l'opérande a subi un débordement, dépassant 0xFF, le drapeau est à 0 sinon.\\
+Les autres registres n'ont pas vraiment de rôles spécifiques mais servent pour beaucoup d'opérations.
+\subsection{Instructions}
+Une instruction est un calcul ou un ordre que va exécuter/commander le processeur, ces instructions peuvent être classées officieusement de la manière suivante, et afin de mieux comprendre un exemple sera donné pour chaque classe d'instruction:
+
+instructions en 8 bits d'arithmétique/logique | exemple: "INC B", soit incrémenter le registre B. Si B vaut 0x04 avant l'opération. B vaudra 0x05 après.
+
+instructions en 16 bits d'arithmétique/logique | exemple: "INC BC", soit incrémenter le couple de registres BC. Si BC vaut 0x01FF avant l'opération. BC vaudra 0x0200 après, donc B vaudra 0x02 et C vaudra 0x00.
+
+instructions en 8 bits de chargement/sauvegarde/déplacement | exemple: "LD A,C", soit charger le registre C dans le registre A. après l'opération le registre A aura la même valeur que le registre C.
+
+instructions en 16 bits de chargement/sauvegarde/déplacement | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.
+
+instructions de sauts et d'appels | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.
+
+instructions de contrôles/diverses | exemple: "NOP", soit, ne rien faire.
+
+Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre maximum d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant: 
+Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x2000) = 0x00, (0x2001) = 0xCA, (0x2002) = 0xEF, (0x2003) = 0xBE.
+
+Comme PC vaut 0x2000 le processeur lit d'abord 0x00 ce qui correspond à l'instruction "NOP", ne rien faire. 
+Le processeur ne lira donc qu'un octet pour cette instruction, le registre PC sera incrémenté et vaudra 0x2001.
+Ensuite le processeur va lire 0xCA ce qui correspond à l'opération "JP Z,0xHHHH", dans cette opération le processeur a besoin de la valeur 0xHHHH, le processeur va donc lire les 2 octets supplémentaires. Ce qui donne dans ce cas, "JP Z,0xBEEF".
+Comme le flag Z est à un, le registre PC vaut 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.
+
+Les instructions ont des coûts en temps, ces coûts sont représentés en cycles d'exécutions.
+Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH BC" coûte 16 cycles.
+Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
+Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
+
+Schéma minimaliste réprésentant Le LR35902:
+
 \section{GPU}
 \section{MMU}
+le MMU soit Memory Management Unit est un composant qui autorise ou non l'accés en mémoire demandée par le processeur.
+En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé à un espace d'addressage de 16 bits.
+Pour mieux comprendre à quoi correspond cet espace, l'espace d'addressage sera
+dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
+plus en détails:\\
+0xFE00-0xFFFF Espace mémoire particulier\\
+0xC000-0xFDFF RAM interne\\
+0xA000-0xBFFF RAM de la cartouche\\
+0x8000-0x9FFF RAM interne dédiée aux dessins du jeu\\
+0x0000-0x7FFF ROM de la cartouche\\
+
+\subsection{0xFE00-0xFFFF Espace mémoire particulier}
+
+0xFFFF : Cette adresse sert à savoir quelles interruptions sont autorisées ou
+non. Le détail de ces interruptions pourra être trouvé dans la partie
+interruptions.
+0xFF80-0xFFFE: Cette zone est réservée pour la pile, les
+développeurs initialisent généralement le registre SP à l'adresse 0xFFFE.
+0xFF00-0xFF7F: Cette zone contient des registres de contrôles pour tous les composants de la
+GameBoy.
+0xFEA0-0xFEFF: Inutilisé.
+0xFE00-0xFE9F: Object Attribute Memory (OAM), zone contenant les informations
+sur les sprites affichés.
+
+\subsection{0xC000-0xFDFF RAM interne}
+
+0xE000-0xFDFF: Echo de la plage d'addresse de 0xC000 à 0xDDFF, cette zone est
+généralement inutilisée.
+0xC000-0xDFFF: RAM servant à stocker les variables du jeu.
+
+\subsection{0xA000-0xBFFF RAM de la cartouche}
+Cette zone est raccordée à la RAM présente dans la cartouche de jeu (si elle
+existe). Si une batterie est présente dans la cartouche, la RAM est maintenue,
+ce qui permet de gérer les sauvegardes.
+
+\subsection{0x8000-0x9FFF RAM interne dédiée aux dessins du jeu}
+
+0x9C00-0x9FFF: Carte d'arrière plan 2 
+0x9800-0x9BFF: Carte d'arrière plan 1, zone spécifiant
+0x8000-0x97FF: Données des dessins, où sont stockés tous les dessins du jeu.
+
+\subsection{0x0000-0x7FFF ROM de la cartouche}
 \section{APU}
 \section{Interruptions/Synchronisations}
 \chapter{Réalisation}
