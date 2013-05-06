@@ -31,7 +31,7 @@
 
 => APU
 
-	\section{Présentation générale}
+	\subsection{Présentation générale}
 		La GameBoy dispose de deux cannaux de son (un pour la gauche,
 		et un pour la droite), reliés aux terminaux de sortie appelés
 		SO1 et SO2 par le constructeur, ainsi que d'un terminal
@@ -57,7 +57,7 @@
 		"mixées" pour diriger vers les canaux de sortie l'onde
 		correspondant au son à produire pour le jeu.
 	
-	\section{Registres, valeurs et contrôles} 
+	\subsection{Registres, valeurs et contrôles} 
 		Pour générer cette musique sans laquelle les jeux n'auraient
 		surement pas la même dimension, la console dispose de 22
 		registres, qu'elle peut consulter et modifier à quasiment
@@ -79,7 +79,7 @@
 		6 donnent la valeur d'un volume" correspond à dire "le nombre binaire
 		110 donne la valeur d'un volume".
 
-		\subsection{Ton et balayage}
+		\subsubsection{Ton et balayage}
 		La première famille comporte cinq registres, utilisés pour
 		générer et modifier le premier type d'onde, les ondes carrées
 		avec enveloppe de volume et fonction de balayage.\\
@@ -126,7 +126,7 @@
 			compte ou non, et les bits 0 à 2 contiennent les 3 bits
 			manquant à la fréquence stockée en NR13. \\
 
-		\subsection{Ton}
+		\subsubsection{Ton}
 		La deuxième famille correspond à la deuxième onde carrée, elle
 		fonctionne comme la première mais sans le registre de
 		balayage. Le fonctionnement, l'ordre et les valeurs des bits
@@ -140,7 +140,7 @@
 			NR12, le NR23(FF18) fonctionne comme le NR13 et le
 			NR24(FF19) comme le NR14. 
 			
-		\subsection{Onde mémoire}
+		\subsubsection{Onde mémoire}
 		Cette famille de registres correspond principalement à
 		l'utilisation de sons pré-enregistrés dans la cartouche
 		(et certains dans la gameboy, le bruit de démarrage par
@@ -184,7 +184,7 @@
 			4 bits de poids fort en premier et 4 bits de poids
 			faible ensuite.
 
-		\subsection{Bruit}
+		\subsubsection{Bruit}
 			Cette famille de registre correspond à une onde de son
 			appelé "bruit blanc", c'est généralement d'elle que
 			vienne les sont saturés que l'on entend dans la
@@ -231,7 +231,7 @@
 			qu'il faut stopper en passant à 0 lorsque la valeur de
 			longueur du son lue en NR41 tombe à 0. 
 
-		\subsection{Contrôles du son}
+		\subsubsection{Contrôles du son}
 			C'est la cinquième et ultime famille de registres
 			utilisés pour produire du son avec la console, elle
 			correspond à un ensembles de registres dont les
