@@ -1,0 +1,260 @@
+=> Intro
+	
+	Dans le cadre de la 1ère année de Master Informatique à l'Université de Montpellier
+	2, tous les élèves de la promotion ont été amenés à réaliser un projet
+	sous tutelle, afin de mettre en pratique les compétences acquises
+	durant nos précédentes années d'études, mais aussi et surtout de nous
+	placer dans un contexte de réel travail sur un projet à réaliser.\\
+	Ce Travail d'Étude de Recherche est donc un bon moyen de nous
+	familiariser avec le type de travail qui pourra nous être demandé dans
+	les années à venir, ainsi que de travailler nos démarches.
+	Et c'est sur l'élaboration d'un Émulateur de console de jeu vidéo, et plus précisément de GameBoy,
+	que nous avons choisi de travail1ler, plus que motivé par l'apport de
+	connaissances que représente l'étude du comportement d'un processeur
+	et sa simulation à partir de zéro.
+	\\
+	L'idée principale n'étant pas simplement de pouvoir rejouer aux jeux
+	ayant bercé notre enfance, mais bien d'analyser et comprendre le
+	fonctionnement d'un système d'émulation, qui reste très orienté bas
+	niveau et "culture des composants", mais suffisemment accessible pour
+	que notre travail puisse aboutir à un exemple concret, réalisé par nos
+	soins.\\
+	\\
+
+	Dès lors que notre choix fut fixé et validé par nos enseignants, il
+	fut assez rapide de déterminer les grandes lignes du déroulement du
+	projet, à savoir une première étape de documentation importante, afin
+	de bien comprendre le fonctionnement de l'appareil. Une seconde partie
+	de développement et donc de réelle simulation des différents aspects
+	du système, et une dernière partie de perfectionnement et
+	amélioration éventuelle de ce que nous aurons réalisé.
+
+=> APU
+
+	\section{Présentation générale}
+		La GameBoy dispose de deux cannaux de son (un pour la gauche,
+		et un pour la droite), reliés aux terminaux de sortie appelés
+		SO1 et SO2 par le constructeur, ainsi que d'un terminal
+		d'entré appelé Vin, recevant le signal électrique
+		correspondant au son et pouvant être redirigé après
+		traitement vers le terminal SO1, SO2, ou les deux en même
+		temps (pour passer d'un son mono à un son stéréo par
+		exemple).\\
+
+		Grossièrement, les composants de l'appareil permettent de
+		créer un son de quatre façons différentes : 
+			\begin{itemize}
+			\item Une première onde carrée, avec une enveloppe de
+			volume et une fonction de balayage.
+			\item Une seconde onde carrée avec enveloppe de volume
+			aussi mais sans fonction de balayage.
+			\item Une onde formée à partir d'échantillons
+			prédéfinis et stockés en mémoire cartouche.
+			\item Et une onde "Bruit" avec une enveloppe de
+			volume.
+			\end{itemize}
+		Ces quatre ondes sont générées indépendemment et finalement
+		"mixées" pour diriger vers les canaux de sortie l'onde
+		correspondant au son à produire pour le jeu.
+	
+	\section{Registres, valeurs et contrôles} 
+		Pour générer cette musique sans laquelle les jeux n'auraient
+		surement pas la même dimension, la console dispose de 22
+		registres, qu'elle peut consulter et modifier à quasiment
+		n'importe quel moment dès lors que le son du jeu à commencé à
+		être joué.\\
+		Ces registres sont séparés en 5 "familles" (4 pour les quatre
+		ondes, et une pour les contrôles du son) numérotés et appelés
+		par convention NRXX ou NR signifie "Noise Register", et XX le
+		numéro dudit registre. \\
+		Chacun de ces registres peut être utilisé pour stocker une
+		ou plusieurs valeurs, en utilisant tout ou seulement une
+		partie des 8 bits qu'il contient.\\
+
+		NB : La notation "bits 0 à x" (x = 5 par exemple) signifie
+		plus exactement la valeur binaire que l'on obtient en
+		extrayant lesdits bits du registre et en les traitant comme un
+		nouveau nombre.\\
+		Par exemple pour une valeur lue de 01101011 dire "les bits 4 à
+		6 donnent la valeur d'un volume" correspond à dire "le nombre binaire
+		110 donne la valeur d'un volume".
+
+		\subsection{Ton et balayage}
+		La première famille comporte cinq registres, utilisés pour
+		générer et modifier le premier type d'onde, les ondes carrées
+		avec enveloppe de volume et fonction de balayage.\\
+			NR10(FF10): le registre de balayage.\\
+			C'est le premier exemple de registre utilisé pour
+			stocker plusieurs valeurs, ici les bits 4 à 6 donnent
+			la valeur de la fréquence de balayge, les bits 0 à 2
+			le nombre de décalage de ces balayages à effectuer, et le bit
+			numéro 3 indique par sa valeur (0 ou 1) s'il s'agit
+			d'un balayage montant (où la fréquence augmente) ou
+			d'un balayage descendant (où elle diminue).\\ \\
+
+			NR11(FF11): Forme d'onde et longueur de son\\
+			Les bits 4 à 6 de ce registre contiennent la valeur de
+			forme d'onde, chacune des 4 valeurs possibles donne
+			une valeur de "temps montant" (1/8 pour 0, 1/4 pour
+			1, 1/2 pour 2 et 3/4 pour 3).
+			Les bits 0 à 5 donnent la valeur de la longueur
+			(periode) du son à jouer. Cette valeur n'est prise en
+			compte que si c'est indiqué dans le registre NR14.\\
+			\\
+
+			NR12(FF12): Enveloppe de volume \\
+			Les bits 4 à 7 donnent la valeur initiale de volume de
+			l'enveloppe.
+			Le bit numéro 3 indique la "direction" de l'enveloppe,
+			à savoir si le son sera lu avec un volume augmentant
+			ou descendant.
+			Les bits 0 à 2 donnent la valeur d'un nombre
+			d'utilisation de l'enveloppe.\\ \\
+
+			NR13(FF13): Composantes basses de la fréquence \\
+			La fréquence du son à jouer est un nombre sur 11 bits
+			dont les 8 représentant la composante basse sont
+			stockés ici et les 3 manquants représentant la
+			composante haute sont stockés dans le registre
+			suivant.\\ \\
+
+			NR14(FF14): Composantes hautes \\
+			Le bit 7 est un indicateur de réinitialisation de la
+			fréquence, le bit 6 un compteur d'opérations
+			consecutives, qui va indiquer si la longueur lue sur
+			les bits 0 à 5 du registre NR11 est à prendre en
+			compte ou non, et les bits 0 à 2 contiennent les 3 bits
+			manquant à la fréquence stockée en NR13. \\
+
+		\subsection{Ton}
+		La deuxième famille correspond à la deuxième onde carrée, elle
+		fonctionne comme la première mais sans le registre de
+		balayage. Le fonctionnement, l'ordre et les valeurs des bits
+		correspondent aux mêmes descriptions que pour la première
+		famille, la seule différence réside dans les registres
+		utilisés.\\ \\
+			Le registre NR21(FF16) fonctionne comme le NR11 (à
+			l'exception de la vérification de prise en compte de
+			la longueur, qui se fait via le bit 6 du registre NR24
+			cette fois-ci), le NR22(FF17) fonctionne comme le
+			NR12, le NR23(FF18) fonctionne comme le NR13 et le
+			NR24(FF19) comme le NR14. 
+			
+		\subsection{Onde mémoire}
+		Cette famille de registres correspond principalement à
+		l'utilisation de sons pré-enregistrés dans la cartouche
+		(et certains dans la gameboy, le bruit de démarrage par
+		exemple).
+		Dans certains cas elle peut être utilisé pour jouer un son de
+		la même façon que les 2 premières ondes, ce qui explique la
+		présence des registres NR33 et NR34. \\ 
+			NR30(FF1A): Trigger de son \\ 
+			Il n'est utilisé que pour indiquer via la
+			valeur du bit 7 si l'onde mémoire est à utiliser ou
+			non. \\ \\
+
+			NR31(FF1B): Longueur de son \\
+			La valeur entière (bits 0 à 7) du
+			registre est utilisée et donne la longueur du son à
+			jouer. \\ \\
+
+			NR32(FF1C): Selecteur \\
+			Les bits 5 à 6 donne la valeur d'un
+			selecteur de volume pour le son à jouer, il est joué
+			sans son pour une valeur de 0, tel quel pour 1, avec un volume à 50% 
+			pour 2 (décalé d'un bit vers la droite), et un volume
+			de 25% pour 3 (décalé de deux bits vers la droite). \\
+			\\
+
+			NR33(FF1D): Composantes basses \\
+			Comme pour les NR13 et NR23, ce registre
+			contient les 8 premiers bits de la valeur de fréquence
+			du son à jouer. \\ \\
+
+			NR34(FF1E): Composantes hautes \\
+			Celui-ci fonctionne comme les NR14 et NR24 mais pour
+			cette 3eme onde (utilisé dans le cas d'une utilisation
+			de cette onde pour produire un son sans utiliser les
+			sons mémoire). \\ \\
+
+			Les registres FF30 à FF3F ne sont pas numérotés en NR
+			mais contiennent les sons pré-enregistrés à jouer, ils
+			sont stockés sous la forme de 32 échantillons de 4
+			bits chacun, soit 16 valeurs 8 bits lues dans l'ordre
+			4 bits de poids fort en premier et 4 bits de poids
+			faible ensuite.
+
+		\subsection{Bruit}
+			Cette famille de registre correspond à une onde de son
+			appelé "bruit blanc", c'est généralement d'elle que
+			vienne les sont saturés que l'on entend dans la
+			plupart des jeux (une brique cassée dans Super Mario
+			par exemple!). 
+			Ce bruit est réalisé par une variation aléatoire
+			d'amplitude entre composantes hautes et basses d'une
+			fréquence donnée. Le son paraitra plus ou moins rude
+			en fonction de cette fréquence. \\
+
+			Cette onde est aussi parfois utilisée pour générer un
+			son correct en régularisant la sortie par une
+			modification volontaire de la modification aléatoire
+			d'amplitude (qui par conséquent, n'est plus réellement
+			due au hasard). \\
+
+			NR41(FF20): Longueur de son \\
+			Les bits 0 à 5 donnent la valeur de la longueur du son
+			à jouer. \\ \\
+
+			NR42(FF21): Enveloppe de volume\\
+			Les bits 4 à 7 correspondent à la valeur initiale de
+			l'enveloppe, le bit numéro 3 donne sa direction
+			(montante ou descendante) et les bits 0 à 2 donnent le
+			nombre d'utilisations de l'enveloppe. \\ \\
+
+			NR43(FF22) : Compteur polynomial \\
+			L'amplitude est modifiée aléatoirement entre haute et
+			basse sur la fréquence donnée. Plus cette fréquence
+			est haute, moins le bruit paraitre rude. 
+			Si le bit 3 est activé, l'intervalle de valeurs
+			aléatoires est réduit, et la sortie devient plus
+			régulière, rendant la sortie plus proche d'un réel
+			son que d'un bruit (au sens mathématique du terme).
+			Les bits 4 à 7 donnent la fréquence utilisée, le bit 3
+			indique la taille de l'intervalle des valeurs
+			aléatoires d'amplitude et les bits 0 à 2 correspondent
+			à une valeur de diviseur de fréquence. \\ \\
+
+			FF23(NR43) : Compteur consécutif\\
+			Le bit 7 est un initialiseur, il réinitialise le bruit
+			lorsque sa valeur est 1.
+			Le bit 6 est l'indicateur de jeu du son, il indique
+			qu'il faut stopper en passant à 0 lorsque la valeur de
+			longueur du son lue en NR41 tombe à 0. 
+
+		\subsection{Contrôles du son}
+			C'est la cinquième et ultime famille de registres
+			utilisés pour produire du son avec la console, elle
+			correspond à un ensembles de registres dont les
+			valeurs servent à contrôler physiquement dans son
+			ensemble, par exemple indiquer le canal de sortie,
+			gérer le volume général ou simplement activer ou
+			désactiver le son de la console. \\
+
+			NR50(FF24): Controle du signal d'entrée \\ 
+			Le bit 7 envoie le signal Vin vers la sortie SO2
+			lorsqu'il est activé, alors que le bit 3 l'envoie vers
+			la sortie SO1. les bits 6 à 4 correspondent au volume
+			propre à la SO2, et les 0 à 2 à celui de la SO1. \\ \\
+
+			NR51(FF25): Sélection du terminal de sortie propre \\
+			Ici les bits redirige les 4 ondes possibles vers un
+			terminal donné.
+			Les bits 0 à 3 envoie respectivement les ondes 1 à 4
+			vers la SO1, les bits 4 à 7 envoie respectivement les
+			ondes 1 à 4 vers la SO2.\\ \\
+
+			NR52(FF26): Activation du son \\
+			Les bits 0 à 3 de ce registre activent (ou
+			desactivent) respectivement les ondes 1 à 4 et le bit
+			7 indique si le son général de la console est activé
+			ou non.
