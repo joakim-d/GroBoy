@@ -134,7 +134,7 @@ Zone dédiée à la RAM de la cartouche (Voir Partie Cartouche de jeu)
 
 \subsection{0xC000-0xFDFF RAM interne}
 \begin{itemize}
-\item \textbf{0xC000-0xDFFF:} zone de RAM interne servant à stocker les différentes variables du jeu.
+\item \textbf{0xC000-0xDFFF:} Zone de RAM interne servant à stocker les différentes variables du jeu.
 \item \textbf{0xE000-0xFDFF:} Echo de la plage d'addresse de 0xC000 à 0xDDFF, cette zone est
 généralement inutilisée.
 \end{itemize} 
@@ -155,6 +155,43 @@ non. (Voir partie Interruptions)
 
 \section{APU}
 \section{Interruptions/Synchronisations}
+Comme vu dans les parties précédentes, le processeur de la GameBoy travaille conjointement avec d'autres composants. Afin d'éviter un chaos général voir l'endommagement de certains composants, un système d'interruptions a été intégré dans l'architecture de la GameBoy.
+\subsection{Que fait une interruption?}
+Lorsqu'une interruption est déclenchée, le processeur va interrompre ses calculs afin d'exécuter une routine. Pour cela lorsqu'une interruption est déclenchée le processeur va ajouter dans la pile le registre PC et remplacer la valeur du registre PC par l'adresse de la routine. L'adresse de la routine est différente selon le type d'interruption déclenchée.
+\subsection{Registres d'interruption}
+Afin qu'une interruption soit déclenchée il faut qu'un certain nombre de conditions soient réunies.
+\subsubsection{Registre IME}
+En premier lieu le processeur dispose d'un registre spécial appelé IME (Interrupt Master Enabled), qui va contrôler si les interruptions peuvent être déclenchées ou non. Si IME est à 0 aucune interruption ne sera déclenchée, sinon si IME est à 1 les interruptions peuvent être déclenchées.
+\subsubsection{Registres IE et IF} 
+IE correspond à 'Interrupt Enable' et IF correspond à 'Interrupt Flag', ces deux registres sont stockées en mémoire. IE est disponible à l'adresse 0xFFFF et IF à l'adresse 0xFF0F. Le registres IE signale quelles interruptions peuvent être déclenchées. Le registre IF signale quelles interruptions veulent être déclenchées.
+Comme il existe cinq types d'interruptions, cinq bits de ces registres vont servir à savoir quelle interruption est demandée/activée:\\\\
+\textbf{0xFFFF - IE - Interrupt Enable} \\
+Bit 0: V-Blank  Interruption Autorisée  (1=Autorisée)\\
+Bit 1: LCD STAT Interruption Autorisée  (1=Autorisée)\\
+Bit 2: Timer    Interruption Autorisée  (1=Autorisée)\\
+Bit 3: Serial   Interruption Autorisée  (1=Autorisée)\\
+Bit 4: Joypad   Interruption Autorisée  (1=Autorisée)\\\\
+\textbf{0xFF0F - IF - Interrupt Flag} \\
+Bit 0: V-Blank  Requête d'Interruption  (1=Requête)\\
+Bit 1: LCD STAT Requête d'Interruption  (1=Requête)\\
+Bit 2: Timer    Requête d'Interruption  (1=Requête)\\
+Bit 3: Serial   Requête d'Interruption  (1=Requête)\\
+Bit 4: Joypad   Requête d'Interruption  (1=Requête)\\\\
+
+\subsection{Quand est-ce qu'une interruption est déclenchée?}
+Pour qu'une interruption soit déclenchée, par exemple l'interruption VBlank, Il faut que IME soit à 1, et que les bits 0 de IE et IF soit à 1 également.
+Lorsqu'elle sera déclenchée le bit 0 de IF sera mis à 0. IME sera mis à 0 également pour éviter qu'une interruption soit déclenchée pendant la routine d'une autre interruption (bien que celà soit possible pour le développeur en utilisant l'instruction "EI" dans une routine d'interruption).
+\subsection{Les différents types d'interruptions}
+\subsubsection{Interruption VBlank}
+L'interruption VBlank est demandée par l'écran LCD, cette demande est faites à chaque fois que l'écran rentre dans la période de VBlank (Voir partie GPU), l'interruption sert généralement à mettre à jour les dessins du jeu avant l'affichage d'une nouvelle image. La routine se trouve à l'adresse 0x0040.
+\subsubsection{Interruption LCD STAT}
+Cette interruption est également demandée par l'écran LCD, elle sert généralement à executer des routines lorsque l'écran LCD change d'état (Voir partie GPU). Elle peut aussi intervenir lorsque la ligne actuellement dessinée par l'écran LCD correspond au registre LYC (LY compare) situé à l'adresse 0xFF45. la routine se trouve à l'adresse 0x0048.
+\subsubsection{Interruption Timer}
+Interruption générée par le timer interne de la GameBoy, à chaque fois que celui ci dépasse une certaine durée. La routine se trouve à l'adresse 0x0050.
+\subsubsection{Interruption Serial}
+Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou transmis) à l'aide du câble Link servant à communiquer entre deux GameBoy ou entre une GameBoy et un ordinateur. La routine se trouve à l'adresse 0x0058.
+\subsubsection{Interruption Joypad}
+Interruption générée lors de l'appui sur une touche par le joueur. La routine se trouve à l'adresse 0x0060.
 \chapter{Réalisation}
 \section{CPU}
 \section{GPU}
