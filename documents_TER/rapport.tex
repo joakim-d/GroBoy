@@ -104,47 +104,55 @@ Schéma minimaliste réprésentant Le LR35902:
 \section{GPU}
 \section{MMU}
 le MMU soit Memory Management Unit est un composant qui autorise ou non l'accés en mémoire demandée par le processeur.
-En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé à un espace d'addressage de 16 bits.
+En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'addressage de 16 bits.
 Pour mieux comprendre à quoi correspond cet espace, l'espace d'addressage sera
 dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
 plus en détails:\\
-0xFE00-0xFFFF Espace mémoire particulier\\
-0xC000-0xFDFF RAM interne\\
-0xA000-0xBFFF RAM de la cartouche\\
-0x8000-0x9FFF RAM interne dédiée aux dessins du jeu\\
-0x0000-0x7FFF ROM de la cartouche\\
+\begin{itemize}
+\item \textbf{0xFE00-0xFFFF} Espace mémoire particulier
+\item \textbf{0xC000-0xFDFF} RAM interne
+\item \textbf{0xA000-0xBFFF} RAM de la cartouche
+\item \textbf{0x8000-0x9FFF} RAM interne dédiée aux dessins du jeu
+\item \textbf{0x0000-0x7FFF} ROM de la cartouche
+\end{itemize}
+
+\subsection{0x0000-0x7FFF ROM de la cartouche}
+\begin{itemize}
+\item \textbf{0x0000-0x3FFF:} Banque 0 de la ROM de la cartouche.
+\item \textbf{0x4000-0x7FFF:} Banque 1-n de la ROM de la cartouche (Voir partie Cartouche de jeu).
+\end{itemize}
+
+\subsection{0x8000-0x9FFF RAM interne dédiée aux dessins du jeu}
+\begin{itemize}
+\item \textbf{0x8000-0x97FF:} Données des dessins, où sont stockés tous les dessins du jeu.
+\item \textbf{0x9800-0x9BFF:} "Background Map" 1, zone spécifiant les dessins à utiliser pour dessiner l'arrière plan 1.
+\item \textbf{0x9C00-0x9FFF:} "Background Map" 2, zone spécifiant les dessins à utiliser pour dessiner l'arrière plan 2. 
+\end{itemize} 
+
+\subsection{0xA000-0xBFFF RAM de la cartouche}
+Zone dédiée à la RAM de la cartouche (Voir Partie Cartouche de jeu)
+
+\subsection{0xC000-0xFDFF RAM interne}
+\begin{itemize}
+\item \textbf{0xC000-0xDFFF:} zone de RAM interne servant à stocker les différentes variables du jeu.
+\item \textbf{0xE000-0xFDFF:} Echo de la plage d'addresse de 0xC000 à 0xDDFF, cette zone est
+généralement inutilisée.
+\end{itemize} 
 
 \subsection{0xFE00-0xFFFF Espace mémoire particulier}
 
-0xFFFF : Cette adresse sert à savoir quelles interruptions sont autorisées ou
-non. Le détail de ces interruptions pourra être trouvé dans la partie
-interruptions.
-0xFF80-0xFFFE: Cette zone est réservée pour la pile, les
-développeurs initialisent généralement le registre SP à l'adresse 0xFFFE.
-0xFF00-0xFF7F: Cette zone contient des registres de contrôles pour tous les composants de la
-GameBoy.
-0xFEA0-0xFEFF: Inutilisé.
-0xFE00-0xFE9F: Object Attribute Memory (OAM), zone contenant les informations
+\begin{itemize}
+\item \textbf{0xFE00-0xFE9F:} Object Attribute Memory (OAM), zone contenant les informations
 sur les sprites affichés.
+\item \textbf{0xFEA0-0xFEFF:} Inutilisé.
+\item \textbf{0xFF00-0xFF7F:} Cette zone contient des registres de contrôles pour tous les composants de la
+GameBoy.
+\item \textbf{0xFF80-0xFFFE:} Cette zone est réservée pour la pile, les
+développeurs initialisent généralement le registre SP à l'adresse 0xFFFE.
+\item \textbf{0xFFFF :} Cette adresse sert à savoir quelles interruptions sont autorisées ou
+non. (Voir partie Interruptions)
+\end{itemize} 
 
-\subsection{0xC000-0xFDFF RAM interne}
-
-0xE000-0xFDFF: Echo de la plage d'addresse de 0xC000 à 0xDDFF, cette zone est
-généralement inutilisée.
-0xC000-0xDFFF: RAM servant à stocker les variables du jeu.
-
-\subsection{0xA000-0xBFFF RAM de la cartouche}
-Cette zone est raccordée à la RAM présente dans la cartouche de jeu (si elle
-existe). Si une batterie est présente dans la cartouche, la RAM est maintenue,
-ce qui permet de gérer les sauvegardes.
-
-\subsection{0x8000-0x9FFF RAM interne dédiée aux dessins du jeu}
-
-0x9C00-0x9FFF: Carte d'arrière plan 2 
-0x9800-0x9BFF: Carte d'arrière plan 1, zone spécifiant
-0x8000-0x97FF: Données des dessins, où sont stockés tous les dessins du jeu.
-
-\subsection{0x0000-0x7FFF ROM de la cartouche}
 \section{APU}
 \section{Interruptions/Synchronisations}
 \chapter{Réalisation}
