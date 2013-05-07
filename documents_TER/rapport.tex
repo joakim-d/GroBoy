@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[francais]{babel}
 \usepackage{url}
+\usepackage{listings}
 \title{TER, développement d'un émulateur de GameBoy}
 \author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
@@ -445,9 +446,55 @@ Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou t
 \subsubsection{Interruption Joypad}
 Interruption générée lors de l'appui sur une touche par le joueur. La routine se trouve à l'adresse 0x0060.
 \chapter{Réalisation}
-Ce chapître synthétise la manière dont nous avons réalisé notre émulateur
+Ce chapître synthétise la manière dont nous avons réalisé notre émulateur(...)
 \section{CPU}
+Le processeur a été le premier "composant" à être développé. Nous allons donc décrire dans cette partie comment il a été réalisé.
+\subsection{Structure}
+En premier lieu nous avons défini une structure rassemblant tous les registres utilisés par le processeur.
+Voici sa forme:
+\begin{lstlisting}
+typedef struct {
+	unsigned short PC;
+	unsigned short SP;
+	unsigned char A;
+	unsigned char F;
+	unsigned char B;
+	unsigned char C;
+	unsigned char D;
+	unsigned char E;
+	unsigned char H;
+	unsigned char L;	
+} z80_t;
+\end{lstlisting}
+On retrouve bien tous les registres ainsi que leur taille respective.
+\subsection{Algorithme principal}
+Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré de \cite{komkom}. Voici son allure générale:
+ \begin{lstlisting}
+void run(){
+	BYTE op_code;
+	for(;;)
+	{
+		op_code=memory_read(z80.PC++);
+		cycles = z80_cycles[op_code];
+		switch(op_code){
+		
+			case 0x00:
+				//Appel de l'opcode 0x00.
+				break;
+			case 0x01:
+				//Appel de l'opcode 0x01.
+				break;
+			...
+			case 0xFF:
+				//Appel de l'opcode 0xFF.
+				break;
+		}
+		update_other_component(cycles);
+	}
+}
+ \end{lstlisting}		
 
+\subsection{Développement des opcodes}
 \section{GPU}
 \section{MMU}
 \section{APU}
@@ -460,7 +507,6 @@ Ce chapître synthétise la manière dont nous avons réalisé notre émulateur
 %bibliographie
 \bibliographystyle{plain}
 \bibliography{rapport}
-\nocite{*} %a enlever dès la première citation
 %annexes
 \appendix
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
