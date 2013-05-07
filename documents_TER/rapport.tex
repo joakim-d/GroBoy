@@ -2,6 +2,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[francais]{babel}
+\usepackage{url}
 \title{TER, développement d'un émulateur de GameBoy}
 \author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
@@ -444,7 +445,9 @@ Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou t
 \subsubsection{Interruption Joypad}
 Interruption générée lors de l'appui sur une touche par le joueur. La routine se trouve à l'adresse 0x0060.
 \chapter{Réalisation}
+Ce chapître synthétise la manière dont nous avons réalisé notre émulateur
 \section{CPU}
+
 \section{GPU}
 \section{MMU}
 \section{APU}
@@ -454,10 +457,14 @@ Interruption générée lors de l'appui sur une touche par le joueur. La routine
 \section{Bilan}
 \section{Fonctionnalités pouvant être rajoutées}
 \section{Emulation aujourd'hui}
-
+%bibliographie
+\bibliographystyle{plain}
+\bibliography{rapport}
+\nocite{*} %a enlever dès la première citation
 %annexes
 \appendix
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
 \chapter{Charger et créer une police au format BMP sans recours à une librairie externe avec SDL}
 \chapter{Méthodes de débuggage et roms de test}
+
 \end{document}
