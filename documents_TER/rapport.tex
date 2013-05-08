@@ -557,7 +557,8 @@ Chacune de ces instructions nécessite d'incrémenter un registre en particulier
 static inline void inc_smpl(BYTE *reg);
 \end{lstlisting}
 Il suffit donc de passer en paramètre l'adresse du registre désiré pour que l'instruction soit exécutée sur le bon registre.
-Le préfixe static indique juste que cette fonction est uniquement disponible pour le processeur, ce qui est logique car aucun autre composant ne devrait pouvoir exécuter cette fonction. Ensuite le préfixe inline est présent dans un soucis d'optimisation, en effet lors de sa présence le compilateur peut prendre en compte ou non ce mot clé. Si le compilateur le prend en compte celà aura pour effet d'incorporer le corps de la fonction aux endroits où elle est appelée, plutôt que de faire appel à elle. 
+Le préfixe static indique juste que cette fonction est uniquement disponible pour le processeur, ce qui est logique car aucun autre composant ne devrait pouvoir exécuter cette fonction. Ensuite le préfixe inline est présent dans un soucis d'optimisation, en effet lors de sa présence le compilateur peut prendre en compte ou non ce mot clé. Si le compilateur le prend en compte celà aura pour effet d'incorporer le corps de la fonction aux endroits où elle est appelée, plutôt que de faire appel à elle.\\\\ 
+Enfin toutes les intructions du processeur ont pus être développées principalement grâce aux trois références suivantes \cite{pastraiser}, \cite{clrhome}, \cite{pinaud}.
 \section{GPU}
 \section{MMU}
 \section{APU}
