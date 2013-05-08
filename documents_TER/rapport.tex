@@ -466,18 +466,17 @@ typedef struct {
 	unsigned char L;	
 } z80_t;
 \end{lstlisting}
-On retrouve bien tous les registres ainsi que leur taille respective.
+On retrouve bien tous les registres ainsi que leur taille respective, à noté que nous avons préféré l'appeler z80\_t au lieu de lr35902\_t par commodité.
 \subsection{Algorithme principal}
-Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré de \cite{komkom}. Voici son allure générale:
+Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré des conseils de la page de KomKom\cite{komkom}. Voici son allure générale:
  \begin{lstlisting}
 void run(){
 	BYTE op_code;
 	for(;;)
 	{
-		op_code=memory_read(z80.PC++);
+		op_code = memory_read(z80.PC++);
 		cycles = z80_cycles[op_code];
-		switch(op_code){
-		
+		switch(op_code){	
 			case 0x00:
 				//Appel de l'opcode 0x00.
 				break;
@@ -489,12 +488,76 @@ void run(){
 				//Appel de l'opcode 0xFF.
 				break;
 		}
-		update_other_component(cycles);
+		update_other_components(cycles);
+		handle_interrupts();
 	}
 }
  \end{lstlisting}		
+Ici plusieurs choses interviennent, nous allons détailler chacune de ces choses.
+\begin{lstlisting}
+for(;;){
+	...
+}
+\end{lstlisting}
+Le processeur est un composant qui travaille sans relâche jusqu'à sa mise en éteinte, d'où la boucle infinie. On préférera déclarer la boucle infinie de cette manière plutôt qu'avec un simple "while(1)" évitant à certains compilateurs de faire vérifier la condition.
+\begin{lstlisting}
+op_code = memory_read(z80.PC++);
+\end{lstlisting}
+Pour pouvoir lire la prochaine instruction à exécuter, nous avons implémenté une fonction memory\_read, cette fonction a la signature suivante:
+\begin{lstlisting}
+unsigned char memory_read(unsigned short addr);
+\end{lstlisting}
+En fait cette fonction retourne la valeur située en mémoire à l'adresse "addr", comme dit précédemment dans la section MMU. Le processeur à une plage d'adresse de 16 bits, d'où le type unsigned short de la variable addr.
+Vous vous en doutez alors, nous avons également implémenté une fonction pour écrire en mémoire. Sa signature est:
+\begin{lstlisting}
+void memory_write(unsigned short addr, unsigned char data);
+\end{lstlisting}
 
-\subsection{Développement des opcodes}
+\begin{lstlisting}
+cycles = z80_cycles[op_code];
+\end{lstlisting}
+Comme décrit dans la section Hardware-CPU chaque instruction a un nombre de cycles représentant son coût en temps. cette ligne sert à récupérer dans le tableau "z80\_cycles" ce nombre de cycles.
+\begin{lstlisting}
+switch(op_code){	
+	case 0x00:
+		//Appel de l'opcode 0x00.
+		break;
+	case 0x01:
+		//Appel de l'opcode 0x01.
+		break;
+	...
+	case 0xFF:
+		//Appel de l'opcode 0xFF.
+		break;
+}
+\end{lstlisting}
+Ici est la partie où l'instruction va être exécutée, un switch est mis en place sur la valeur de l'instruction. Lorsqu'il y'a beaucoup de cas différents il est toujours préférable de faire un switch géant, plutôt qu'une suite de "if, else if", car au niveau de l'exécutable le switch permet d'aller directement sur la bonne valeur grâce à l'instruction "jump". Une suite de "if, else if" nécessite de vérifier chacune des valeurs jusqu'à trouver la bonne. 
+\begin{lstlisting}
+update_other_components(cycles);
+\end{lstlisting}
+Cette fonction donne aux autres composants le nombre de cycles exécutés pour qu'ils puissent être synchronisés avec le processeur et pour qu'ils fassent leurs routines.
+\begin{lstlisting}
+handle_interrupts();
+\end{lstlisting}
+Enfin, après les routines des autres composants, il se peut qu'il y'ait une interruption déclenchée, c'est le rôle de cette fonction, de voir si une interruption a été déclenchée et de mettre en place son exécution.\\\\
+Voilà donc l'algorithme de base du fonctionnement de notre processeur. Ce qui est intéressant c'est de voir que l'algorithme est assez générique et qu'il peut tout à fait être utilisé et adapté pour implémenter d'autres processeurs.
+\subsection{Développement des instructions}
+Après avoir mis en place l'algorithme et pour que le processeur puisse travailler, nous avons développé les différentes instructions que peut exécuter le processeur. Au vue du nombre d'instructions et de la possible généricité de certaines nous avons préféré régrouper certaines instructions ensemble pour en faire des fonctions génériques. Comme exemple nous pouvons nous pencher sur les instructions suivantes:
+\begin{lstlisting}
+INC B
+INC C
+INC D
+INC E
+INC H
+INC L
+INC A
+\end{lstlisting}
+Chacune de ces instructions nécessite d'incrémenter un registre en particulier, donc pour ce type d'instructions nous avons défini la fonction:
+\begin{lstlisting}
+static inline void inc_smpl(BYTE *reg);
+\end{lstlisting}
+Il suffit donc de passer en paramètre l'adresse du registre désiré pour que l'instruction soit exécutée sur le bon registre.
+Le préfixe static indique juste que cette fonction est uniquement disponible pour le processeur, ce qui est logique car aucun autre composant ne devrait pouvoir exécuter cette fonction. Ensuite le préfixe inline est présent dans un soucis d'optimisation, en effet lors de sa présence le compilateur peut prendre en compte ou non ce mot clé. Si le compilateur le prend en compte celà aura pour effet d'incorporer le corps de la fonction aux endroits où elle est appelée, plutôt que de faire appel à elle. 
 \section{GPU}
 \section{MMU}
 \section{APU}
