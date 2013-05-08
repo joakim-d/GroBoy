@@ -53,3 +53,85 @@ le pixel soit transparent.
 Exemple d'affichage:
 
 ->schéma
+
+\section{Cartouche de jeu}
+Une cartouche de jeu est composée au minimum d'une mémoire (un circuit intégré) appelée ROM (Read Only Memory), mais peut aussi contenir dans certains cas de la RAM (Random Access Memory) ou d'autres composants que nous verrons un peu plus loin.
+
+\subsection{Le header}
+Dans chaque cartouche, une zone d'information la concernant est située entre les adresses 0x0100 et 0x014F, cette zone est appelée le header. Les différentes informations contenues dans cette zone sont les suivantes:
+
+\begin{itemize}
+
+\item \textbf{0x0100-0x0103:} Cette addresse est le point d'entrée du programme, après l'affichage du logo Nintendo, le processeur va faire un "jump" vers cette adresse, puis faire un autre "jump" vers la valeur qu'elle contient qui est en fait l'adresse du début du programme.
+
+\item \textbf{0x0104-0x0133:} Cette addresse contient les bytes permettant l'affichage du logo Nintendo quand la Game Boy s'allume. Les valeurs sont les suivantes:
+\\CE ED 66 66 CC 0D 00 0B 03 73 00 83 00 0C 00 0D
+\\00 08 11 1F 88 89 00 0E DC CC 6E E6 DD DD D9 99
+\\BB BB 67 63 6E 0E EC CC DD DC 99 9F BB B9 33 3E
+
+\item \textbf{0x0134-0x0143:} Le titre du jeu est stocké à cette adresse, il est écrit en majuscule et en ASCII.
+
+\item \textbf{0x013F-0x0142:} Cette adresse correspond au code de l'entreprise qui a créée le jeu, par exemple pour Nintendo cette adresse aura la valeur: 0x33.
+
+\item \textbf{0x0143:} Le CGB (Color Game Boy) Flag est contenu à cette adresse, il permet d'indiquer si le jeu est compatible avec les autres Game Boy ou seulement avec la Game Boy Color.
+
+\item \textbf{0x0144-0x0145:} Cette adresse contient deux caractères ASCII qui indiquent la société ayant publié le jeu.
+
+\item \textbf{0x0146:} Le SGB (Super Game Boy) Flag est stocké ici, il permet de savoir si le jeu est compatible avec les fonctionnalités de la SGB.
+
+\item \textbf{0x0147:} Cette adresse spécifie quel MBC (Memory Bank Controller) est utilisé par la cartouche et si il y a des composants externes comme une batterie ou une caméra. Nous aborderons cette partie un peu plus loin.
+
+\item \textbf{0x0148:} La taille de la ROM est indiquée à cette adresse:
+\\00h -  32KByte (pas de banque)
+\\01h -  64KByte (4 banques)
+\\02h - 128KByte (8 banques)
+\\03h - 256KByte (16 banques)
+\\04h - 512KByte (32 banques)
+\\05h -   1MByte (64 banques)
+\\06h -   2MByte (128 banques)
+\\07h -   4MByte (256 banques)
+\\52h - 1.1MByte (72 banques)
+\\53h - 1.2MByte (80 banques)
+\\54h - 1.5MByte (96 banques)
+
+\item \textbf{0x0149:} La taille de la RAM est indiquée à cette adresse:
+\\00h - Aucune
+\\01h - 2 KBytes
+\\02h - 8 Kbytes
+\\03h - 32 KBytes
+
+\item \textbf{0x014A:} Cette adresse contient le code qui indique si le jeu est censé être vendu au Japon ou ailleurs.
+
+\item \textbf{0x014D:} Le Header Checksum est contenu ici. Lors du lancement d'un jeu si les 8 bits de poids faible du résultat du checksum ne sont pas égaux à ceux contenus à cette adresse , le jeu ne se lancera pas.
+
+\end{itemize}
+
+\subsection{Memory Bank Controllers}
+Les bus d'adressage de 16 bits de la Game Boy offrent un espace d'adressage limité pour la ROM et la RAM , de ce fait la plupart des cartouches utilisent une puce nommée MBC qui permet d'étendre cet espace en changeant de banque. Les différents types de puces MBC utilisées par la Game Boy sont les suivantes:
+
+\begin{itemize}
+\item \textbf{aucun}
+	Les petits jeu qui ne dépassent pas 32 KBytes de ROM ne requièrent pas de puce MBC, la ROM est directement répartit sur les adresses 0x0000 à 0x7FFF et la RAM de 0xA000 à 0xBFFF. Ces jeu contiennent tout de même une petite puce qui ressemble à une puce MBC mais n'en est pas une.
+\item \textbf{MBC1}
+	La puce MBC1 est la première puce MBC, toute les suivantes fonctionnent de manière similaire, ce qui permet une compatibilité et une mise à niveau relativement simple. Cette puce est utilisée pour les jeux ne dépassant pas 2MByte de ROM et/ou 32 KByte de RAM.
+\\La répartition des adresses est la suivante:
+\begin{itemize}
+\item \textbf{0x0000-0x3FFF:} La banque de ROM 00 , cette banque contient toujours les 16 premiers KBytes de la ROM de la cartouche.
+\item \textbf{0x4000-0x7FFF:} Les banques de ROM 01 à 7F, cette zone contient toutes les autres banques de 16 KBytes, ce qui correspond à un total de 125 banques utilisables car les banques 0x20, 0x40 et 0x60 ne sont pas accessibles.
+\item \textbf{0xA000-0xBFFF:} Les banques de RAM 00 à 03 si elles existent. La RAM de la cartouche est principalement utilisée en complément d'un batterie pour pouvoir stocker les scores ou les sauvegardes et cela même si la Game Boy est éteinte ou la cartouche retirée.
+\item \textbf{0x0000-0x1FFF:} Cette adresse permet d'autoriser ou d'interdire l'écriture dans la RAM, écrire la valeur 0x0A permet d'autoriser l'écriture et 0x00 de l'interdire. 
+\item \textbf{0x2000-0x3FFF:} Ecrire à cette adresse permet de sélectionner une banque. La banque est sélectionnée en fonction des 5 bits de poids faible, par contre si 0x00 est écrit la banque sélectionnée sera la banque 01, la même chose se passe pour les banques 20, 40 et 60.
+\item \textbf{0x4000-0x5FFF:} Ce registre de 2 bits permet de sélectionner une banque de RAM. Suivant le mode sélectionner (voir plus bas) il pourra aussi servir à sélectionner les 2 bits de poids fort de la banque de ROM.
+\item \textbf{0x6000-0x7FFF:} Ce registre de 1 bits va permettre de savoir comment vont être utilisés les 2 bits du registre précédent. Si l'on écrit la valeur 0x00 alors on les utilisera pour choisir la banque de ROM, par contre si 0x01 est écrit se sera pour choisir la banque de RAM.
+\end{itemize}
+\item \textbf{MBC2}
+	La puce MBC2 est une version améliorée de la puce précédente, elle est utilisée pour les jeu ayant au plus 256 KByte de ROM et 4x512 bits de RAM.
+\\Les différences entre les deux puces sont les suivantes:
+\begin{itemize}
+\item \textbf{0x4000-0x7FFF:} Même chose que la puce précédente sauf qu'un total de 16 banques de ROM est supporté.
+\item \textbf{0A000-A1FF:} Le MBC2 n'étant pas compatible avec la RAM externe, 512*4 bits de RAM sont inclus directement dans la puce du MBC, ce qui requiert une batterie pour sauvegarder les données durant les périodes ou la Game Boy est éteinte.
+\item \textbf{0x0000-0x1FFF:} Cette adresse permet de d'activer ou de désactiver la RAM. Le plsu petit bit signifiactif de l'adresse haute du Byte doit être 0, pour activer ou désactiver la RAM.
+\item \textbf{0x2000-0x3FFF:} Les 4 bits de poids faible écris ici serve à sélectionner la banque de ROM.
+\end{itemize}
+\item \textbf{MBC3}
+\end{itemize}
