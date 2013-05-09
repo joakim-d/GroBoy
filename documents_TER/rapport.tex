@@ -621,6 +621,75 @@ Le préfixe static indique juste que cette fonction est uniquement disponible po
 Enfin toutes les intructions du processeur ont pus être développées principalement grâce aux trois références suivantes \cite{pastraiser}, \cite{clrhome}, \cite{pinaud}.
 \section{GPU}
 \section{MMU}
+Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
+\subsection{initialisation} 
+Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accés à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la GameBoy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la GameBoy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
+Ces deux derniers buffers ont une allocation mémoire dynamique, en effet comme expliqué dans la partie Hardware-Cartouche de jeu selon les jeux leurs tailles sont différentes, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux.
+Les fichiers de jeux (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
+Lorsqu'un fichier est ouvert avec groboy son chemin est envoyé au module mémoire du programme avec la fonction "memory\_init", cette dernière s'occupe d'afficher sur la sortie standard les informations relatives au fichier et d'initialiser les différents buffers. Voici un exemple avec la cartouche de jeu Zelda.
+\begin{lstlisting}
+$ ./groboy roms/Zelda\ -\ Link\'s\ Awakening.gb
+Game title: ZELDA
+Cartridge type: MBC1+RAM+BATTERY
+Rom Size 512KB: 32 Banks
+Ram Size 8KB: 1 Bank
+Language English Game
+Manufacturer
+Version number 2
+\end{lstlisting}
+La fonction "memory\_init" s'occupe également d'initialiser le buffer de ROM avec l'intégralité du fichier lu, et le buffer de RAM en fonction des informations lus.
+Voici la façon dont elle procède pour la ROM:
+\begin{lstlisting}
+int file_d;
+struct stat file_stat;
+
+file_d = open(rom_path, O_RDONLY);
+fstat(file_d, &file_stat);
+
+cartridge_rom_buffer = (BYTE *) malloc(file_stat.st_size);
+if(read(file_d, cartridge_rom_buffer, file_stat.st_size) == -1){
+	printf("Error while reading rom file\n");
+	exit(-1);
+}    
+close(file_d);
+\end{lstlisting}
+On récupère la taille du fichier lu grâce à la fonction fstat, et on alloue à cartridge\_rom\_buffer la taille du fichier lu, puis on lit l'intégralité du fichier que l'on place dans le buffer.\\
+Voici maintenant la façon dont elle procède pour la RAM:
+\begin{lstlisting}
+switch(*(cartridge_rom_buffer + 0x0149)){
+       	case 0: cartridge_ram_enabled = 0;break;
+	case 1: alloc_ram_mem(0x100);break;
+	case 2: alloc_ram_mem(0x2000);break;
+	case 3: alloc_ram_mem(0x8000);break;
+}
+\end{lstlisting}
+Un switch est placé sur l'octet 0x0149 de cartridge\_rom\_buffer, contenant la taille de la RAM. Si la valeur vaut 0, il n'y'a pas de RAM dans la cartouche, sinon le buffer cartridge\_ram\_buffer est initialisé avec la fonction alloc\_ram\_mem.
+Enfin l'initialisation de la mémoire interne se fait en mettant tout le buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
+\subsection{Lecture/Ecriture}
+Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction memory\_read, si celà vous intéresse vous pouvez toujours retrouver la fonction "memory\_write" dans les sources du projet.
+\begin{lstlisting}
+inline BYTE memory_read(unsigned short addr){
+	if(addr <= 0x3FFF) 	//Banque 0 ROM cartouche
+		return cartridge_rom_buffer[addr];
+
+	else if(addr <= 0x7FFF) //Banque 1-n ROM cartouche
+		return 
+		cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
+
+	else if(addr <= 0x9FFF) //Memoire video interne
+		return internal_ram[addr];
+
+	else if(addr <= 0xBFFF && cartridge_ram_enabled) //RAM cartouche
+		return 
+		cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
+
+	else 	//Memoire interne
+		return internal_ram[addr];
+}
+\end{lstlisting}
+On peut voir dans cette fonction que pour chaque plage d'adresse demandée on retourne en fonction soit les valeurs de "cartridge\_rom\_buffer", de "cartridge\_ram\_buffer" ou de "internal\_ram".
+Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs de banques de ROM et de RAM des cartouches.
+
 \section{APU}
 \section{Interruptions/Synchronisations}
 \section{Fonctionnalités additionnelles}
