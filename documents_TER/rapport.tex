@@ -696,7 +696,7 @@ Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs
 \subsection{Cheminement}
 	En nous basant sur les informations expliquées plus haut, nous avons d'abord pensé utiliser la librairie SDL afin de simplement produire le son souhaité à partir de la multitude de données réparties dans les registres "NRXX". Cependant l'idée n'eu pas le succès espéré, étant donné que les informations récupérées nécessitent en fin de compte un certain nombre de traitements avant de pouvoir être utiles à la création d'un son.\\
 	Déterminer ces traitements et les adapter informatiquement demande beaucoup de temps, c'est pourquoi nous avons eu l'agréable surprise de trouver une librairie simplifiant quelques-unes de ces adaptations, créée par un internaute passionné d'émulation et notamment de l'audio dans l'émulation.\\
-	Cette librairie s'appelle "blip_buff", et permet de rééchantillonner des ondes audio à partir d'une fréquence d'horloge vers une fréquence d'échantillonage, soit créer une onde discrétisée (donc utilisable par des librairies pour produire du son) à partir d'informations sur une onde carrée. 
+	Cette librairie s'appelle "blip buff", et permet de rééchantillonner des ondes audio à partir d'une fréquence d'horloge vers une fréquence d'échantillonage, soit créer une onde discrétisée (donc utilisable par des librairies pour produire du son) à partir d'informations sur une onde carrée. 
 	Une explication plus détaillée se trouve en annexe, il peut être nécessaire de la lire afin de bien comprendre la démarche utilisée ici pour produire du son.
 \subsection{Initialisation}
 %Premières valeurs à placer dans les registres, Initialisation de la wave ?
