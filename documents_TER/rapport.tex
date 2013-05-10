@@ -18,18 +18,18 @@
 	sous tutelle, afin de mettre en pratique les compétences acquises
 	durant nos précédentes années d'études, mais aussi et surtout de nous
 	placer dans un contexte de réel travail sur un projet à réaliser.\\
-	Ce Travail d'Étude de Recherche est donc un bon moyen de nous
+	Ce Travail d'Étude et de Recherche est donc un bon moyen de nous
 	familiariser avec le type de travail qui pourra nous être demandé dans
 	les années à venir, ainsi que de travailler nos démarches.
 	Et c'est sur l'élaboration d'un Émulateur de console de jeu vidéo, et plus précisément de GameBoy,
-	que nous avons choisi de travail1ler, plus que motivé par l'apport de
+	que nous avons choisi de travailler, plus que motivé par l'apport de
 	connaissances que représente l'étude du comportement d'un processeur
 	et sa simulation à partir de zéro.
 	\\
 	L'idée principale n'étant pas simplement de pouvoir rejouer aux jeux
 	ayant bercé notre enfance, mais bien d'analyser et comprendre le
 	fonctionnement d'un système d'émulation, qui reste très orienté bas
-	niveau et "culture des composants", mais suffisemment accessible pour
+	niveau et "culture des composants", mais suffisamment accessible pour
 	que notre travail puisse aboutir à un exemple concret, réalisé par nos
 	soins.\\
 	\\
@@ -51,15 +51,15 @@ Ce projet a été réalisé grâce à de nombreux outils, les voici, avec les ra
 Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques un ensemble d'outils pour développer tel que gcc, gdb etc...
 
 \subsection{Langage}
-C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des executables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
+C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des exécutables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
 
 \subsection{Compilateur}
-gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'executable compilé.
+gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'exécutable compilé.
 
 \subsection{Librairie}
-SDL, une librairie multimedia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions etc...
+SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions etc...
 
-\subsection{Dépot}
+\subsection{Dépôt}
 Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version.
 
 \subsection{IDE}
@@ -77,13 +77,13 @@ Emulateur open source écrit en c++, un des émulateurs les plus fidèles au com
 
 \chapter{Etude du Hardware}
 \section{CPU}
-\subsection{Caractèristiques générales}
+\subsection{Caractéristiques générales}
 Le CPU de la GameBoy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la GameBoy, son vrai nom est Sharp LR35902.
 Une de ses spécificités est qu'il est capable de faire des opérations 16 bits.
 Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 opérations possibles.
 \subsection{Registres}
 
-Un registre est un espace mémoire interne au CPU, ce qui donne un accès en temps réel par le CPU à cet espace mémoire, aucun autre composant ne peut y accèder.
+Un registre est un espace mémoire interne au CPU, ce qui donne un accés en temps réel par le CPU à cet espace mémoire, aucun autre composant ne peut y accéder.
 Le LR35902 possède 10 registres, 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
 Ce CPU est capable pour certaines opérations de coupler certains registres tels A et F, B et C, D et E, H et L, pour en faire des registres 16 bits, AF, BC, DE, HL.
 Pratiquement tous les registres ont des rôles spécifiques:\\
@@ -131,13 +131,13 @@ Schéma minimaliste réprésentant Le LR35902:
 
 \section{GPU}
 
-Le GPU de la GameBoy est intégré dans le même circuit intégre que le CPU. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+La Gameboy ne posséde pas de composant GPU, l'écran LCD gère à lui seul l'affichage et le traitement des images. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
-L'affichage de la Gameboy se fait via un ecran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.\\
+L'affichage de la Gameboy se fait via un écran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.\\
 Ces périodes de VBlank ou de HBlank ont un nombre de cycles défini, c'est
-durant ces périodes que l'accés au différentes matrices en écriture va être
+durant ces périodes que l'accès au différentes matrices en écriture va être
 débloqué pour que le CPU puisse modifier les éléments à afficher.\\
 
 ->schéma d'affichage
@@ -169,7 +169,7 @@ similaire à celui de la couche Background si ce n'est qu'elle ne possède qu'un
 matrice et qu'elle est positionnée par rapport à l'écran et non l'inverse.
 
 \item \textbf{La couche Sprites:}
-	Cette couche est utilisées pour représenter les objets d'intérets d'un
+	Cette couche est utilisées pour représenter les objets d'intérêts d'un
 jeu (personnages, objets, etc). Elle est représentée en mémoire par un maximum
 de 40 tuiles différentes. Ces tuiles sont positionnées à l'écran via un registre indiquant leur position absolue, ainsi que diverses options d'affichage comme la possibilité d'appliquer une symétrie verticale ou horizontale sur la tuile.
 \end{itemize}
@@ -191,9 +191,9 @@ le pixel soit transparent.
 ->schéma
 
 \section{MMU}
-le MMU soit Memory Management Unit est un composant qui autorise ou non l'accés en mémoire demandée par le processeur.
-En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'addressage de 16 bits.
-Pour mieux comprendre à quoi correspond cet espace, l'espace d'addressage sera
+le MMU soit Memory Management Unit est un composant qui autorise ou non l'accès en mémoire demandée par le processeur.
+En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
+Pour mieux comprendre à quoi correspond cet espace, l'espace d'addresage sera
 dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
 plus en détails:\\
 \begin{itemize}
@@ -243,14 +243,14 @@ non. (Voir partie Interruptions)
 
 \section{APU}
 \subsection{Présentation générale}
-	La GameBoy dispose de deux cannaux de son (un pour la gauche,
+	La GameBoy dispose de deux canaux de son (un pour la gauche,
 	et un pour la droite), reliés aux terminaux de sortie appelés
 	SO1 et SO2 par le constructeur, ainsi que d'un terminal
-	d'entré appelé Vin, recevant le signal électrique
+	d'entrée appelé Vin, recevant le signal électrique
 	correspondant au son et pouvant être redirigé après
 	traitement vers le terminal SO1, SO2, ou les deux en même
 	temps (pour passer d'un son mono à un son stéréo par
-	exemple).\\
+	exemple).CA SERAIT BIEN DE RAJOUTER UN SCHEMA\\
 
 	Grossièrement, les composants de l'appareil permettent de
 	créer un son de quatre façons différentes : 
@@ -264,20 +264,20 @@ non. (Voir partie Interruptions)
 		\item Et une onde "Bruit" avec une enveloppe de
 		volume.
 		\end{itemize}
-	Ces quatre ondes sont générées indépendemment et finalement
+	Ces quatre ondes sont générées indépendamment et finalement
 	"mixées" pour diriger vers les canaux de sortie l'onde
 	correspondant au son à produire pour le jeu.
 
 \subsection{Registres, valeurs et contrôles} 
 	Pour générer cette musique sans laquelle les jeux n'auraient
-	surement pas la même dimension, la console dispose de 22
+	sûrement pas la même dimension, la console dispose de 22
 	registres, qu'elle peut consulter et modifier à quasiment
 	n'importe quel moment dès lors que le son du jeu à commencé à
 	être joué.\\
 	Ces registres sont séparés en 5 "familles" (4 pour les quatre
 	ondes, et une pour les contrôles du son) numérotés et appelés
-	par convention \textbf{NRXX} ou NR signifie "Noise Register", et XX le
-	numéro dudit registre. \\
+	par convention \textbf{NRXX} où NR signifie "Noise Register", et XX le
+	numéro du-dit registre. \\
 	Chacun de ces registres peut être utilisé pour stocker une
 	ou plusieurs valeurs, en utilisant tout ou seulement une
 	partie des 8 bits qu'il contient.\\
@@ -298,7 +298,7 @@ non. (Voir partie Interruptions)
 		\textbf{NR10(FF10):} le registre de balayage.\\
 		C'est le premier exemple de registre utilisé pour
 		stocker plusieurs valeurs, ici les bits 4 à 6 donnent
-		la valeur de la fréquence de balayge, les bits 0 à 2
+		la valeur de la fréquence de balayage, les bits 0 à 2
 		le nombre de décalage de ces balayages à effectuer, et le bit
 		numéro 3 indique par sa valeur (0 ou 1) s'il s'agit
 		d'un balayage montant (où la fréquence augmente) ou
@@ -310,7 +310,7 @@ non. (Voir partie Interruptions)
 		une valeur de "temps montant" (1/8 pour 0, 1/4 pour
 		1, 1/2 pour 2 et 3/4 pour 3).
 		Les bits 0 à 5 donnent la valeur de la longueur
-		(periode) du son à jouer. Cette valeur n'est prise en
+		(période) du son à jouer. Cette valeur n'est prise en
 		compte que si c'est indiqué dans le registre \textbf{NR14}.\\
 	
 	\textbf{NR12(FF12):} Enveloppe de volume \\
@@ -330,9 +330,9 @@ non. (Voir partie Interruptions)
 		suivant.\\ 
 
 		\textbf{NR14(FF14)}: Composantes hautes \\
-		Le bit 7 est un indicateur de réinitialisation de la
+		Le bit 7 est un indicateur de ré-initialisation de la
 		fréquence, le bit 6 un compteur d'opérations
-		consecutives, qui va indiquer si la longueur lue sur
+		consécutives, qui va indiquer si la longueur lue sur
 		les bits 0 à 5 du registre \textbf{NR11} est à prendre en
 		compte ou non, et les bits 0 à 2 contiennent les 3 bits
 		manquant à la fréquence stockée en \textbf{NR13}.
@@ -347,7 +347,7 @@ non. (Voir partie Interruptions)
 	Le registre \textbf{NR21(FF16)} fonctionne comme le \textbf{NR11} (à
 		l'exception de la vérification de prise en compte de
 		la longueur, qui se fait via le bit 6 du registre \textbf{NR24}
-		cette fois-ci), le \textbf{NR22(FF17)} fonctionne comme le
+		cette fois ci), le \textbf{NR22(FF17)} fonctionne comme le
 		\textbf{NR12}, le \textbf{NR23(FF18)} fonctionne comme le \textbf{NR13} et le
 		\textbf{NR24(FF19)} comme le \textbf{NR14}. 
 			
@@ -356,7 +356,7 @@ non. (Voir partie Interruptions)
 		l'utilisation de sons pré-enregistrés dans la cartouche
 		(et certains dans la gameboy, le bruit de démarrage par
 		exemple).
-		Dans certains cas elle peut être utilisé pour jouer un son de
+		Dans certains cas elle peut être utilisée pour jouer un son de
 		la même façon que les 2 premières ondes, ce qui explique la
 		présence des registres \textbf{NR33} et \textbf{NR34}. \\ 
 		
@@ -370,9 +370,9 @@ non. (Voir partie Interruptions)
 		registre est utilisée et donne la longueur du son à
 		jouer.\\ 
 		
-		\textbf{NR32(FF1C):} Selecteur \\
+		\textbf{NR32(FF1C):} Sélecteur \\
 		Les bits 5 à 6 donne la valeur d'un
-		selecteur de volume pour le son à jouer, il est joué
+		sélecteur de volume pour le son à jouer, il est joué
 		sans son pour une valeur de 0, tel quel pour 1, avec un volume à 50pourcents 
 		pour 2 (décalé d'un bit vers la droite), et un volume
 		de 25pourcents pour 3 (décalé de deux bits vers la droite). \\
@@ -384,7 +384,7 @@ non. (Voir partie Interruptions)
 
 		\textbf{NR34(FF1E):} Composantes hautes \\
 		Celui-ci fonctionne comme les \textbf{NR14} et \textbf{NR24} mais pour
-		cette 3eme onde (utilisé dans le cas d'une utilisation
+		cette 3ème onde (utilisé dans le cas d'une utilisation
 		de cette onde pour produire un son sans utiliser les
 		sons mémoire). \\
 
@@ -403,7 +403,7 @@ non. (Voir partie Interruptions)
 		par exemple!). 
 		Ce bruit est réalisé par une variation aléatoire
 		d'amplitude entre composantes hautes et basses d'une
-		fréquence donnée. Le son paraitra plus ou moins rude
+		fréquence donnée. Le son paraîtra plus ou moins rude
 		en fonction de cette fréquence. \\
 		Cette onde est aussi parfois utilisée pour générer un
 		son correct en régularisant la sortie par une
@@ -424,7 +424,7 @@ non. (Voir partie Interruptions)
 		\textbf{NR43(FF22):} Compteur polynomial \\
 		L'amplitude est modifiée aléatoirement entre haute et
 		basse sur la fréquence donnée. Plus cette fréquence
-		est haute, moins le bruit paraitre rude. 
+		est haute, moins le bruit paraître rude. 
 		Si le bit 3 est activé, l'intervalle de valeurs
 		aléatoires est réduit, et la sortie devient plus
 		régulière, rendant la sortie plus proche d'un réel
@@ -435,7 +435,7 @@ non. (Voir partie Interruptions)
 		à une valeur de diviseur de fréquence.\\ 
 
 		\textbf{FF23(NR43):} Compteur consécutif\\
-		Le bit 7 est un initialiseur, il réinitialise le bruit
+		Le bit 7 est un initialisateur, il réinitialise le bruit
 		lorsque sa valeur est 1.
 		Le bit 6 est l'indicateur de jeu du son, il indique
 		qu'il faut stopper en passant à 0 lorsque la valeur de
@@ -449,14 +449,14 @@ non. (Voir partie Interruptions)
 		gérer le volume général ou simplement activer ou
 		désactiver le son de la console. \\
 
-		\textbf{NR50(FF24):} Controle du signal d'entrée \\ 
+		\textbf{NR50(FF24):} Contrôle du signal d'entrée \\ 
 		Le bit 7 envoie le signal Vin vers la sortie SO2
 		lorsqu'il est activé, alors que le bit 3 l'envoie vers
 		la sortie SO1. les bits 6 à 4 correspondent au volume
 		propre à la SO2, et les 0 à 2 à celui de la SO1. \\
 
 		\textbf{NR51(FF25):} Sélection du terminal de sortie propre \\
-		Ici les bits redirige les 4 ondes possibles vers un
+		Ici les bits redirigent les 4 ondes possibles vers un
 		terminal donné.
 		Les bits 0 à 3 envoie respectivement les ondes 1 à 4
 		vers la SO1, les bits 4 à 7 envoie respectivement les
@@ -464,7 +464,7 @@ non. (Voir partie Interruptions)
 
 		\textbf{NR52(FF26):} Activation du son \\
 		Les bits 0 à 3 de ce registre activent (ou
-		desactivent) respectivement les ondes 1 à 4 et le bit
+		désactivent) respectivement les ondes 1 à 4 et le bit
 		7 indique si le son général de la console est activé
 		ou non.
 \section{Interruptions/Synchronisations}
@@ -493,12 +493,12 @@ Bit 4: Joypad   Requête d'Interruption  (1=Requête)\\\\
 
 \subsection{Quand est-ce qu'une interruption est déclenchée?}
 Pour qu'une interruption soit déclenchée, par exemple l'interruption VBlank, Il faut que IME soit à 1, et que les bits 0 de IE et IF soit à 1 également.
-Lorsqu'elle sera déclenchée le bit 0 de IF sera mis à 0. IME sera mis à 0 également pour éviter qu'une interruption soit déclenchée pendant la routine d'une autre interruption (bien que celà soit possible pour le développeur en utilisant l'instruction "EI" dans une routine d'interruption).
+Lorsqu'elle sera déclenchée le bit 0 de IF sera mis à 0. IME sera mis à 0 également pour éviter qu'une interruption soit déclenchée pendant la routine d'une autre interruption (bien que cela soit possible pour le développeur en utilisant l'instruction "EI" dans une routine d'interruption).
 \subsection{Les différents types d'interruptions}
 \subsubsection{Interruption VBlank}
 L'interruption VBlank est demandée par l'écran LCD, cette demande est faites à chaque fois que l'écran rentre dans la période de VBlank (Voir partie GPU), l'interruption sert généralement à mettre à jour les dessins du jeu avant l'affichage d'une nouvelle image. La routine se trouve à l'adresse 0x0040.
 \subsubsection{Interruption LCD STAT}
-Cette interruption est également demandée par l'écran LCD, elle sert généralement à executer des routines lorsque l'écran LCD change d'état (Voir partie GPU). Elle peut aussi intervenir lorsque la ligne actuellement dessinée par l'écran LCD correspond au registre LYC (LY compare) situé à l'adresse 0xFF45. la routine se trouve à l'adresse 0x0048.
+Cette interruption est également demandée par l'écran LCD, elle sert généralement à exécuter des routines lorsque l'écran LCD change d'état (Voir partie GPU). Elle peut aussi intervenir lorsque la ligne actuellement dessinée par l'écran LCD correspond au registre LYC (LY compare) situé à l'adresse 0xFF45. la routine se trouve à l'adresse 0x0048.
 \subsubsection{Interruption Timer}
 Interruption générée par le timer interne de la GameBoy, à chaque fois que celui ci dépasse une certaine durée. La routine se trouve à l'adresse 0x0050.
 \subsubsection{Interruption Serial}
@@ -506,7 +506,7 @@ Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou t
 \subsubsection{Interruption Joypad}
 Interruption générée lors de l'appui sur une touche par le joueur. La routine se trouve à l'adresse 0x0060.
 \chapter{Réalisation}
-Ce chapître synthétise la manière dont nous avons réalisé notre émulateur(...)
+Ce chapitre synthétise la manière dont nous avons réalisé notre émulateur(...)
 \section{CPU}
 Le processeur a été le premier "composant" à être développé. Nous allons donc décrire dans cette partie comment il a été réalisé.
 \subsection{Structure}
@@ -602,7 +602,7 @@ handle_interrupts();
 Enfin, après les routines des autres composants, il se peut qu'il y'ait une interruption déclenchée, c'est le rôle de cette fonction, de voir si une interruption a été déclenchée et de mettre en place son exécution.\\\\
 Voilà donc l'algorithme de base du fonctionnement de notre processeur. Ce qui est intéressant c'est de voir que l'algorithme est assez générique et qu'il peut tout à fait être utilisé et adapté pour implémenter d'autres processeurs.
 \subsection{Développement des instructions}
-Après avoir mis en place l'algorithme et pour que le processeur puisse travailler, nous avons développé les différentes instructions que peut exécuter le processeur. Au vue du nombre d'instructions et de la possible généricité de certaines nous avons préféré régrouper certaines instructions ensemble pour en faire des fonctions génériques. Comme exemple nous pouvons nous pencher sur les instructions suivantes:
+Après avoir mis en place l'algorithme et pour que le processeur puisse travailler, nous avons développé les différentes instructions que peut exécuter le processeur. Au vue du nombre d'instructions et de la possible généricité de certaines nous avons préféré regrouper certaines instructions ensemble pour en faire des fonctions génériques. Comme exemple nous pouvons nous pencher sur les instructions suivantes:
 \begin{lstlisting}
 INC B
 INC C
@@ -617,8 +617,8 @@ Chacune de ces instructions nécessite d'incrémenter un registre en particulier
 static inline void inc_smpl(BYTE *reg);
 \end{lstlisting}
 Il suffit donc de passer en paramètre l'adresse du registre désiré pour que l'instruction soit exécutée sur le bon registre.
-Le préfixe static indique juste que cette fonction est uniquement disponible pour le processeur, ce qui est logique car aucun autre composant ne devrait pouvoir exécuter cette fonction. Ensuite le préfixe inline est présent dans un soucis d'optimisation, en effet lors de sa présence le compilateur peut prendre en compte ou non ce mot clé. Si le compilateur le prend en compte celà aura pour effet d'incorporer le corps de la fonction aux endroits où elle est appelée, plutôt que de faire appel à elle.\\\\ 
-Enfin toutes les intructions du processeur ont pus être développées principalement grâce aux trois références suivantes \cite{pastraiser}, \cite{clrhome}, \cite{pinaud}.
+Le préfixe static indique juste que cette fonction est uniquement disponible pour le processeur, ce qui est logique car aucun autre composant ne devrait pouvoir exécuter cette fonction. Ensuite le préfixe inline est présent dans un soucis d'optimisation, en effet lors de sa présence le compilateur peut prendre en compte ou non ce mot clé. Si le compilateur le prend en compte cela aura pour effet d'incorporer le corps de la fonction aux endroits où elle est appelée, plutôt que de faire appel à elle.\\\\ 
+Enfin toutes les instructions du processeur ont pus être développées principalement grâce aux trois références suivantes \cite{pastraiser}, \cite{clrhome}, \cite{pinaud}.
 \section{GPU}
 \section{MMU}
 Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
@@ -666,7 +666,7 @@ switch(*(cartridge_rom_buffer + 0x0149)){
 Un switch est placé sur l'octet 0x0149 de cartridge\_rom\_buffer, contenant la taille de la RAM. Si la valeur vaut 0, il n'y'a pas de RAM dans la cartouche, sinon le buffer cartridge\_ram\_buffer est initialisé avec la fonction alloc\_ram\_mem.
 Enfin l'initialisation de la mémoire interne se fait en mettant tout le buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
 \subsection{Lecture/Ecriture}
-Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction memory\_read, si celà vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet.
+Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction memory\_read, si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet.
 \begin{lstlisting}
 inline BYTE memory_read(unsigned short addr){
 	if(addr <= 0x3FFF) 	//Banque 0 ROM cartouche
