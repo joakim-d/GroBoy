@@ -131,45 +131,45 @@ Schéma minimaliste réprésentant Le LR35902:
 
 \section{GPU}
 
-Le GPU de la GameBoy est intégré dans le même circuit physique que le CPU. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+Le GPU de la GameBoy est intégré dans le même circuit intégre que le CPU. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
-L'affichage de la Gameboy se fait via un écran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dite de "HBlank", ce qui correspond à un retour à la ligne, puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de "VBlank", qui correspond à un retour à la première ligne.\\
-Ces périodes de VBlank ou de HBlank ont un nombre de cycles défini, et c'est
-durant ces périodes que l'accés aux différentes matrices en écriture va être
+L'affichage de la Gameboy se fait via un ecran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.\\
+Ces périodes de VBlank ou de HBlank ont un nombre de cycles défini, c'est
+durant ces périodes que l'accés au différentes matrices en écriture va être
 débloqué pour que le CPU puisse modifier les éléments à afficher.\\
 
 ->schéma d'affichage
 
 \subsection{Génération d'une ligne}
 
-Trois types de couches peuvent être affichées: la couche background, la couche
-window et la couche sprites, les deux premières peuvent être activées ou
-désactivées selon les jeux en modifiant un registre ( à l'adresse FF40 ).\\
+Trois types de couches peuvent être affichés: la couche background, la couche
+window et la couche sprites, les deux première peuvent être activées ou
+désactivées selon les jeu en modifiant un registre ( à l'adresse FF40 ).\\
 
 Ces trois couches ont des rôles différents et servent à séparer différents
 éléments graphiques d'un jeu.\\
 
 \begin{itemize}
 \item \textbf{La couche Background:}
-	Cette couche comprends tous les éléments qui appartiennent au décor du
-jeu. Elle est représentée par deux matrices de 256*256 pixels, soit 32*32
-tuiles (carrés de 8*8 pixels). La Gameboy peut donc passer d'une matrice à
+	Cette couche comprends tout les éléments qui appartiennent au décor du
+jeu. Elle est représentée par deux matrice de 256*256 pixels, soit 32*32
+tuiles (carré de 8*8 pixels). La Gameboy peut donc passer d'une matrice à
 l'autre pour afficher les différents éléments du décor. Ces matrices étant
-d'une taille supérieure à celle de l'écran lors de l'affichage, on gère la position de
+d'une taille supérieure à celle de l'écran lors de l'affichage, la positionne
 l'écran sur une zone d'une des matrices via la modification des valeurs de
 deux registres. L'écran peut ainsi naviguer sur ces matrices pour modifier
 l'affichage.
 
 \item \textbf{La couche Window:}
-	Cette couche est généralement utilisée pour tous les éléments statiques
+	Cette couche est généralement utilisée pour tous les éléments statique
 d'un jeu, comme la barre de menu ou les scores. Elle a un comportement
 similaire à celui de la couche Background si ce n'est qu'elle ne possède qu'une seule
 matrice et qu'elle est positionnée par rapport à l'écran et non l'inverse.
 
 \item \textbf{La couche Sprites:}
-	Cette couche est utilisée pour représenter les objets d'intérêts d'un
+	Cette couche est utilisées pour représenter les objets d'intérets d'un
 jeu (personnages, objets, etc). Elle est représentée en mémoire par un maximum
 de 40 tuiles différentes. Ces tuiles sont positionnées à l'écran via un registre indiquant leur position absolue, ainsi que diverses options d'affichage comme la possibilité d'appliquer une symétrie verticale ou horizontale sur la tuile.
 \end{itemize}
@@ -180,7 +180,7 @@ Les couches Background et Window utilisent un registre (palette monochrome) pour
 couleurs des différents pixels, dans le cas de la Gameboy ce registre contient
 4 niveaux de gris codés sur 2 bits.\\
 
-La couche Sprite peut utiliser deux palettes qui diffèrent en un point de la
+La couche Sprite peux utiliser deux palettes qui diffèrent en un point de la
 palette précédente, la valeur 00 ne correspond pas au blanc mais au fait que
 le pixel soit transparent.
 
@@ -831,7 +831,12 @@ switch(type){
 \end{lstlisting}
 Selon l'interruption déclenchée on remplace la valeur de PC par l'adresse de la routine.
 Ces fonctions résument au final toutes les explications décrites dans la partie Hardware-Interruptions.
+\section{Sauvegarde de jeu}
 \section{Fonctionnalités additionnelles}
+\subsection{Sauvegarde par état}
+\subsection{GUI}
+Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo ZSnes. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension (SDL\_ttfjesaispasquoi), vous retrouverez comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe dans les annexes. Cette GUI comprend un menu de base avec plusieurs options: (screenshot). 
+La première option permet à l'utilisateur 
 \chapter{Conclusion}
 \section{Bilan}
 \section{Fonctionnalités pouvant être rajoutées}
