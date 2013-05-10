@@ -709,6 +709,145 @@ Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs
 %Quelques mots sur les fonctions de clock, le frame sequencer, je trouve la prochaine variation d'amplitude et je l'envoie, gauche droite ou les deux
 %La wave, les aléatoires, les sons pré-enregistrés.
 \section{Interruptions/Synchronisations}
+Dans cette partie nous allons voir comment les interruptions sont gérées et déclenchées. 
+\subsection{Gestion des interruptions}
+Dans la partie Réalisation-CPU nous avons vu qu'après chaque instruction un appel à la fonction "handle\_interrupts" est fait afin de vérifier si une interruption a été déclenchée. Nous allons voir comment cette fonction procède.
+\begin{lstlisting}
+void handle_interrupts(z80_t *z80){
+	BYTE IE;
+	BYTE IF;
+
+	if(IME){
+		IE = memory_read(0xFFFF);
+		IF = memory_read(0xFF0F);
+		if(IE & IF & 0x01){
+			memory_write(0xFF0F, IF & 0xFE);
+			execute_interrupt(V_BLANK, z80);
+		}
+		else if(IE & IF & 0x02){
+			memory_write(0xFF0F, IF & 0xFD);
+			execute_interrupt(LCD_STAT, z80);
+		}
+		else if (IE & IF & 0x04){
+			memory_write(0xFF0F, IF & 0xFB);
+			execute_interrupt(TIMER, z80);
+		}
+		else if(IE & IF & 0x08){
+			memory_write(0xFF0F, IF & 0xF7);
+			execute_interrupt(SERIAL, z80);
+		}
+		else if(IE & IF & 0x10){
+			memory_write(0xFF0F, IF & 0xEF);
+			execute_interrupt(JOYPAD, z80);
+		}
+	}
+	else if(is_halted()){
+		IE = memory_read(0xFFFF);
+		IF = memory_read(0xFF0F);
+		if(IE & IF & 0x1F){
+			reset_halt();
+		}
+	}
+}
+\end{lstlisting}
+\begin{lstlisting}
+if(IME){
+	...
+}
+\end{lstlisting}
+Comme expliqué dans la partie Hardware-Interruptions, une interruption est déclenchée uniquement si le registre IME est à 1. 
+\begin{lstlisting}
+IE = memory_read(0xFFFF);
+IF = memory_read(0xFF0F);
+if(IE & IF & 0x01){
+	memory_write(0xFF0F, IF & 0xFE);
+	execute_interrupt(V_BLANK, z80);
+}
+else if(IE & IF & 0x02){
+	memory_write(0xFF0F, IF & 0xFD);
+	execute_interrupt(LCD_STAT, z80);
+}
+else if (IE & IF & 0x04){
+	memory_write(0xFF0F, IF & 0xFB);
+	execute_interrupt(TIMER, z80);
+}
+else if(IE & IF & 0x08){
+	memory_write(0xFF0F, IF & 0xF7);
+	execute_interrupt(SERIAL, z80);
+}
+else if(IE & IF & 0x10){
+	memory_write(0xFF0F, IF & 0xEF);
+	execute_interrupt(JOYPAD, z80);
+}
+\end{lstlisting}
+Ici les registres IE et IF sont récupérés. Puis une comparaison est faite entre ces registres et les bits correspondants à des interruptions. Si il s'avère que les registres IE et IF ont un bit commun à 1 une interruption est déclenchée. On peut constater que l'ordre de priorité est respecté grâce aux "if, else if" (Il faut l'expliquer dans la partie Hardware-Interruptions).
+\begin{lstlisting}
+else if(is_halted()){
+	IE = memory_read(0xFFFF);
+	IF = memory_read(0xFF0F);
+	if(IE & IF & 0x1F){
+		reset_halt();
+	}
+}
+\end{lstlisting}
+Cette partie n'intervient que lorsque le CPU est en état particulier de halte. 
+Nous ne la détaillerons pas car elle n'est pas indispensable à la compréhension des interruptions.
+Nous allons maintenant voir comment un appel à une routine est effectué avec la fonction "execute\_interrupt".
+\subsection{Execution d'une interruption}
+\begin{lstlisting}
+void execute_interrupt(BYTE type, z80_t *z80){
+	reset_IME();
+	memory_write(z80->SP - 1, (z80->PC & 0xFF00) >> 8);
+	memory_write(z80->SP - 2, (z80->PC & 0x00FF));
+	z80->SP -= 2;
+
+	switch(type){
+		case V_BLANK:	
+			z80->PC = 0x40;
+			break;
+		case LCD_STAT:
+			z80->PC = 0x48;
+			break;
+		case TIMER:
+			z80->PC = 0x50;
+			break;
+		case SERIAL:
+			z80->PC = 0x58;
+			break;
+		case JOYPAD:
+			z80->PC = 0x60;
+			break;
+	}
+}
+\end{lstlisting}
+\begin{lstlisting}
+reset_IME();
+memory_write(z80->SP - 1, (z80->PC & 0xFF00) >> 8);
+memory_write(z80->SP - 2, (z80->PC & 0x00FF));
+z80->SP -= 2;
+\end{lstlisting}
+En premier lieu le registre IME est désactivé pour éviter qu'une autre interruption soit déclenchée pendant la routine. Ensuite le registre PC est écrit dans la pile pour pouvoir revenir aux calculs en cours, et la valeur de SP est décrémentée de 2 pour indiquer le nouvel emplacement du sommet de la pile.
+\begin{lstlisting}
+switch(type){
+	case V_BLANK:	
+		z80->PC = 0x40;
+		break;
+	case LCD_STAT:
+		z80->PC = 0x48;
+		break;
+	case TIMER:
+		z80->PC = 0x50;
+		break;
+	case SERIAL:
+		z80->PC = 0x58;
+		break;
+	case JOYPAD:
+		z80->PC = 0x60;
+		break;
+}
+\end{lstlisting}
+Selon l'interruption déclenchée on remplace la valeur de PC par l'adresse de la routine.
+Ces fonctions résument au final toutes les explications décrites dans la partie Hardware-Interruptions.
 \section{Fonctionnalités additionnelles}
 \chapter{Conclusion}
 \section{Bilan}
