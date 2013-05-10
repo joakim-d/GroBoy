@@ -691,6 +691,23 @@ On peut voir dans cette fonction que pour chaque plage d'adresse demandée on re
 Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs de banques de ROM et de RAM des cartouches.
 
 \section{APU}
+	Si le fonctionnement général de l'unité son de la console n'est pas d'une extrême complexité, sa réalisation sur un émulateur nous aura donné, elle, beaucoup de fil à retordre.
+	En effet, la technologie de la GameBoy permettant de produire un son efficacement et simplement, en fonctionnant comme expliqué dans la partie hardware, la documentation à ce sujet est relativement difficile à trouver, puis à exploiter pour l'émulation.\\
+\subsection{Cheminement}
+	En nous basant sur les informations expliquées plus haut, nous avons d'abord pensé utiliser la librairie SDL afin de simplement produire le son souhaité à partir de la multitude de données réparties dans les registres "NRXX". Cependant l'idée n'eu pas le succès espéré, étant donné que les informations récupérées nécessitent en fin de compte un certain nombre de traitements avant de pouvoir être utiles à la création d'un son.\\
+	Déterminer ces traitements et les adapter informatiquement demande beaucoup de temps, c'est pourquoi nous avons eu l'agréable surprise de trouver une librairie simplifiant quelques-unes de ces adaptations, créée par un internaute passionné d'émulation et notamment de l'audio dans l'émulation.\\
+	Cette librairie s'appelle "blip buff", et permet de rééchantillonner des ondes audio à partir d'une fréquence d'horloge vers une fréquence d'échantillonage, soit créer une onde discrétisée (donc utilisable par des librairies pour produire du son) à partir d'informations sur une onde carrée. 
+	Une explication plus détaillée se trouve en annexe, il peut être nécessaire de la lire afin de bien comprendre la démarche utilisée ici pour produire du son.
+\subsection{Initialisation}
+%Premières valeurs à placer dans les registres, Initialisation de la wave ?
+%Fonction callback et structure sdl
+\subsection{Appels principaux et écritures permanentes}
+%Plage mémoire dédiée au son, écriture de son gérée par le core du son (apu) lui même.
+%Appel de write_sound à chaque tentative d'écriture en mémoire dans ces plages, petit détail de write_sound
+%Récupération des données, appel du sound update à chaque fois
+\subsection{Le son, le vrai}
+%Quelques mots sur les fonctions de clock, le frame sequencer, je trouve la prochaine variation d'amplitude et je l'envoie, gauche droite ou les deux
+%La wave, les aléatoires, les sons pré-enregistrés.
 \section{Interruptions/Synchronisations}
 Dans cette partie nous allons voir comment les interruptions sont gérées et déclenchées. 
 \subsection{Gestion des interruptions}
