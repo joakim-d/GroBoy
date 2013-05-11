@@ -4,6 +4,7 @@
 \usepackage[francais]{babel}
 \usepackage{url}
 \usepackage{listings}
+\usepackage{graphicx}
 \title{TER, développement d'un émulateur de GameBoy}
 \author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
@@ -852,8 +853,15 @@ Ces fonctions résument au final toutes les explications décrites dans la parti
 \section{Fonctionnalités additionnelles}
 \subsection{Sauvegarde par état}
 \subsection{GUI}
-Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo ZSnes. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension (SDL\_ttfjesaispasquoi), vous retrouverez comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe dans les annexes. Cette GUI comprend un menu de base avec plusieurs options: (screenshot). 
-La première option permet à l'utilisateur 
+Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo "ZSNES" \cite{zsnes}. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension SDL\_ttf qui permet aux développeurs d'utiliser des polices et donc d'écrire du texte dans les fenêtres SDL. Ce qui imposait également à l'utilisateur d'installer des librairies supplémentaires. Vous retrouverez donc comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe dans les annexes. Cette GUI comprend un menu de base avec plusieurs options: \\ 
+\includegraphics[scale=0.5]{images/screenshot_menu.png}\\
+La première option permet à l'utilisateur de choisir un jeu, et donc de naviguer parmis ses dossiers.\\
+\includegraphics[scale=0.5]{images/screenshot_navigate.png}\\
+La seconde option permet à l'utilisateur de configurer les touches.\\
+\includegraphics[scale=0.5]{images/screenshot_config.png}\\
+La dernière option ne sert juste qu'à quitter l'interface. Enfin une fois le jeu choisi le menu change et propose toujours les différentes options en plus de pouvoir lancer le jeu.\\
+\includegraphics[scale=0.5]{images/screenshot_menu2.png}\\
+Nous ne détaillerons pas plus comment nous avons réalisé cette partie car elle n'intervient pas vraiment dans la réalisation d'un émulateur.
 \chapter{Conclusion}
 \section{Bilan}
 \section{Fonctionnalités pouvant être rajoutées}
