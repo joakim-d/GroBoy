@@ -623,7 +623,7 @@ Enfin toutes les instructions du processeur ont pus être développées principa
 \section{GPU}
 \section{MMU}
 Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
-\subsection{initialisation} 
+\subsection{Initialisation} 
 Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accés à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la GameBoy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la GameBoy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
 Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche de jeu selon les jeux leurs tailles sont différentes, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux.
 Les fichiers de jeu (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
@@ -850,11 +850,29 @@ switch(type){
 Selon l'interruption déclenchée on remplace la valeur de PC par l'adresse de la routine.
 Ces fonctions résument au final toutes les explications décrites dans la partie Hardware-Interruptions.
 \section{Sauvegarde de jeu}
-Nous allons dans cette partie expliquer comment nous avons fait pour réaliser les sauvegardes dites "classiques".
+Nous allons dans cette partie expliquer comment nous avons réalisé les sauvegardes dites "classiques".
 \subsection{Fonctionnement général}
-Matériellement et comme expliqué dans la partie (?), certaines cartouches de jeu permettent la sauvegarde de partie. Une pile est intégrée pour maintenir l'état de la RAM lorsque la cartouche n'est pas utilisée. Pour la réalisation de ceci, à chaque fois que l'on ferme le processus groboy un fichier est écrit sur le disque. Ce fichier contient toutes les données du buffer "cartridge\_ram\_buffer" à l'état de fermeture du processus. Rappelons que "cartridge\_ram\_buffer" est le buffer contenant les données RAM de la cartouche. Enfin si le jeu est relancé, on vérifie si le fichier de sauvegarde est bien présent, dans le cas favorable il est chargé dans le buffer "cartridge\_ram\_buffer". Ceci montre que le processus de sauvegarde classique est relativement facile à implémenter, nous ne détaillerons donc pas son implémentation.
+Matériellement et comme expliqué dans la partie (?), certaines cartouches de jeu permettent la sauvegarde de partie. Une pile est intégrée pour maintenir l'état de la RAM lorsque la cartouche n'est pas utilisée. Pour la réalisation de ceci, à chaque fois que l'on ferme le processus groboy un fichier est écrit sur le disque. Ce fichier contient toutes les données du buffer "cartridge\_ram\_buffer" à l'état de fermeture du processus. Rappelons que "cartridge\_ram\_buffer" est le buffer contenant les données RAM de la cartouche. Enfin si le jeu est relancé, on vérifie que le fichier de sauvegarde est bien présent, dans le cas favorable il est chargé dans le buffer "cartridge\_ram\_buffer". Ceci montre que le processus de sauvegarde classique est relativement facile à implémenter, nous ne détaillerons donc pas son implémentation.
 \section{Fonctionnalités additionnelles}
 \subsection{Sauvegarde par état}
+Nous allons dans cette partie expliquer qu'est-ce qu'une sauvegarde par état et comment nous avons réalisé cette fonctionnalité.
+\subsubsection{Principe}
+La grande force de l'émulation est d'avoir implémenté un algorithme que l'on retrouve dans la plupart des émulateurs, l'algorithme de 'sauvegarde par état'. Cet algorithme n'est juste ni plus ni moins que la sauvegarde de l'ensemble des variables globales importantes du processus à un instant t. Cela a pour effet dans un jeu de pouvoir revenir à n'importe quel instant et donc de pouvoir sauvegarder à n'importe quel moment.
+\subsubsection{Algorithme utilisé}
+Lorsque l'utilisateur appuie sur une touche de sauvegarde l'algorithme suivant est utilisé:
+\begin{lstlisting}
+void save_state(char *save_path){
+	FILE *file;
+	file = fopen(save_path, "w+");
+	if(file == NULL) printf("Error while saving\n");
+	else{
+		save_all_components(file);
+		fclose(file);
+	}
+}
+\end{lstlisting}
+Pour faire simple un fichier est ouvert en écriture et chaque module de l'émulateur va écrire dans le fichier ses variables globales.
+Pour la restauration le processus inverse est adopté, on vérifie que le fichier de sauvegarde d'état est présent, dans le cas favorable il est ouvert en lecture et toutes les variables globales sont restaurées.
 \subsection{GUI}
 Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo "ZSNES" \cite{zsnes}. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension SDL\_ttf qui permet aux développeurs d'utiliser des polices et donc d'écrire du texte dans les fenêtres SDL. Ce qui imposait également à l'utilisateur d'installer des librairies supplémentaires. Vous retrouverez donc comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe dans les annexes. Cette GUI comprend un menu de base avec plusieurs options: \\ 
 \includegraphics[scale=0.5]{images/screenshot_menu.png}\\
