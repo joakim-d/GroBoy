@@ -146,6 +146,7 @@ void navigate(SDL_Surface *sdl_screen, char *path_name, char *destination){
 				}
 				SDL_Flip(sdl_screen);
 			}
+			SDL_Delay(30);
 		}
 		if(keystate[SDLK_DOWN]){
 			if(cursor_pos != 22 && cursor_pos != nb_files - 1){
@@ -165,6 +166,7 @@ void navigate(SDL_Surface *sdl_screen, char *path_name, char *destination){
 				}
 				SDL_Flip(sdl_screen);
 			}
+			SDL_Delay(30);
 		}
 		if(keystate[SDLK_RETURN]) {	//if user select a file
 			stat(files[current_index]->d_name, &file_stat);
