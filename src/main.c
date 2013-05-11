@@ -29,6 +29,7 @@ int main(int argc, char * argv[]){
 	memory_init(gamepath);
 	}
 	else{
+		set_gamepath(argv[1]);
 		memory_init(argv[1]);
 	}
 	sound_init();

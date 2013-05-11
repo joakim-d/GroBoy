@@ -185,10 +185,10 @@ static void alloc_ram_mem(size_t size){
 
 inline void memory_write(unsigned short addr, BYTE data){
 	if((addr <= 0x7FFF) || (addr >= 0xA000 && addr <= 0xBFFF)){
-		if(cartridge_type >= 0x01 || cartridge_type <= 0x03){//MBC1
+		if(cartridge_type >= 0x01 && cartridge_type <= 0x03){//MBC1
 			write_mbc1(addr, data);		
 		}
-		if(cartridge_type == 0x05 || cartridge_type == 0x06)//MBC2
+		else if(cartridge_type == 0x05 || cartridge_type == 0x06)//MBC2
 		{
 			write_mbc2(addr,data);
 		}
@@ -206,10 +206,10 @@ inline void memory_write(unsigned short addr, BYTE data){
 		if(!force_write){
 			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr] = 0;}	//reset counter
 			else if(addr >= 0xFF10 && addr <= 0xFF26){
-				//write_sound(addr,data);	
+				write_sound(addr,data);	
 			}
 			else if(addr >= 0xFF30 && addr <= 0xFF3F){
-				//write_wave(addr,data);
+				write_wave(addr,data);
 			}
 			else if(addr == 0xFF46) {dma_transfer(data);}					//dma transfer
 			else {internal_ram[addr] = data;}

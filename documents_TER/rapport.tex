@@ -4,6 +4,7 @@
 \usepackage[francais]{babel}
 \usepackage{url}
 \usepackage{listings}
+\usepackage{graphicx}
 \title{TER, développement d'un émulateur de GameBoy}
 \author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
@@ -12,7 +13,7 @@
 \maketitle
 
 \tableofcontents
-\chapter{Introduction}
+\chapter*{Introduction}
 	Dans le cadre de la 1ère année de Master Informatique à l'Université de Montpellier
 	2, tous les élèves de la promotion ont été amenés à réaliser un projet
 	sous tutelle, afin de mettre en pratique les compétences acquises
@@ -34,7 +35,7 @@
 	soins.\\
 	\\
 
-\section{Définition du projet}
+\section*{Définition du projet}
 	Dès lors que notre choix fut fixé et validé par nos enseignants, il
 	fut assez rapide de déterminer les grandes lignes du déroulement du
 	projet, à savoir une première étape de documentation importante, afin
@@ -48,7 +49,7 @@
 Ce projet a été réalisé grâce à de nombreux outils, les voici, avec les raisons qui ont motivés nos choix.\\
 
 \subsection{Environnement de travail}
-Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques un ensemble d'outils pour développer tel que gcc, gdb etc...
+Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques d'un ensemble d'outils pour développer tel que gcc, gdb. De plus l'installation de librairies et ou de logiciels supplémentaires est relativement aisée grâce aux systèmes de logithèques.
 
 \subsection{Langage}
 C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des exécutables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
@@ -56,23 +57,25 @@ C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d
 \subsection{Compilateur}
 gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'exécutable compilé.
 
-\subsection{Librairie}
-SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions etc...
+\subsection{Librairie multimédia}
+SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions et autres.
 
 \subsection{Dépôt}
 Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version.
 
 \subsection{IDE}
-Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception d'un projet il est propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
+Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du projet il a été propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
 \section{Documentation}
 \section{Etude de l'existant}
-Il existe actuellement de nombreux émulateurs de GameBoy, pour rappel(si on l'a déjà dit dans l'intro) le but de ce projet n'était pas de rendre groboy un émulateur de renommée, mais bien de comprendre les rouages d'un émulateur de console de jeu.
-Tous ces émulateurs ont leurs avantages par rapport aux autres:
+Il existe actuellement de nombreux émulateurs de GameBoy, le but de ce projet n'était pas de rendre groboy un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y'arriver?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
+Tous ces émulateurs ont leurs avantages par rapport aux autres. Voici une liste non exhaustive des émulateurs que nous avons trouvé intéressants, vous pourrez retrouver une liste plus complète des émulateurs GameBoy sur le site de Zophar \cite{zophar}:
 
-(Liste des émulateurs principaux + avantages)
 \subsection{Gambatte}
-http://sourceforge.net/projects/gambatte/\\
-Emulateur open source écrit en c++, un des émulateurs les plus fidèles au comportement de la GameBoy, il se base sur des tests réalisés directement sur une GameBoy.
+Gambatte \cite{gambatte} est un émulateur open source écrit en c++, un des émulateurs les plus fidèles au comportement de la GameBoy, il se base sur des tests réalisés directement sur une GameBoy. Il émule tout aussi bien la GameBoy Color.
+\subsection{Visual Boy Advance}
+Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte GameBoy, GameBoy Color et GameBoy Advance. Il a été porté sur Windows, Linux et Mac.
+\subsection{No\$GMB}
+No\$GMB \cite{nogmb} est un émulateur de GameBoy, GameBoy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
 \section{Articles de recherches}
 
 \chapter{Etude du Hardware}
@@ -83,55 +86,47 @@ Une de ses spécificités est qu'il est capable de faire des opérations 16 bits
 Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 opérations possibles.
 \subsection{Registres}
 
-Un registre est un espace mémoire interne au CPU, ce qui donne un accés en temps réel par le CPU à cet espace mémoire, aucun autre composant ne peut y accéder.
-Le LR35902 possède 10 registres, 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
+Un registre interne est un espace mémoire interne au CPU, ce qui donne au CPU un accés en temps réel à cet espace mémoire. Aucun autre composant ne peut y accéder.
+Le LR35902 possède 10 registres internes: 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
 Ce CPU est capable pour certaines opérations de coupler certains registres tels A et F, B et C, D et E, H et L, pour en faire des registres 16 bits, AF, BC, DE, HL.
-Pratiquement tous les registres ont des rôles spécifiques:\\
-Le registre PC appelé "Program Counter" est le registre pointant vers la prochaine opération à lire en mémoire.\\
-Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet de la pile.\\
-Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.\\
+Pratiquement tous les registres ont des rôles spécifiques:\\\\
+Le registre PC appelé "Program Counter" est le registre pointant vers la prochaine instruction à effectuer.\\\\
+Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet de la pile.\\\\
+Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.\\\\
 Le registre F appelé "Flags" est modifié par certaines circonstances.
-Il possède 4 drapeaux, Z, N, H, C.
-Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux:
-ils sont disposés tels quels: Z N H C - - - -. Les 4 bits de bas niveaux sont eux toujours à 0.
+Il possède 4 drapeaux, Z, N, H, C. Un drapeau n'est rien d'autre qu'un certain bit activé ou non, mais qui a une signification spécifique.
+Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux, 
+ils sont disposés tels quels: \\Z N H C - - - -.\\Les 4 bits de bas niveaux sont eux toujours à 0.
 Généralement, \\Le drapeau Z est à 1 lorsque le résultat d'une opération vaut 0, 0 sinon.\\
 Le drapeau N est à 1 lorsque l'opération est une soustraction, 0 pour une addition, sinon il garde son état.\\
 Le drapeau H est à 1 après une opération où les 4 bits de poids faibles de l'opérande ont subi un "débordement", dépassant 0xF, le drapeau est à 0 sinon.\\
-Le drapeau C est à 1 après une opération où l'opérande a subi un débordement, dépassant 0xFF, le drapeau est à 0 sinon.\\
+Le drapeau C est à 1 après une opération où l'opérande a subi un débordement, dépassant 0xFF, le drapeau est à 0 sinon.\\\\
 Les autres registres n'ont pas vraiment de rôles spécifiques mais servent pour beaucoup d'opérations.
 \subsection{Instructions}
-Une instruction est un calcul ou un ordre que va exécuter/commander le processeur, ces instructions peuvent être classées officieusement de la manière suivante, et afin de mieux comprendre un exemple sera donné pour chaque classe d'instruction:
-
-instructions en 8 bits d'arithmétique/logique | exemple: "INC B", soit incrémenter le registre B. Si B vaut 0x04 avant l'opération. B vaudra 0x05 après.
-
-instructions en 16 bits d'arithmétique/logique | exemple: "INC BC", soit incrémenter le couple de registres BC. Si BC vaut 0x01FF avant l'opération. BC vaudra 0x0200 après, donc B vaudra 0x02 et C vaudra 0x00.
-
-instructions en 8 bits de chargement/sauvegarde/déplacement | exemple: "LD A,C", soit charger le registre C dans le registre A. après l'opération le registre A aura la même valeur que le registre C.
-
-instructions en 16 bits de chargement/sauvegarde/déplacement | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.
-
-instructions de sauts et d'appels | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.
-
-instructions de contrôles/diverses | exemple: "NOP", soit, ne rien faire.
-
-Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre maximum d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant: 
+Une instruction est un calcul ou un ordre que va exécuter/commander le processeur, ces instructions peuvent être classées officieusement de la manière suivante, et afin de mieux comprendre un exemple sera donné pour chaque classe d'instruction:\\\\
+\textbf{instructions en 8 bits d'arithmétique/logique} | exemple: "INC B", soit incrémenter le registre B. Si B vaut 0x04 avant l'opération. B vaudra 0x05 après.\\\\
+\textbf{instructions en 16 bits d'arithmétique/logique} | exemple: "INC BC", soit incrémenter le couple de registres BC. Si BC vaut 0x01FF avant l'opération. BC vaudra 0x0200 après, donc B vaudra 0x02 et C vaudra 0x00.\\\\
+\textbf{instructions en 8 bits de chargement/sauvegarde/déplacement} | exemple: "LD A,C", soit charger le registre C dans le registre A. après l'opération le registre A aura la même valeur que le registre C.\\\\
+\textbf{instructions en 16 bits de chargement/sauvegarde/déplacement} | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.\\\\
+\textbf{instructions de sauts et d'appels} | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.\\\\
+\textbf{instructions de contrôles/diverses} | exemple: "NOP", soit, ne rien faire.\\\\
+Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre maximum d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant:\\ 
 Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x2000) = 0x00, (0x2001) = 0xCA, (0x2002) = 0xEF, (0x2003) = 0xBE.
 
 Comme PC vaut 0x2000 le processeur lit d'abord 0x00 ce qui correspond à l'instruction "NOP", ne rien faire. 
 Le processeur ne lira donc qu'un octet pour cette instruction, le registre PC sera incrémenté et vaudra 0x2001.
 Ensuite le processeur va lire 0xCA ce qui correspond à l'opération "JP Z,0xHHHH", dans cette opération le processeur a besoin de la valeur 0xHHHH, le processeur va donc lire les 2 octets supplémentaires. Ce qui donne dans ce cas, "JP Z,0xBEEF".
-Comme le flag Z est à un, le registre PC vaut 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.
-
+Comme le flag Z est à un, le registre PC vaut maintenant 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.\\\\
 Les instructions ont des coûts en temps, ces coûts sont représentés en cycles d'exécutions.
 Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH BC" coûte 16 cycles.
 Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
 Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
-
+\\\\
 Schéma minimaliste réprésentant Le LR35902:
 
 \section{GPU}
 
-La Gameboy ne posséde pas de composant GPU, l'écran LCD gère à lui seul l'affichage et le traitement des images. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+La Gameboy ne posséde pas de composant GPU, l'écran LCD gère à lui seul l'affichage et le traitement des images. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) afin de l'afficher physiquement, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
@@ -193,7 +188,7 @@ le pixel soit transparent.
 \section{MMU}
 le MMU soit Memory Management Unit est un composant qui autorise ou non l'accès en mémoire demandée par le processeur.
 En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
-Pour mieux comprendre à quoi correspond cet espace, l'espace d'addresage sera
+Pour mieux comprendre à quoi correspond cet espace, l'espace d'adressage sera
 dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
 plus en détails:\\
 \begin{itemize}
@@ -470,7 +465,7 @@ non. (Voir partie Interruptions)
 \section{Interruptions/Synchronisations}
 Comme vu dans les parties précédentes, le processeur de la GameBoy travaille conjointement avec d'autres composants. Afin d'éviter un chaos général voir l'endommagement de certains composants, un système d'interruptions a été intégré dans l'architecture de la GameBoy.
 \subsection{Que fait une interruption?}
-Lorsqu'une interruption est déclenchée, le processeur va interrompre ses calculs afin d'exécuter une routine. Pour cela lorsqu'une interruption est déclenchée le processeur va ajouter dans la pile le registre PC et remplacer la valeur du registre PC par l'adresse de la routine. L'adresse de la routine est différente selon le type d'interruption déclenchée.
+Lorsqu'une interruption est déclenchée, le processeur va interrompre ses calculs afin d'exécuter une routine. Pour cela le processeur va ajouter dans la pile le registre PC et remplacer la valeur du registre PC par l'adresse de la routine. L'adresse de la routine est différente selon le type d'interruption déclenchée.
 \subsection{Registres d'interruption}
 Afin qu'une interruption soit déclenchée il faut qu'un certain nombre de conditions soient réunies.
 \subsubsection{Registre IME}
@@ -528,7 +523,7 @@ typedef struct {
 \end{lstlisting}
 On retrouve bien tous les registres ainsi que leur taille respective, à noté que nous avons préféré l'appeler z80\_t au lieu de lr35902\_t par commodité.
 \subsection{Algorithme principal}
-Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré des conseils de la page de KomKom\cite{komkom}. Voici son allure générale:
+Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré des conseils de la page de KomKon\cite{komkon}. Voici son allure générale:
  \begin{lstlisting}
 void run(){
 	BYTE op_code;
@@ -622,10 +617,10 @@ Enfin toutes les instructions du processeur ont pus être développées principa
 \section{GPU}
 \section{MMU}
 Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
-\subsection{initialisation} 
+\subsection{Initialisation} 
 Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accés à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la GameBoy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la GameBoy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
 Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche de jeu selon les jeux leurs tailles sont différentes, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux.
-Les fichiers de jeux (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
+Les fichiers de jeu (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
 Lorsqu'un fichier est ouvert avec groboy son chemin est envoyé au module mémoire du programme avec la fonction "memory\_init", cette dernière s'occupe d'afficher sur la sortie standard les informations relatives au fichier et d'initialiser les différents buffers. Voici un exemple avec la cartouche de jeu Zelda.
 \begin{lstlisting}
 $ ./groboy roms/Zelda\ -\ Link\'s\ Awakening.gb
@@ -664,7 +659,7 @@ switch(*(cartridge_rom_buffer + 0x0149)){
 }
 \end{lstlisting}
 Un switch est placé sur l'octet 0x0149 de cartridge\_rom\_buffer, contenant la taille de la RAM. Si la valeur vaut 0, il n'y'a pas de RAM dans la cartouche, sinon le buffer cartridge\_ram\_buffer est initialisé avec la fonction alloc\_ram\_mem.
-Enfin l'initialisation de la mémoire interne se fait en mettant tout le buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
+Enfin l'initialisation de la mémoire interne se fait en mettant toutes les valeurs du buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
 \subsection{Lecture/Ecriture}
 Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction memory\_read, si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet.
 \begin{lstlisting}
@@ -897,22 +892,50 @@ switch(type){
 Selon l'interruption déclenchée on remplace la valeur de PC par l'adresse de la routine.
 Ces fonctions résument au final toutes les explications décrites dans la partie Hardware-Interruptions.
 \section{Sauvegarde de jeu}
+Nous allons dans cette partie expliquer comment nous avons réalisé les sauvegardes dites "classiques".
+\subsection{Fonctionnement général}
+Matériellement et comme expliqué dans la partie (?), certaines cartouches de jeu permettent la sauvegarde de partie. Une pile est intégrée pour maintenir l'état de la RAM lorsque la cartouche n'est pas utilisée. Pour la réalisation de ceci, à chaque fois que l'on ferme le processus groboy un fichier est écrit sur le disque. Ce fichier contient toutes les données du buffer "cartridge\_ram\_buffer" à l'état de fermeture du processus. Rappelons que "cartridge\_ram\_buffer" est le buffer contenant les données RAM de la cartouche. Enfin si le jeu est relancé, on vérifie que le fichier de sauvegarde est bien présent, dans le cas favorable il est chargé dans le buffer "cartridge\_ram\_buffer". Ceci montre que le processus de sauvegarde classique est relativement facile à implémenter, nous ne détaillerons donc pas son implémentation.
 \section{Fonctionnalités additionnelles}
 \subsection{Sauvegarde par état}
+Nous allons dans cette partie expliquer qu'est-ce qu'une sauvegarde par état et comment nous avons réalisé cette fonctionnalité.
+\subsubsection{Principe}
+La grande force de l'émulation est d'avoir implémenté un algorithme que l'on retrouve dans la plupart des émulateurs, l'algorithme de 'sauvegarde par état'. Cet algorithme n'est juste ni plus ni moins que la sauvegarde de l'ensemble des variables globales importantes du processus à un instant t. Cela a pour effet dans un jeu de pouvoir revenir à n'importe quel instant et donc de pouvoir sauvegarder à n'importe quel moment.
+\subsubsection{Algorithme utilisé}
+Lorsque l'utilisateur appuie sur une touche de sauvegarde l'algorithme suivant est utilisé:
+\begin{lstlisting}
+void save_state(char *save_path){
+	FILE *file;
+	file = fopen(save_path, "w+");
+	if(file == NULL) printf("Error while saving\n");
+	else{
+		save_all_components(file);
+		fclose(file);
+	}
+}
+\end{lstlisting}
+Pour faire simple un fichier est ouvert en écriture et chaque module de l'émulateur va écrire dans le fichier ses variables globales.
+Pour la restauration le processus inverse est adopté, on vérifie que le fichier de sauvegarde d'état est présent, dans le cas favorable il est ouvert en lecture et toutes les variables globales sont restaurées.
 \subsection{GUI}
-Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo ZSnes. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension (SDL\_ttfjesaispasquoi), vous retrouverez comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe dans les annexes. Cette GUI comprend un menu de base avec plusieurs options: (screenshot). 
-La première option permet à l'utilisateur 
-\chapter{Conclusion}
-\section{Bilan}
-\section{Fonctionnalités pouvant être rajoutées}
-\section{Emulation aujourd'hui}
+Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo "ZSNES" \cite{zsnes}. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension SDL\_ttf qui permet aux développeurs d'utiliser des polices et donc d'écrire du texte dans les fenêtres SDL. Ce qui imposait également à l'utilisateur d'installer des librairies supplémentaires. Vous retrouverez donc comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe grâce au tutoriel de Loka \cite{loka}. Cette GUI comprend un menu de base avec plusieurs options: \\ 
+\includegraphics[scale=0.5]{images/screenshot_menu.png}\\
+La première option permet à l'utilisateur de choisir un jeu, et donc de naviguer parmis ses dossiers.\\
+\includegraphics[scale=0.5]{images/screenshot_navigate.png}\\
+La seconde option permet à l'utilisateur de configurer les touches.\\
+\includegraphics[scale=0.5]{images/screenshot_config.png}\\
+La dernière option ne sert juste qu'à quitter l'interface. Enfin une fois le jeu choisi le menu change et propose toujours les différentes options en plus de pouvoir lancer le jeu.\\
+\includegraphics[scale=0.5]{images/screenshot_menu2.png}\\
+Nous ne détaillerons pas plus comment nous avons réalisé cette partie car elle n'intervient pas vraiment dans la réalisation d'un émulateur.
+\chapter*{Conclusion}
+\section*{Bilan}
+\section*{Fonctionnalités pouvant être rajoutées}
+\section*{Emulation aujourd'hui}
 %bibliographie
 \bibliographystyle{plain}
 \bibliography{rapport}
 %annexes
 \appendix
+\chapter{Comptes rendus de réunion}
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
-\chapter{Charger et créer une police au format BMP sans recours à une librairie externe avec SDL}
 \chapter{Méthodes de débuggage et roms de test}
 
 \end{document}

@@ -23,6 +23,7 @@ typedef struct{
 typedef enum {menu, config, load_rom} page_e;
 void load_gui(SDL_Surface *sdl_screen);
 void get_gamepath(char *gamepath);
+void set_gamepath(char *gamepath);
 void get_gamename(char *gamename);
 
 
