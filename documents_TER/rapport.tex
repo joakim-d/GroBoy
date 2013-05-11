@@ -626,7 +626,7 @@ Nous allons dans cette partie expliquer comment nous avons traité la mémoire.
 \subsection{initialisation} 
 Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accés à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la GameBoy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la GameBoy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
 Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche de jeu selon les jeux leurs tailles sont différentes, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux.
-Les fichiers de jeux (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
+Les fichiers de jeu (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
 Lorsqu'un fichier est ouvert avec groboy son chemin est envoyé au module mémoire du programme avec la fonction "memory\_init", cette dernière s'occupe d'afficher sur la sortie standard les informations relatives au fichier et d'initialiser les différents buffers. Voici un exemple avec la cartouche de jeu Zelda.
 \begin{lstlisting}
 $ ./groboy roms/Zelda\ -\ Link\'s\ Awakening.gb
@@ -850,6 +850,9 @@ switch(type){
 Selon l'interruption déclenchée on remplace la valeur de PC par l'adresse de la routine.
 Ces fonctions résument au final toutes les explications décrites dans la partie Hardware-Interruptions.
 \section{Sauvegarde de jeu}
+Nous allons dans cette partie expliquer comment nous avons fait pour réaliser les sauvegardes dites "classiques".
+\subsection{Fonctionnement général}
+Matériellement et comme expliqué dans la partie (?), certaines cartouches de jeu permettent la sauvegarde de partie. Une pile est intégrée pour maintenir l'état de la RAM lorsque la cartouche n'est pas utilisée. Pour la réalisation de ceci, à chaque fois que l'on ferme le processus groboy un fichier est écrit sur le disque. Ce fichier contient toutes les données du buffer "cartridge\_ram\_buffer" à l'état de fermeture du processus. Rappelons que "cartridge\_ram\_buffer" est le buffer contenant les données RAM de la cartouche. Enfin si le jeu est relancé, on vérifie si le fichier de sauvegarde est bien présent, dans le cas favorable il est chargé dans le buffer "cartridge\_ram\_buffer". Ceci montre que le processus de sauvegarde classique est relativement facile à implémenter, nous ne détaillerons donc pas son implémentation.
 \section{Fonctionnalités additionnelles}
 \subsection{Sauvegarde par état}
 \subsection{GUI}
