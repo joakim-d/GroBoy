@@ -13,7 +13,7 @@
 \maketitle
 
 \tableofcontents
-\chapter{Introduction}
+\chapter*{Introduction}
 	Dans le cadre de la 1ère année de Master Informatique à l'Université de Montpellier
 	2, tous les élèves de la promotion ont été amenés à réaliser un projet
 	sous tutelle, afin de mettre en pratique les compétences acquises
@@ -35,7 +35,7 @@
 	soins.\\
 	\\
 
-\section{Définition du projet}
+\section*{Définition du projet}
 	Dès lors que notre choix fut fixé et validé par nos enseignants, il
 	fut assez rapide de déterminer les grandes lignes du déroulement du
 	projet, à savoir une première étape de documentation importante, afin
@@ -49,7 +49,7 @@
 Ce projet a été réalisé grâce à de nombreux outils, les voici, avec les raisons qui ont motivés nos choix.\\
 
 \subsection{Environnement de travail}
-Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques un ensemble d'outils pour développer tel que gcc, gdb etc...
+Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques d'un ensemble d'outils pour développer tel que gcc, gdb. De plus l'installation de librairies et ou de logiciels supplémentaires est relativement aisée grâce aux systèmes de logithèques.
 
 \subsection{Langage}
 C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des exécutables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
@@ -57,23 +57,25 @@ C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d
 \subsection{Compilateur}
 gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'exécutable compilé.
 
-\subsection{Librairie}
-SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions etc...
+\subsection{Librairie multimédia}
+SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions et autres.
 
 \subsection{Dépôt}
 Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version.
 
 \subsection{IDE}
-Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception d'un projet il est propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
+Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du projet il a été propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
 \section{Documentation}
 \section{Etude de l'existant}
-Il existe actuellement de nombreux émulateurs de GameBoy, pour rappel(si on l'a déjà dit dans l'intro) le but de ce projet n'était pas de rendre groboy un émulateur de renommée, mais bien de comprendre les rouages d'un émulateur de console de jeu.
-Tous ces émulateurs ont leurs avantages par rapport aux autres:
+Il existe actuellement de nombreux émulateurs de GameBoy, le but de ce projet n'était pas de rendre groboy un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y'arriver?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
+Tous ces émulateurs ont leurs avantages par rapport aux autres. Voici une liste non exhaustive des émulateurs que nous avons trouvé intéressants, vous pourrez retrouver une liste plus complète des émulateurs GameBoy sur le site de Zophar \cite{zophar}:
 
-(Liste des émulateurs principaux + avantages)
 \subsection{Gambatte}
-http://sourceforge.net/projects/gambatte/\\
-Emulateur open source écrit en c++, un des émulateurs les plus fidèles au comportement de la GameBoy, il se base sur des tests réalisés directement sur une GameBoy.
+Gambatte \cite{gambatte} est un émulateur open source écrit en c++, un des émulateurs les plus fidèles au comportement de la GameBoy, il se base sur des tests réalisés directement sur une GameBoy. Il émule tout aussi bien la GameBoy Color.
+\subsection{Visual Boy Advance}
+Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte GameBoy, GameBoy Color et GameBoy Advance. Il a été porté sur Windows, Linux et Mac.
+\subsection{No\$GMB}
+No\$GMB \cite{nogmb} est un émulateur de GameBoy, GameBoy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
 \section{Articles de recherches}
 
 \chapter{Etude du Hardware}
@@ -92,8 +94,8 @@ Le registre PC appelé "Program Counter" est le registre pointant vers la procha
 Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet de la pile.\\\\
 Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.\\\\
 Le registre F appelé "Flags" est modifié par certaines circonstances.
-Il possède 4 drapeaux, Z, N, H, C. Un drapeau n'est rien d'autre qu'un certain bit activé ou non.
-Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux:
+Il possède 4 drapeaux, Z, N, H, C. Un drapeau n'est rien d'autre qu'un certain bit activé ou non, mais qui a une signification spécifique.
+Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux, 
 ils sont disposés tels quels: \\Z N H C - - - -.\\Les 4 bits de bas niveaux sont eux toujours à 0.
 Généralement, \\Le drapeau Z est à 1 lorsque le résultat d'une opération vaut 0, 0 sinon.\\
 Le drapeau N est à 1 lorsque l'opération est une soustraction, 0 pour une addition, sinon il garde son état.\\
@@ -114,7 +116,7 @@ Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x
 Comme PC vaut 0x2000 le processeur lit d'abord 0x00 ce qui correspond à l'instruction "NOP", ne rien faire. 
 Le processeur ne lira donc qu'un octet pour cette instruction, le registre PC sera incrémenté et vaudra 0x2001.
 Ensuite le processeur va lire 0xCA ce qui correspond à l'opération "JP Z,0xHHHH", dans cette opération le processeur a besoin de la valeur 0xHHHH, le processeur va donc lire les 2 octets supplémentaires. Ce qui donne dans ce cas, "JP Z,0xBEEF".
-Comme le flag Z est à un, le registre PC vaut 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.\\\\
+Comme le flag Z est à un, le registre PC vaut maintenant 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.\\\\
 Les instructions ont des coûts en temps, ces coûts sont représentés en cycles d'exécutions.
 Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH BC" coûte 16 cycles.
 Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
@@ -521,7 +523,7 @@ typedef struct {
 \end{lstlisting}
 On retrouve bien tous les registres ainsi que leur taille respective, à noté que nous avons préféré l'appeler z80\_t au lieu de lr35902\_t par commodité.
 \subsection{Algorithme principal}
-Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré des conseils de la page de KomKom\cite{komkom}. Voici son allure générale:
+Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré des conseils de la page de KomKon\cite{komkon}. Voici son allure générale:
  \begin{lstlisting}
 void run(){
 	BYTE op_code;
@@ -866,7 +868,7 @@ void save_state(char *save_path){
 Pour faire simple un fichier est ouvert en écriture et chaque module de l'émulateur va écrire dans le fichier ses variables globales.
 Pour la restauration le processus inverse est adopté, on vérifie que le fichier de sauvegarde d'état est présent, dans le cas favorable il est ouvert en lecture et toutes les variables globales sont restaurées.
 \subsection{GUI}
-Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo "ZSNES" \cite{zsnes}. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension SDL\_ttf qui permet aux développeurs d'utiliser des polices et donc d'écrire du texte dans les fenêtres SDL. Ce qui imposait également à l'utilisateur d'installer des librairies supplémentaires. Vous retrouverez donc comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe dans les annexes. Cette GUI comprend un menu de base avec plusieurs options: \\ 
+Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo "ZSNES" \cite{zsnes}. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension SDL\_ttf qui permet aux développeurs d'utiliser des polices et donc d'écrire du texte dans les fenêtres SDL. Ce qui imposait également à l'utilisateur d'installer des librairies supplémentaires. Vous retrouverez donc comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe grâce au tutoriel de Loka \cite{loka}. Cette GUI comprend un menu de base avec plusieurs options: \\ 
 \includegraphics[scale=0.5]{images/screenshot_menu.png}\\
 La première option permet à l'utilisateur de choisir un jeu, et donc de naviguer parmis ses dossiers.\\
 \includegraphics[scale=0.5]{images/screenshot_navigate.png}\\
@@ -875,10 +877,10 @@ La seconde option permet à l'utilisateur de configurer les touches.\\
 La dernière option ne sert juste qu'à quitter l'interface. Enfin une fois le jeu choisi le menu change et propose toujours les différentes options en plus de pouvoir lancer le jeu.\\
 \includegraphics[scale=0.5]{images/screenshot_menu2.png}\\
 Nous ne détaillerons pas plus comment nous avons réalisé cette partie car elle n'intervient pas vraiment dans la réalisation d'un émulateur.
-\chapter{Conclusion}
-\section{Bilan}
-\section{Fonctionnalités pouvant être rajoutées}
-\section{Emulation aujourd'hui}
+\chapter*{Conclusion}
+\section*{Bilan}
+\section*{Fonctionnalités pouvant être rajoutées}
+\section*{Emulation aujourd'hui}
 %bibliographie
 \bibliographystyle{plain}
 \bibliography{rapport}
@@ -886,7 +888,6 @@ Nous ne détaillerons pas plus comment nous avons réalisé cette partie car ell
 \appendix
 \chapter{Comptes rendus de réunion}
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
-\chapter{Charger et créer une police au format BMP sans recours à une librairie externe avec SDL}
 \chapter{Méthodes de débuggage et roms de test}
 
 \end{document}
