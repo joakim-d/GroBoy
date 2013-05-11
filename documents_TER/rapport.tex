@@ -124,7 +124,7 @@ Schéma minimaliste réprésentant Le LR35902:
 
 \section{GPU}
 
-La Gameboy ne posséde pas de composant GPU, l'écran LCD gère à lui seul l'affichage et le traitement des images. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+La Gameboy ne posséde pas de composant GPU, l'écran LCD gère à lui seul l'affichage et le traitement des images. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) afin de l'afficher physiquement, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
@@ -186,7 +186,7 @@ le pixel soit transparent.
 \section{MMU}
 le MMU soit Memory Management Unit est un composant qui autorise ou non l'accès en mémoire demandée par le processeur.
 En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
-Pour mieux comprendre à quoi correspond cet espace, l'espace d'addresage sera
+Pour mieux comprendre à quoi correspond cet espace, l'espace d'adressage sera
 dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
 plus en détails:\\
 \begin{itemize}
@@ -463,7 +463,7 @@ non. (Voir partie Interruptions)
 \section{Interruptions/Synchronisations}
 Comme vu dans les parties précédentes, le processeur de la GameBoy travaille conjointement avec d'autres composants. Afin d'éviter un chaos général voir l'endommagement de certains composants, un système d'interruptions a été intégré dans l'architecture de la GameBoy.
 \subsection{Que fait une interruption?}
-Lorsqu'une interruption est déclenchée, le processeur va interrompre ses calculs afin d'exécuter une routine. Pour cela lorsqu'une interruption est déclenchée le processeur va ajouter dans la pile le registre PC et remplacer la valeur du registre PC par l'adresse de la routine. L'adresse de la routine est différente selon le type d'interruption déclenchée.
+Lorsqu'une interruption est déclenchée, le processeur va interrompre ses calculs afin d'exécuter une routine. Pour cela le processeur va ajouter dans la pile le registre PC et remplacer la valeur du registre PC par l'adresse de la routine. L'adresse de la routine est différente selon le type d'interruption déclenchée.
 \subsection{Registres d'interruption}
 Afin qu'une interruption soit déclenchée il faut qu'un certain nombre de conditions soient réunies.
 \subsubsection{Registre IME}
@@ -657,7 +657,7 @@ switch(*(cartridge_rom_buffer + 0x0149)){
 }
 \end{lstlisting}
 Un switch est placé sur l'octet 0x0149 de cartridge\_rom\_buffer, contenant la taille de la RAM. Si la valeur vaut 0, il n'y'a pas de RAM dans la cartouche, sinon le buffer cartridge\_ram\_buffer est initialisé avec la fonction alloc\_ram\_mem.
-Enfin l'initialisation de la mémoire interne se fait en mettant tout le buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
+Enfin l'initialisation de la mémoire interne se fait en mettant toutes les valeurs du buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
 \subsection{Lecture/Ecriture}
 Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction memory\_read, si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet.
 \begin{lstlisting}
