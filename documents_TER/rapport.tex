@@ -84,55 +84,47 @@ Une de ses spécificités est qu'il est capable de faire des opérations 16 bits
 Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 opérations possibles.
 \subsection{Registres}
 
-Un registre est un espace mémoire interne au CPU, ce qui donne un accés en temps réel par le CPU à cet espace mémoire, aucun autre composant ne peut y accéder.
-Le LR35902 possède 10 registres, 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
+Un registre interne est un espace mémoire interne au CPU, ce qui donne au CPU un accés en temps réel à cet espace mémoire. Aucun autre composant ne peut y accéder.
+Le LR35902 possède 10 registres internes: 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
 Ce CPU est capable pour certaines opérations de coupler certains registres tels A et F, B et C, D et E, H et L, pour en faire des registres 16 bits, AF, BC, DE, HL.
-Pratiquement tous les registres ont des rôles spécifiques:\\
-Le registre PC appelé "Program Counter" est le registre pointant vers la prochaine opération à lire en mémoire.\\
-Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet de la pile.\\
-Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.\\
+Pratiquement tous les registres ont des rôles spécifiques:\\\\
+Le registre PC appelé "Program Counter" est le registre pointant vers la prochaine instruction à effectuer.\\\\
+Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet de la pile.\\\\
+Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.\\\\
 Le registre F appelé "Flags" est modifié par certaines circonstances.
-Il possède 4 drapeaux, Z, N, H, C.
+Il possède 4 drapeaux, Z, N, H, C. Un drapeau n'est rien d'autre qu'un certain bit activé ou non.
 Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux:
-ils sont disposés tels quels: Z N H C - - - -. Les 4 bits de bas niveaux sont eux toujours à 0.
+ils sont disposés tels quels: \\Z N H C - - - -.\\Les 4 bits de bas niveaux sont eux toujours à 0.
 Généralement, \\Le drapeau Z est à 1 lorsque le résultat d'une opération vaut 0, 0 sinon.\\
 Le drapeau N est à 1 lorsque l'opération est une soustraction, 0 pour une addition, sinon il garde son état.\\
 Le drapeau H est à 1 après une opération où les 4 bits de poids faibles de l'opérande ont subi un "débordement", dépassant 0xF, le drapeau est à 0 sinon.\\
-Le drapeau C est à 1 après une opération où l'opérande a subi un débordement, dépassant 0xFF, le drapeau est à 0 sinon.\\
+Le drapeau C est à 1 après une opération où l'opérande a subi un débordement, dépassant 0xFF, le drapeau est à 0 sinon.\\\\
 Les autres registres n'ont pas vraiment de rôles spécifiques mais servent pour beaucoup d'opérations.
 \subsection{Instructions}
-Une instruction est un calcul ou un ordre que va exécuter/commander le processeur, ces instructions peuvent être classées officieusement de la manière suivante, et afin de mieux comprendre un exemple sera donné pour chaque classe d'instruction:
-
-instructions en 8 bits d'arithmétique/logique | exemple: "INC B", soit incrémenter le registre B. Si B vaut 0x04 avant l'opération. B vaudra 0x05 après.
-
-instructions en 16 bits d'arithmétique/logique | exemple: "INC BC", soit incrémenter le couple de registres BC. Si BC vaut 0x01FF avant l'opération. BC vaudra 0x0200 après, donc B vaudra 0x02 et C vaudra 0x00.
-
-instructions en 8 bits de chargement/sauvegarde/déplacement | exemple: "LD A,C", soit charger le registre C dans le registre A. après l'opération le registre A aura la même valeur que le registre C.
-
-instructions en 16 bits de chargement/sauvegarde/déplacement | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.
-
-instructions de sauts et d'appels | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.
-
-instructions de contrôles/diverses | exemple: "NOP", soit, ne rien faire.
-
-Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre maximum d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant: 
+Une instruction est un calcul ou un ordre que va exécuter/commander le processeur, ces instructions peuvent être classées officieusement de la manière suivante, et afin de mieux comprendre un exemple sera donné pour chaque classe d'instruction:\\\\
+\textbf{instructions en 8 bits d'arithmétique/logique} | exemple: "INC B", soit incrémenter le registre B. Si B vaut 0x04 avant l'opération. B vaudra 0x05 après.\\\\
+\textbf{instructions en 16 bits d'arithmétique/logique} | exemple: "INC BC", soit incrémenter le couple de registres BC. Si BC vaut 0x01FF avant l'opération. BC vaudra 0x0200 après, donc B vaudra 0x02 et C vaudra 0x00.\\\\
+\textbf{instructions en 8 bits de chargement/sauvegarde/déplacement} | exemple: "LD A,C", soit charger le registre C dans le registre A. après l'opération le registre A aura la même valeur que le registre C.\\\\
+\textbf{instructions en 16 bits de chargement/sauvegarde/déplacement} | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.\\\\
+\textbf{instructions de sauts et d'appels} | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.\\\\
+\textbf{instructions de contrôles/diverses} | exemple: "NOP", soit, ne rien faire.\\\\
+Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre maximum d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant:\\ 
 Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x2000) = 0x00, (0x2001) = 0xCA, (0x2002) = 0xEF, (0x2003) = 0xBE.
 
 Comme PC vaut 0x2000 le processeur lit d'abord 0x00 ce qui correspond à l'instruction "NOP", ne rien faire. 
 Le processeur ne lira donc qu'un octet pour cette instruction, le registre PC sera incrémenté et vaudra 0x2001.
 Ensuite le processeur va lire 0xCA ce qui correspond à l'opération "JP Z,0xHHHH", dans cette opération le processeur a besoin de la valeur 0xHHHH, le processeur va donc lire les 2 octets supplémentaires. Ce qui donne dans ce cas, "JP Z,0xBEEF".
-Comme le flag Z est à un, le registre PC vaut 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.
-
+Comme le flag Z est à un, le registre PC vaut 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.\\\\
 Les instructions ont des coûts en temps, ces coûts sont représentés en cycles d'exécutions.
 Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH BC" coûte 16 cycles.
 Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
 Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
-
+\\\\
 Schéma minimaliste réprésentant Le LR35902:
 
 \section{GPU}
 
-La Gameboy ne posséde pas de composant GPU, l'écran LCD gère à lui seul l'affichage et le traitement des images. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+La Gameboy ne posséde pas de composant GPU, l'écran LCD gère à lui seul l'affichage et le traitement des images. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
@@ -892,6 +884,7 @@ Nous ne détaillerons pas plus comment nous avons réalisé cette partie car ell
 \bibliography{rapport}
 %annexes
 \appendix
+\chapter{Comptes rendus de réunion}
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
 \chapter{Charger et créer une police au format BMP sans recours à une librairie externe avec SDL}
 \chapter{Méthodes de débuggage et roms de test}
