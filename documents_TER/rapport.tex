@@ -701,7 +701,55 @@ Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs
 \subsection{Initialisation}
 %Premières valeurs à placer dans les registres, Initialisation de la wave ?
 %Fonction callback et structure sdl
+Les premières fonctions appelées dans notre programme principal sont les diverses fonctions d'initialisation, dont celle du son.
+La cartouche de jeu étant seule à modifier les valeurs des registres, et ceux dès son lancement, ils n'ont pas à l'être au cours de cette initialisation, ce qui limite le nombre de traitements effectués ici.
+La fonction "sound init()" se contente donc de remplir les tableaux appelés LFSR servant d'ensembles de valeurs pour les variations aléatoires d'amplitudes de la 4eme chaine, ainsi que de fixer des contraintes physiques pour la SDL.
+\begin{lstlisting}
+SDL_InitSubSystem(SDL_INIT_AUDIO); //Initialisation de la branche son de la SDL
+desired.freq = sample_rate; //Frequence d'echantillonage de sortie, 44100Hz ici
+desired.format = AUDIO_S16SYS; //Parametrage SDL
+desired.channels = 2; //Nombre de canaux de sortie
+desired.samples = 2048; //Nombre d'echantillons par seconde
+desired.callback = callback; //Fonction de generation de l'onde
+\end{lstlisting}
+La structure instanciée ici en tant que "desired" est une structure appartenant à la SDL correspondant aux caractéristiques du son désiré en sortie.
+La fonction callback est la fonction qui remplit en permanence le buffer SDL avec les données correspondant au son à sortir.
+Après cette initialisation, on instancie des structures dites "blip", une pour chaque haut parleur de sortie, qui vont faire l'intermediaire entre les données réellement récoltées et celles que l'on va donner à la SDL pour produire un son.
 \subsection{Appels principaux et écritures permanentes}
+Dès lors que le CPU a démarré sa boucle de lecture des instructions dans la cartouche, le son peut démarrer à tout moment, et une fois que c'est le cas, la génération d'onde est permanente.
+C'est l'écriture d'une valeur dans la plage mémoire consacrée aux registres NR (donc géré par le MMU) qui va déclencher la génération de son.
+\begin{lstlisting}
+else if(addr >= 0xFF10 && addr <= 0xFF26){
+	write_sound(addr, data); //Ecriture d'une valeur dans les registres son
+}
+else if(addr >= 0xFF30 && addr <= 0xFF3F){
+	write_wave(addr,data); //Ecriture d'une valeur dans les ondes pre enregistrees
+}
+\end{lstlisting}
+Ce mode de fonctionnement n'est pas obligatoire, mais il permet au système apu de l'émulateur de gérer lui même tout ce qui concerne le son, tant pour la génération, la lecture et l'écriture des valeurs de registres qui y correspondent.
+La fonction "write sound" va directement faire appel à la fonction de mise à jour du son à proprement parler, avant de récupérer les informations que la cartouche envoie, et les écrire dans le registre correspondant. Le fonctionnement au tout premier appel est assuré via l'initialisation de tous les registres par le MMU.
+\begin{lstlisting}
+void write_sound(unsigned short addr, BYTE data){
+	...
+	//Declaration de variables locales diverses
+	...
+	update_sound(); //Mise a jour du son
+
+	switch(addr){
+		case NR10:
+			apu.channel1.sweep.time = ((value & 0x70) >> 4); // Periode de balayage
+			apu.channel1.sweep.shift_number = (value & 0x07); // Nombre balayages
+			apu.channel1.sweep.decrease_dir = (value & BIT_3)?1:0;
+			internal_ram[addr] = value;
+			break;
+		case NR11:
+			...
+			...
+	}
+}
+\end{lstlisting}
+La récupération de toutes les données intéressantes contenues dans chaque registre se fait par suite de comparaisons, tests et décalages éventuels, en fonction de la place de l'information dans le registre, mais aussi 
+parfois de celles indiquées par le controleur de son, afin de ne pas par exemple prendre en compte la 4eme onde lorsque la cartouche indique le contraire.
 %Plage mémoire dédiée au son, écriture de son gérée par le core du son (apu) lui même.
 %Appel de write_sound à chaque tentative d'écriture en mémoire dans ces plages, petit détail de write_sound
 %Récupération des données, appel du sound update à chaque fois
