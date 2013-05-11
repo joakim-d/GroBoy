@@ -78,8 +78,7 @@ void display_menu(SDL_Surface *sdl_screen){
 		write_text("GROBOY", sdl_screen->w/2 - 30, 0, sdl_screen);
 		write_text("LOAD ROM", 15, 20, sdl_screen);
 		write_text("CONFIG KEYBOARD", 15, 30, sdl_screen);
-		write_text("CONFIG JOYSTICK", 15, 40, sdl_screen);
-		write_text("EXIT", 15, 50, sdl_screen);
+		write_text("EXIT", 15, 40, sdl_screen);
 		write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
 	}
 	else{
@@ -89,8 +88,7 @@ void display_menu(SDL_Surface *sdl_screen){
 		write_text("PLAY", 15,20,sdl_screen);
 		write_text("LOAD ROM", 15, 30, sdl_screen);
 		write_text("CONFIG KEYBOARD", 15, 40, sdl_screen);
-		write_text("CONFIG JOYSTICK", 15, 50, sdl_screen);
-		write_text("EXIT", 15, 60, sdl_screen);
+		write_text("EXIT", 15, 50, sdl_screen);
 		write_text(">", 5, cursor_pos*10 + 20, sdl_screen);
 	}
 }
@@ -377,10 +375,10 @@ int menu_action(SDL_Surface *sdl_screen){
 	else if(action == 2){
 		keyboard_conf(sdl_screen);
 	}
-	else if(action == 3){
+	/*else if(action == 3){
 		joystick_conf(sdl_screen);
-	}
-	else if(action == 4){
+	}*/
+	else if(action == 3){
 		exit(1);
 	}
 	return 0;
@@ -389,6 +387,10 @@ int menu_action(SDL_Surface *sdl_screen){
 void get_gamepath(char *gamepath){
 	strcpy(gamepath, selected_game);
 }	
+
+void set_gamepath(char *gamepath){
+	strcpy(selected_game, gamepath);
+}
 
 void get_gamename(char *gamename){
 	char *temp;
@@ -414,8 +416,8 @@ void load_gui(SDL_Surface *sdl_screen){
 			move_cursor(sdl_screen, UP);
 		}
 		if(keystate[SDLK_DOWN]){
-			if(strcmp(selected_game, "") == 0 && cursor_pos < 3) move_cursor(sdl_screen, DOWN);
-			else if (strcmp(selected_game, "") != 0 && cursor_pos < 4) move_cursor(sdl_screen, DOWN);
+			if(strcmp(selected_game, "") == 0 && cursor_pos < 2) move_cursor(sdl_screen, DOWN);
+			else if (strcmp(selected_game, "") != 0 && cursor_pos < 3) move_cursor(sdl_screen, DOWN);
 		}
 		if(keystate[SDLK_RETURN]) play = menu_action(sdl_screen);
 		if(keystate[SDLK_ESCAPE]) break;
