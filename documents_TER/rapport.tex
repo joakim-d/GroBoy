@@ -36,6 +36,11 @@
 	\\
 
 \section*{Définition du projet}
+\subsection*{Qu'est ce qu'un émulateur?}
+	Selon la définition d'émulation sur le site Wikipédia:\\"\textbf{En informatique, l'émulation consiste à substituer un élément de matériel informatique – tel un terminal informatique, un ordinateur ou une console de jeux – par un logiciel.}".\\Ce logiciel est donc ce que l'on appelle un émulateur.
+\subsection*{Qu'est ce que la GameBoy?}
+	La GameBoy est une console de jeu portable commercialisée par Nintendo en Europe durant l'année 1990.
+\subsection*{Déroulement}
 	Dès lors que notre choix fut fixé et validé par nos enseignants, il
 	fut assez rapide de déterminer les grandes lignes du déroulement du
 	projet, à savoir une première étape de documentation importante, afin
@@ -67,7 +72,7 @@ Github, un site permettant de créer gratuitement un dépôt git. git est un log
 Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du projet il a été propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
 \section{Documentation}
 \section{Etude de l'existant}
-Il existe actuellement de nombreux émulateurs de GameBoy, le but de ce projet n'était pas de rendre groboy un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y'arriver?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
+Il existe actuellement de nombreux émulateurs de GameBoy, le but de ce projet n'était pas de rendre groboy un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y prétendre?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
 Tous ces émulateurs ont leurs avantages par rapport aux autres. Voici une liste non exhaustive des émulateurs que nous avons trouvé intéressants, vous pourrez retrouver une liste plus complète des émulateurs GameBoy sur le site de Zophar \cite{zophar}:
 
 \subsection{Gambatte}
@@ -83,7 +88,7 @@ No\$GMB \cite{nogmb} est un émulateur de GameBoy, GameBoy Color fonctionnant so
 \subsection{Caractéristiques générales}
 Le CPU de la GameBoy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la GameBoy, son vrai nom est Sharp LR35902.
 Une de ses spécificités est qu'il est capable de faire des opérations 16 bits.
-Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 opérations possibles.
+Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 instructions.
 \subsection{Registres}
 
 Un registre interne est un espace mémoire interne au CPU, ce qui donne au CPU un accés en temps réel à cet espace mémoire. Aucun autre composant ne peut y accéder.
@@ -896,6 +901,7 @@ Nous allons dans cette partie expliquer comment nous avons réalisé les sauvega
 \subsection{Fonctionnement général}
 Matériellement et comme expliqué dans la partie (?), certaines cartouches de jeu permettent la sauvegarde de partie. Une pile est intégrée pour maintenir l'état de la RAM lorsque la cartouche n'est pas utilisée. Pour la réalisation de ceci, à chaque fois que l'on ferme le processus groboy un fichier est écrit sur le disque. Ce fichier contient toutes les données du buffer "cartridge\_ram\_buffer" à l'état de fermeture du processus. Rappelons que "cartridge\_ram\_buffer" est le buffer contenant les données RAM de la cartouche. Enfin si le jeu est relancé, on vérifie que le fichier de sauvegarde est bien présent, dans le cas favorable il est chargé dans le buffer "cartridge\_ram\_buffer". Ceci montre que le processus de sauvegarde classique est relativement facile à implémenter, nous ne détaillerons donc pas son implémentation.
 \section{Fonctionnalités additionnelles}
+Ce que nous appelons fonctionnalités additionnelles sont en fait des fonctionnalités qui n'existent pas sur le matériel d'origine, mais qui sont intégrées dans les émulateurs afin de rendre l'expérience de jeu plus agréable. Nous allons donc présenter quelques fonctionnalités dont nous avons eu le temps d'implémenter.
 \subsection{Sauvegarde par état}
 Nous allons dans cette partie expliquer qu'est-ce qu'une sauvegarde par état et comment nous avons réalisé cette fonctionnalité.
 \subsubsection{Principe}
@@ -927,7 +933,29 @@ La dernière option ne sert juste qu'à quitter l'interface. Enfin une fois le j
 Nous ne détaillerons pas plus comment nous avons réalisé cette partie car elle n'intervient pas vraiment dans la réalisation d'un émulateur.
 \chapter*{Conclusion}
 \section*{Bilan}
-\section*{Fonctionnalités pouvant être rajoutées}
+Au final, groboy est fonctionnel et jouable pour une grande majorité de jeux, nous allons lister pour chaque module le travail accompli. 
+\subsection*{CPU}
+Toutes les instructions sont bien implémentées, car groboy passe le test cpu de "blargg" sans erreur (il faudrait en parler dans les chap prec.). 
+\subsection*{GPU}
+Le GPU travaille correctement, les trois couches de dessins sont bien implémentées, il est possible d'élargir l'écran comme le désire l'utilisateur.
+\subsection*{APU}
+Malgré une implémentation difficile à réaliser Le son est présent et tend à être fidèle au son d'origine.
+\subsection*{Cartouches de jeu}
+Les types de cartouche MBC1 et MBC2 ont été implémentés. Ce qui veut dire que l'ensemble des jeux utilisant ces puces sont jouables sur l'émulateur.
+\subsection*{Sauvegarde}
+Les sauvegardes classiques et par état sont implémentées.
+\subsection*{GUI}
+Une interface utilisateur est présente permettant de choisir un jeu, ou de reconfigurer les touches.
+\section*{Fonctionnalités pouvant être rajoutées ou améliorées}
+Dans cette partie nous allons parler des fonctionnalités principales qui peuvent être rajoutées ou améliorées.
+\subsection*{Implémenter le comportement de cartouches MBC3}
+Il manque pour que l'intégralité des jeux puissent être supportés d'implémenter les cartouches de types MBC3.
+\subsection*{Améliorer le son}
+Le son tend à être fidèle au son d'origine, cependant il ne l'est pas encore et rend par conséquent l'émulateur instable. Il faudrait pouvoir venir à bout de ce problème.
+\subsection*{Implémenter le système deux joueurs}
+La GameBoy dispose d'un port link pour pouvoir communiquer avec une autre GameBoy, il serait agréable de pouvoir faire de même entre deux processus groboy.
+\subsection*{Implémenter la GameBoy color}
+La GameBoy color a une architecture basée sur la GameBoy et donc très similaire, son portage est donc réalisable. 
 \section*{Emulation aujourd'hui}
 %bibliographie
 \bibliographystyle{plain}
