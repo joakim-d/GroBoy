@@ -6,12 +6,11 @@
 \usepackage{listings}
 \usepackage{graphicx}
 \title{TER, développement d'un émulateur de GameBoy}
-\author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
+\author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
 
 \begin{document}
 \maketitle
-
 \tableofcontents
 \chapter*{Introduction}
 	Dans le cadre de la 1ère année de Master Informatique à l'Université de Montpellier
@@ -419,7 +418,7 @@ non. (Voir partie Interruptions)
 		Les bits 4 à 7 correspondent à la valeur initiale de
 		l'enveloppe, le bit numéro 3 donne sa direction
 		(montante ou descendante) et les bits 0 à 2 donnent le
-		nombre d'utilisations de l'enveloppe.\\ 
+		nombre d'utilisations de l'enveloppe.\\
 
 		\textbf{NR43(FF22):} Compteur polynomial \\
 		L'amplitude est modifiée aléatoirement entre haute et
@@ -455,7 +454,7 @@ non. (Voir partie Interruptions)
 		la sortie SO1. les bits 6 à 4 correspondent au volume
 		propre à la SO2, et les 0 à 2 à celui de la SO1. \\
 
-		\textbf{NR51(FF25):} Sélection du terminal de sortie propre \\
+		\textbf{NR51(FF25):} Sélection du terminal de sortie propre \\
 		Ici les bits redirigent les 4 ondes possibles vers un
 		terminal donné.
 		Les bits 0 à 3 envoie respectivement les ondes 1 à 4
