@@ -1042,5 +1042,5 @@ La GameBoy color a une architecture basée sur la GameBoy et donc très similair
 \chapter{Comptes rendus de réunion}
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
 \chapter{Méthodes de débuggage et roms de test}
-
+Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par un dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une GameBoy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et donc d'avoir un CPU stable.
 \end{document}
