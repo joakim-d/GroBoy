@@ -27,16 +27,16 @@
 {}
 
 
-\title{TER, développement d'un émulateur de Game Boy}
+\title{TER, développement d'un émulateur de \\Game Boy}
 \author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
 
 \begin{document}
 \maketitle
 \chapter*{Remerciements}
-Nous souhaitons tout d'abord remercier M. William PUECH notre tuteur qui a bien voulu nous encadrer pour ce travail d'études et de recherches, ainsi que son doctorant M. Vincent ITIER qui a été présent lors des réunions. Nous remercions également la communauté présente sur internet qui participe activement au développement d'émulateurs ainsi qu'à la rédaction de documentation abordable. Et tout spécialement le dénommé "Blargg" qui a produit toutes sortes d'outils pour aider les développeurs d'émulateurs.
+Nous souhaitons tout d'abord remercier M. William PUECH notre tuteur qui a bien voulu nous encadrer pour ce travail d'études et de recherches, ainsi que son doctorant M. Vincent ITIER qui a été présent lors des réunions. \\Nous remercions également la communauté présente sur internet qui participe activement au développement d'émulateurs ainsi qu'à la rédaction de documentations abordables. Et tout spécialement le dénommé "Blargg" qui a produit et mis à disposition toutes sortes d'outils destinés au développement d'émulateurs.
 \tableofcontents
-\chapter{Introduction}
+\chapter*{Introduction}
 	Dans le cadre de la 1ère année de Master Informatique à l'Université de Montpellier
 	2, tous les élèves de la promotion ont été amenés à réaliser un projet
 	sous tutelle, afin de mettre en pratique les compétences acquises
@@ -58,12 +58,12 @@ Nous souhaitons tout d'abord remercier M. William PUECH notre tuteur qui a bien 
 	soins.\\
 	\\
 
-\section{Définition du projet}
-\subsection{Qu'est ce qu'un émulateur?}
+\section*{Définition du projet}
+\subsection*{Qu'est ce qu'un émulateur?}
 	Selon la définition d'émulation sur le site Wikipédia:\\"\textbf{En informatique, l'émulation consiste à substituer un élément de matériel informatique – tel un terminal informatique, un ordinateur ou une console de jeux – par un logiciel.}".\\Ce logiciel est donc ce que l'on appelle un émulateur.
-\subsection{Qu'est ce que la Game Boy?}
+\subsection*{Qu'est ce que la Game Boy?}
 	La Game Boy est une console de jeu portable commercialisée par Nintendo en Europe durant l'année 1990.
-\subsection{Déroulement}
+\subsection*{Déroulement}
 	Dès lors que notre choix fut fixé et validé par nos enseignants, il
 	fut assez rapide de déterminer les grandes lignes du déroulement du
 	projet, à savoir une première étape de documentation importante, afin
@@ -90,7 +90,7 @@ gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimi
 SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de Game Boy: affichage de fenêtre, son, interruptions et autres.
 
 \subsection{Dépôt}
-Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version.
+Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version. Le lien vers notre dépôt se trouve sur la page de bibliographie à \cite{github}.
 
 \subsection{IDE}
 Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du projet il a été propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
@@ -166,7 +166,8 @@ Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH 
 Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
 Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
 \\\\
-Schéma minimaliste réprésentant Le LR35902:
+Schéma réprésentant le LR35902:\\\\
+\includegraphics[scale=0.80]{images/schema_cpu.png}
 
 \section{GPU}
 
