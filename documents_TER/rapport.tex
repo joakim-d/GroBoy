@@ -127,7 +127,7 @@ No\$GMB \cite{nogmb} est un émulateur de Game Boy, Game Boy Color fonctionnant 
 \subsection{Caractéristiques générales}
 Le CPU de la Game Boy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la Game Boy, son vrai nom est Sharp LR35902.
 Une de ses spécificités est qu'il est capable de faire des opérations 16 bits.
-Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 instructions.
+Il est cadencé à 4,194304 MHz, possède un peu moins de 512 instructions et est de type little endian.
 \subsection{Registres}
 
 Un registre interne est un espace mémoire interne au CPU, ce qui donne au CPU un accés en temps réel à cet espace mémoire. Aucun autre composant ne peut y accéder.
@@ -166,9 +166,12 @@ Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH 
 Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
 Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
 \\\\
-Schéma réprésentant le LR35902:\\\\
+Schéma réprésentant le LR35902:\\
+\begin{figure}[!h]
+\centering
 \includegraphics[scale=0.80]{images/schema_cpu.png}
-
+\caption{Schéma représentant le LR35902}
+\end{figure}
 \section{GPU}
 
 Le GPU de la Game Boy est intégré dans le même circuit intégre que le CPU. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
@@ -709,6 +712,8 @@ Interruption générée par le timer interne de la Game Boy, à chaque fois que 
 Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou transmis) à l'aide du câble Link servant à communiquer entre deux Game Boy ou entre une Game Boy et un ordinateur. La routine se trouve à l'adresse 0x0058.
 \subsubsection{Interruption Joypad}
 Interruption générée lors de l'appui sur une touche par le joueur. La routine se trouve à l'adresse 0x0060.
+\section{Autres composants}
+La Game Boy comprend d'autres composants tels un timer interne, ou un port appelé "link" permettant de communiquer avec une autre Game Boy. Ces composants ne seront pas détaillés, en raison pour le timer du fait que son mécanisme est assez simple et dispensable pour la compréhension du fonctionnement général d'un émulateur. Pour le port link bien que ce composant soit très intéressant nous n'avons pas eu le temps à notre regret de nous y pencher et de l'implémenter.
 \chapter{Réalisation}
 Ce chapitre synthétise la manière dont nous avons réalisé groboy notre émulateur.
 \section{CPU}
@@ -1379,15 +1384,39 @@ void save_state(char *save_path){
 Pour faire simple un fichier est ouvert en écriture et chaque module de l'émulateur va écrire dans le fichier ses variables globales.
 Pour la restauration le processus inverse est adopté, on vérifie que le fichier de sauvegarde d'état est présent, dans le cas favorable il est ouvert en lecture et toutes les variables globales sont restaurées.
 \subsection{GUI}
-Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo "ZSNES" \cite{zsnes}. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension SDL\_ttf qui permet aux développeurs d'utiliser des polices et donc d'écrire du texte dans les fenêtres SDL. Ce qui imposait également à l'utilisateur d'installer des librairies supplémentaires. Vous retrouverez donc comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe grâce au tutoriel de Loka \cite{loka}. Cette GUI comprend un menu de base avec plusieurs options: \\ 
-\includegraphics[scale=0.5]{images/screenshot_menu.png}\\
-La première option permet à l'utilisateur de choisir un jeu, et donc de naviguer parmis ses dossiers.\\
-\includegraphics[scale=0.5]{images/screenshot_navigate.png}\\
-La seconde option permet à l'utilisateur de configurer les touches.\\
-\includegraphics[scale=0.5]{images/screenshot_config.png}\\
-La dernière option ne sert juste qu'à quitter l'interface. Enfin une fois le jeu choisi le menu change et propose toujours les différentes options en plus de pouvoir lancer le jeu.\\
-\includegraphics[scale=0.5]{images/screenshot_menu2.png}\\
-Nous ne détaillerons pas plus comment nous avons réalisé cette partie car elle n'intervient pas vraiment dans la réalisation d'un émulateur.
+Afin de rendre groboy un peu moins "rustre", nous avons développé une GUI (Graphical User Interface) entièrement développée avec SDL, un peu à l'image de l'excellent émulateur Super Nintendo "ZSNES" \cite{zsnes}. Nous avons choisi d'utiliser uniquement la SDL et de ne pas passer par des librairies spécialisées telles GTK ou Qt afin d'éviter les dépendances supplémentaires et par conséquent d'alléger l'exécutable. Cette motivation en a été à un tel point que nous avons également évité d'avoir recours à l'extension SDL\_ttf qui permet aux développeurs d'utiliser des polices et donc d'écrire du texte dans les fenêtres SDL. Ce qui imposait également à l'utilisateur d'installer des librairies supplémentaires. Vous retrouverez donc comment on peut créer et utiliser une police au format BMP sans avoir recours à une librairie externe grâce au tutoriel de Loka \cite{loka}. Cette GUI comprend un menu de base avec plusieurs options \ref{GUI1}: \\\\ 
+La première option \ref{GUI2} permet à l'utilisateur de choisir un jeu, et donc de naviguer parmis ses dossiers.\\
+La seconde option \ref{GUI3} permet à l'utilisateur de configurer les touches.\\
+La dernière option ne sert juste qu'à quitter l'interface. Enfin une fois le jeu choisi le menu change \ref{GUI4} et propose toujours les différentes options en plus de pouvoir lancer le jeu.\\
+Nous ne détaillerons pas plus comment nous avons réalisé cette GUI car elle n'intervient pas vraiment dans la réalisation d'un émulateur.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{images/screenshot_menu.png}
+\caption{Capture du menu de la GUI}
+\label{GUI1}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{images/screenshot_navigate.png}
+\caption{Capture de la navigation dans les fichiers avec la GUI}
+\label{GUI2}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{images/screenshot_config.png}
+\caption{Capture de la configuration des touches avec la GUI}
+\label{GUI3}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{images/screenshot_menu2.png}
+\caption{Capture du menu après sélection d'un jeu avec la GUI}
+\label{GUI4}
+\end{figure}
 \chapter*{Conclusion}
 \section*{Bilan}
 Au final, groboy est fonctionnel et jouable pour une grande majorité de jeux, nous allons lister pour chaque module le travail accompli. 
@@ -1423,4 +1452,5 @@ La Game Boy color a une architecture basée sur la Game Boy et donc très simila
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
 \chapter{Méthodes de débuggage et roms de test}
 Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par un dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une Game Boy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et donc d'avoir un CPU stable.
+\listoffigures
 \end{document}
