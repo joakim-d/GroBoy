@@ -27,7 +27,7 @@
 {}
 
 
-\title{TER, développement d'un émulateur de GameBoy}
+\title{TER, développement d'un émulateur de Game Boy}
 \author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
 
@@ -45,7 +45,7 @@ Nous souhaitons tout d'abord remercier M. William PUECH notre tuteur qui a bien 
 	Ce Travail d'Étude et de Recherche est donc un bon moyen de nous
 	familiariser avec le type de travail qui pourra nous être demandé dans
 	les années à venir, ainsi que de travailler nos démarches.
-	Et c'est sur l'élaboration d'un Émulateur de console de jeu vidéo, et plus précisément de GameBoy,
+	Et c'est sur l'élaboration d'un Émulateur de console de jeu vidéo, et plus précisément de Game Boy,
 	que nous avons choisi de travailler, plus que motivé par l'apport de
 	connaissances que représente l'étude du comportement d'un processeur
 	et sa simulation à partir de zéro.
@@ -61,8 +61,8 @@ Nous souhaitons tout d'abord remercier M. William PUECH notre tuteur qui a bien 
 \section{Définition du projet}
 \subsection{Qu'est ce qu'un émulateur?}
 	Selon la définition d'émulation sur le site Wikipédia:\\"\textbf{En informatique, l'émulation consiste à substituer un élément de matériel informatique – tel un terminal informatique, un ordinateur ou une console de jeux – par un logiciel.}".\\Ce logiciel est donc ce que l'on appelle un émulateur.
-\subsection{Qu'est ce que la GameBoy?}
-	La GameBoy est une console de jeu portable commercialisée par Nintendo en Europe durant l'année 1990.
+\subsection{Qu'est ce que la Game Boy?}
+	La Game Boy est une console de jeu portable commercialisée par Nintendo en Europe durant l'année 1990.
 \subsection{Déroulement}
 	Dès lors que notre choix fut fixé et validé par nos enseignants, il
 	fut assez rapide de déterminer les grandes lignes du déroulement du
@@ -87,7 +87,7 @@ C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d
 gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'exécutable compilé.
 
 \subsection{Librairie multimédia}
-SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de GameBoy: affichage de fenêtre, son, interruptions et autres.
+SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de Game Boy: affichage de fenêtre, son, interruptions et autres.
 
 \subsection{Dépôt}
 Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version.
@@ -111,21 +111,21 @@ Pour effectuer nos tests, nous avons utilisé principalement deux jeux, qui sont
 Si nous possédons les cartouches, supports physiques de ces jeux, les fichiers que nous avons utilisés commes copies informatiques de ces jeux n'ont pas été créés par nos soins. Nous restons tout de même bien éloignés des problèmes de légalité qui peuvent être rencontrés.
 
 \section{Etude de l'existant}
-Il existe actuellement de nombreux émulateurs de GameBoy, le but de ce projet n'était pas de faire de groboy un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y prétendre?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
-Tous ces émulateurs ont leurs avantages par rapport aux autres. Voici une liste non exhaustive des émulateurs que nous avons trouvé intéressants, vous pourrez retrouver une liste plus complète des émulateurs GameBoy sur le site de Zophar \cite{zophar}:
+Il existe actuellement de nombreux émulateurs de Game Boy, le but de ce projet n'était pas de faire du notre un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y prétendre?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
+Tous ces émulateurs ont leurs avantages par rapport aux autres. Voici une liste non exhaustive des émulateurs que nous avons trouvé intéressants, vous pourrez retrouver une liste plus complète des émulateurs Game Boy sur le site de Zophar \cite{zophar}:
 
 \subsection{Gambatte}
-Gambatte \cite{gambatte} est un émulateur open source écrit en c++, un des émulateurs les plus fidèles au comportement de la GameBoy, il se base sur des tests réalisés directement sur une GameBoy. Il émule tout aussi bien la GameBoy Color.
+Gambatte \cite{gambatte} est un émulateur open source écrit en c++, un des émulateurs les plus fidèles au comportement de la Game Boy, il se base sur des tests réalisés directement sur une Game Boy. Il émule tout aussi bien la Game Boy Color.
 \subsection{Visual Boy Advance}
-Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte GameBoy, GameBoy Color et GameBoy Advance. Il a été porté sur Windows, Linux et Mac.
+Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte Game Boy, Game Boy Color et Game Boy Advance. Il a été porté sur Windows, Linux et Mac.
 \subsection{No\$GMB}
-No\$GMB \cite{nogmb} est un émulateur de GameBoy, GameBoy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
+No\$GMB \cite{nogmb} est un émulateur de Game Boy, Game Boy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
 \section{Articles de recherches}
 
 \chapter{Etude du Hardware}
 \section{CPU}
 \subsection{Caractéristiques générales}
-Le CPU de la GameBoy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la GameBoy, son vrai nom est Sharp LR35902.
+Le CPU de la Game Boy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la Game Boy, son vrai nom est Sharp LR35902.
 Une de ses spécificités est qu'il est capable de faire des opérations 16 bits.
 Il est cadencé à 4,194304 MHz, et possède un peu moins de 512 instructions.
 \subsection{Registres}
@@ -170,11 +170,11 @@ Schéma minimaliste réprésentant Le LR35902:
 
 \section{GPU}
 
-Le GPU de la GameBoy est intégré dans le même circuit intégre que le CPU. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+Le GPU de la Game Boy est intégré dans le même circuit intégre que le CPU. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
-L'affichage de la Gameboy se fait via un ecran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.
+L'affichage de la Game Boy se fait via un ecran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.
 Ces périodes de VBlank ou de HBlank ont un nombre de cycles défini, c'est
 durant ces périodes que l'accés au différentes matrices en écriture va être
 débloqué pour que le CPU puisse modifier les éléments à afficher.\\
@@ -194,7 +194,7 @@ Ces trois couches ont des rôles différents et servent à séparer différents
 \item \textbf{La couche Background:}
 	Cette couche comprends tout les éléments qui appartiennent au décor du
 jeu. Elle est représentée par deux matrice de 256*256 pixels, soit 32*32
-tuiles (carré de 8*8 pixels). La Gameboy peut donc passer d'une matrice à
+tuiles (carré de 8*8 pixels). La Game Boy peut donc passer d'une matrice à
 l'autre pour afficher les différents éléments du décor. Ces matrices étant
 d'une taille supérieure à celle de l'écran lors de l'affichage, la positionne
 l'écran sur une zone d'une des matrices via la modification des valeurs de
@@ -216,7 +216,7 @@ de 40 tuiles différentes. Ces tuiles sont positionnées à l'écran via un regi
 \subsection{Les couleurs}
 
 Les couches Background et Window utilisent un registre (palette monochrome) pour gérer les
-couleurs des différents pixels, dans le cas de la Gameboy ce registre contient
+couleurs des différents pixels, dans le cas de la Game Boy ce registre contient
 4 niveaux de gris codés sur 2 bits.
 
 La couche Sprite peux utiliser deux palettes qui diffèrent en un point de la
@@ -302,7 +302,7 @@ Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'ad
 
 \section{MMU}
 le MMU soit Memory Management Unit est un composant qui autorise ou non l'accès en mémoire demandée par le processeur.
-En fait la GameBoy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
+En fait la Game Boy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
 Pour mieux comprendre à quoi correspond cet espace, l'espace d'adressage sera
 dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
 plus en détails:\\
@@ -344,7 +344,7 @@ généralement inutilisée.
 sur les sprites affichés.
 \item \textbf{0xFEA0-0xFEFF:} Inutilisé.
 \item \textbf{0xFF00-0xFF7F:} Cette zone contient des registres de contrôles pour tous les composants de la
-GameBoy.
+Game Boy.
 \item \textbf{0xFF80-0xFFFE:} Cette zone est réservée pour la pile, les
 développeurs initialisent généralement le registre SP à l'adresse 0xFFFE.
 \item \textbf{0xFFFF :} Cette adresse sert à savoir quelles interruptions sont autorisées ou
@@ -446,7 +446,7 @@ La répartition des adresses est la suivante:\\
 
 \section{APU}
 \subsection{Présentation générale}
-	La GameBoy dispose de deux canaux de son (un pour la gauche,
+	La Game Boy dispose de deux canaux de son (un pour la gauche,
 	et un pour la droite), reliés aux terminaux de sortie appelés
 	SO1 et SO2 par le constructeur, ainsi que d'un terminal
 	d'entrée appelé Vin, recevant le signal électrique
@@ -557,7 +557,7 @@ La répartition des adresses est la suivante:\\
 	\subsubsection{Onde mémoire}
 		Cette famille de registres correspond principalement à
 		l'utilisation de sons pré-enregistrés dans la cartouche
-		(et certains dans la gameboy, le bruit de démarrage par
+		(et certains dans la Game Boy, le bruit de démarrage par
 		exemple).
 		Dans certains cas elle peut être utilisée pour jouer un son de
 		la même façon que les 2 premières ondes, ce qui explique la
@@ -671,7 +671,7 @@ La répartition des adresses est la suivante:\\
 		7 indique si le son général de la console est activé
 		ou non.
 \section{Interruptions/Synchronisations}
-Comme vu dans les parties précédentes, le processeur de la GameBoy travaille conjointement avec d'autres composants. Afin d'éviter un chaos général voir l'endommagement de certains composants, un système d'interruptions a été intégré dans l'architecture de la GameBoy.
+Comme vu dans les parties précédentes, le processeur de la Game Boy travaille conjointement avec d'autres composants. Afin d'éviter un chaos général voir l'endommagement de certains composants, un système d'interruptions a été intégré dans l'architecture de la Game Boy.
 \subsection{Que fait une interruption?}
 Lorsqu'une interruption est déclenchée, le processeur va interrompre ses calculs afin d'exécuter une routine. Pour cela le processeur va ajouter dans la pile le registre PC et remplacer la valeur du registre PC par l'adresse de la routine. L'adresse de la routine est différente selon le type d'interruption déclenchée.
 \subsection{Registres d'interruption}
@@ -703,13 +703,13 @@ L'interruption VBlank est demandée par l'écran LCD, cette demande est faites �
 \subsubsection{Interruption LCD STAT}
 Cette interruption est également demandée par l'écran LCD, elle sert généralement à exécuter des routines lorsque l'écran LCD change d'état (Voir partie GPU). Elle peut aussi intervenir lorsque la ligne actuellement dessinée par l'écran LCD correspond au registre LYC (LY compare) situé à l'adresse 0xFF45. la routine se trouve à l'adresse 0x0048.
 \subsubsection{Interruption Timer}
-Interruption générée par le timer interne de la GameBoy, à chaque fois que celui ci dépasse une certaine durée. La routine se trouve à l'adresse 0x0050.
+Interruption générée par le timer interne de la Game Boy, à chaque fois que celui ci dépasse une certaine durée. La routine se trouve à l'adresse 0x0050.
 \subsubsection{Interruption Serial}
-Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou transmis) à l'aide du câble Link servant à communiquer entre deux GameBoy ou entre une GameBoy et un ordinateur. La routine se trouve à l'adresse 0x0058.
+Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou transmis) à l'aide du câble Link servant à communiquer entre deux Game Boy ou entre une Game Boy et un ordinateur. La routine se trouve à l'adresse 0x0058.
 \subsubsection{Interruption Joypad}
 Interruption générée lors de l'appui sur une touche par le joueur. La routine se trouve à l'adresse 0x0060.
 \chapter{Réalisation}
-Ce chapitre synthétise la manière dont nous avons réalisé notre émulateur(...)
+Ce chapitre synthétise la manière dont nous avons réalisé groboy notre émulateur.
 \section{CPU}
 Le processeur a été le premier "composant" à être développé. Nous allons donc décrire dans cette partie comment il a été réalisé.
 \subsection{Structure}
@@ -998,7 +998,7 @@ Comme on peut le voir ci-dessus, la mise à jour de l'écran se fait en fonction
 \section{MMU}
 Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
 \subsection{Initialisation} 
-Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accés à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la GameBoy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la GameBoy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
+Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accés à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la Game Boy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la Game Boy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
 Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche de jeu selon les jeux leurs tailles sont différentes, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux.
 Les fichiers de jeu (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
 Lorsqu'un fichier est ouvert avec groboy son chemin est envoyé au module mémoire du programme avec la fonction "memory\_init", cette dernière s'occupe d'afficher sur la sortie standard les informations relatives au fichier et d'initialiser les différents buffers. Voici un exemple avec la cartouche de jeu Zelda.
@@ -1067,7 +1067,7 @@ Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs
 
 \section{APU}
 	Si le fonctionnement général de l'unité son de la console n'est pas d'une extrême complexité, sa réalisation sur un émulateur nous aura donné, elle, beaucoup de fil à retordre.
-	En effet, la technologie de la GameBoy permettant de produire un son efficacement et simplement, en fonctionnant comme expliqué dans la partie hardware, la documentation à ce sujet est relativement difficile à trouver, puis à exploiter pour l'émulation.\\
+	En effet, la technologie de la Game Boy permettant de produire un son efficacement et simplement, en fonctionnant comme expliqué dans la partie hardware, la documentation à ce sujet est relativement difficile à trouver, puis à exploiter pour l'émulation.\\
 \subsection{Cheminement}
 	En nous basant sur les informations expliquées plus haut, nous avons d'abord pensé utiliser la librairie SDL afin de simplement produire le son souhaité à partir de la multitude de données réparties dans les registres "NRXX". Cependant l'idée n'eu pas le succès espéré, étant donné que les informations récupérées nécessitent en fin de compte un certain nombre de traitements avant de pouvoir être utiles à la création d'un son.\\
 	Déterminer ces traitements et les adapter informatiquement demande beaucoup de temps, c'est pourquoi nous avons eu l'agréable surprise de trouver une librairie simplifiant quelques-unes de ces adaptations, créée par un internaute passionné d'émulation et notamment de l'audio dans l'émulation.\\
@@ -1209,7 +1209,7 @@ La fonction "add delta" utilise la librairie "blip buff" pour exploiter les para
 les variations d'amplitudes correspondant au signal souhaité en sortie.
 Après tout ceci, c'est dans la fonction "callback", associée à l'objet SDL que le son est finalement joué et produit par l'ordinateur, puisque l'objet blip est fermé, et son contenu est lu par la SDL.
 
-Ce fonctionnement est répété en boucle dès la première écriture dans les plages mémoires dédiées au son, et permet donc un comportement très fidèle à celui du circuit son de la fameuse GameBoy.
+Ce fonctionnement est répété en boucle dès la première écriture dans les plages mémoires dédiées au son, et permet donc un comportement très fidèle à celui du circuit son de la fameuse Game Boy.
 %Quelques mots sur les fonctions de clock, le frame sequencer, je trouve la prochaine variation d'amplitude et je l'envoie, gauche droite ou les deux
 %La wave, les aléatoires, les sons pré-enregistrés.
 \section{Interruptions/Synchronisations}
@@ -1409,9 +1409,9 @@ Il manque pour que l'intégralité des jeux puissent être supportés d'impléme
 \subsection*{Améliorer le son}
 Le son tend à être fidèle au son d'origine, cependant il ne l'est pas encore et rend par conséquent l'émulateur instable. Il faudrait pouvoir venir à bout de ce problème.
 \subsection*{Implémenter le système deux joueurs}
-La GameBoy dispose d'un port link pour pouvoir communiquer avec une autre GameBoy, il serait agréable de pouvoir faire de même entre deux processus groboy.
-\subsection*{Implémenter la GameBoy color}
-La GameBoy color a une architecture basée sur la GameBoy et donc très similaire, son portage est donc réalisable. 
+La Game Boy dispose d'un port link pour pouvoir communiquer avec une autre Game Boy, il serait agréable de pouvoir faire de même entre deux processus groboy.
+\subsection*{Implémenter la Game Boy color}
+La Game Boy color a une architecture basée sur la Game Boy et donc très similaire, son portage est donc réalisable. 
 \section*{Emulation aujourd'hui}
 %bibliographie
 \bibliographystyle{plain}
@@ -1421,5 +1421,5 @@ La GameBoy color a une architecture basée sur la GameBoy et donc très similair
 \chapter{Comptes rendus de réunion}
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
 \chapter{Méthodes de débuggage et roms de test}
-Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par un dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une GameBoy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et donc d'avoir un CPU stable.
+Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par un dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une Game Boy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et donc d'avoir un CPU stable.
 \end{document}
