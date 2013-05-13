@@ -874,7 +874,7 @@ Dans cette partie, l'on ajoute le nombre de cycle fait par le CPU au compteur du
          	}
 
 \end{lstlisting}
-Cette partie permet la mise à jour du "coincidence flag", en effet si la lign_actuelle est la même que celle contenue dans le registre LYC alors si le flag n'est pas mis on le met. L'utilité de cette partie est principalement de provoquer une interruption si le flag est à 1.
+Cette partie permet la mise à jour du "coincidence flag", en effet si la ligne actuelle est la même que celle contenue dans le registre LYC alors si le flag n'est pas mis on le met. L'utilité de cette partie est principalement de provoquer une interruption si le flag est à 1.
 
 \begin{lstlisting}
 if(vblank_clock_counter >= 65664){ //Si on entre dans la période de vblank
