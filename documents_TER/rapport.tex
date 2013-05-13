@@ -3,8 +3,30 @@
 \usepackage[utf8]{inputenc}
 \usepackage[francais]{babel}
 \usepackage{url}
+\usepackage{color}
 \usepackage{listings}
 \usepackage{graphicx}
+
+
+\definecolor{vert}{rgb}{0,0.5,0.1} 
+\definecolor{blue}{rgb}{0,0.4,0.6} 
+\definecolor{red}{rgb}{1,0,0} 
+\definecolor{out}{rgb}{0.6,0.6,0.6} 
+\lstset{inputencoding=utf8,
+				language=C,
+				showstringspaces=false,
+				tabsize=2,
+				basicstyle=\scriptsize,
+				keywordstyle=\color{vert},
+				commentstyle=\color{blue}, 
+				stringstyle=\color{red}
+}
+\lstnewenvironment{codeoutput}
+	{\lstset{basicstyle=\ttfamily\color{out},
+	}}
+{}
+
+
 \title{TER, développement d'un émulateur de GameBoy}
 \author{BERGER Mickaël \\ DIVET Joachim \\ VINARD Florian}
 \date{17 Mai 2013}
@@ -12,7 +34,7 @@
 \begin{document}
 \maketitle
 \tableofcontents
-\chapter*{Introduction}
+\chapter{Introduction}
 	Dans le cadre de la 1ère année de Master Informatique à l'Université de Montpellier
 	2, tous les élèves de la promotion ont été amenés à réaliser un projet
 	sous tutelle, afin de mettre en pratique les compétences acquises
@@ -34,12 +56,12 @@
 	soins.\\
 	\\
 
-\section*{Définition du projet}
-\subsection*{Qu'est ce qu'un émulateur?}
+\section{Définition du projet}
+\subsection{Qu'est ce qu'un émulateur?}
 	Selon la définition d'émulation sur le site Wikipédia:\\"\textbf{En informatique, l'émulation consiste à substituer un élément de matériel informatique – tel un terminal informatique, un ordinateur ou une console de jeux – par un logiciel.}".\\Ce logiciel est donc ce que l'on appelle un émulateur.
-\subsection*{Qu'est ce que la GameBoy?}
+\subsection{Qu'est ce que la GameBoy?}
 	La GameBoy est une console de jeu portable commercialisée par Nintendo en Europe durant l'année 1990.
-\subsection*{Déroulement}
+\subsection{Déroulement}
 	Dès lors que notre choix fut fixé et validé par nos enseignants, il
 	fut assez rapide de déterminer les grandes lignes du déroulement du
 	projet, à savoir une première étape de documentation importante, afin
@@ -51,9 +73,10 @@
 \chapter{Organisation du projet}
 \section{Choix des outils}
 Ce projet a été réalisé grâce à de nombreux outils, les voici, avec les raisons qui ont motivés nos choix.\\
+Si cette partie est importante, le nombre de projets que nous avons déjà réalisé par le passé nous a apporté une expérience et un bagage suffisants pour prendre ces décisions rapidement. Les motivations présentés ci-dessous sont par conséquent d'apparence courtes, mais la réflexion qui a précédé les choix n'en a pas pour autant été altérée.
 
 \subsection{Environnement de travail}
-Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques d'un ensemble d'outils pour développer tel que gcc, gdb. De plus l'installation de librairies et ou de logiciels supplémentaires est relativement aisée grâce aux systèmes de logithèques.
+Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques d'un ensemble d'outils pour développer tel que gcc, gdb, etc. De plus l'installation de librairies et ou de logiciels supplémentaires est relativement aisée grâce aux systèmes de logithèques.
 
 \subsection{Langage}
 C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des exécutables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
@@ -71,7 +94,7 @@ Github, un site permettant de créer gratuitement un dépôt git. git est un log
 Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du projet il a été propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
 \section{Documentation}
 \section{Etude de l'existant}
-Il existe actuellement de nombreux émulateurs de GameBoy, le but de ce projet n'était pas de rendre groboy un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y prétendre?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
+Il existe actuellement de nombreux émulateurs de GameBoy, le but de ce projet n'était pas de faire de groboy un émulateur de renommée (d'ailleurs en quelques mois qui pourrait y prétendre?), mais bien de comprendre les rouages d'un émulateur de console de jeu.
 Tous ces émulateurs ont leurs avantages par rapport aux autres. Voici une liste non exhaustive des émulateurs que nous avons trouvé intéressants, vous pourrez retrouver une liste plus complète des émulateurs GameBoy sur le site de Zophar \cite{zophar}:
 
 \subsection{Gambatte}
@@ -453,12 +476,12 @@ La répartition des adresses est la suivante:\\
 	6 donnent la valeur d'un volume" correspond à dire "le nombre binaire
 	110 donne la valeur d'un volume".
 
-	\subsubsection{Ton et balayage}
+	\subsubsection{Son et balayage}
 	La première famille comporte cinq registres, utilisés pour
 	générer et modifier le premier type d'onde, les ondes carrées
 	avec enveloppe de volume et fonction de balayage.\\
 
-		\textbf{NR10(FF10):} le registre de balayage.\\
+	\textbf{NR10(FF10):} le registre de balayage.\\
 		C'est le premier exemple de registre utilisé pour
 		stocker plusieurs valeurs, ici les bits 4 à 6 donnent
 		la valeur de la fréquence de balayage, les bits 0 à 2
@@ -492,14 +515,14 @@ La répartition des adresses est la suivante:\\
 		composante haute sont stockés dans le registre
 		suivant.\\ 
 
-		\textbf{NR14(FF14)}: Composantes hautes \\
+	\textbf{NR14(FF14)}: Composantes hautes \\
 		Le bit 7 est un indicateur de ré-initialisation de la
 		fréquence, le bit 6 un compteur d'opérations
 		consécutives, qui va indiquer si la longueur lue sur
 		les bits 0 à 5 du registre \textbf{NR11} est à prendre en
 		compte ou non, et les bits 0 à 2 contiennent les 3 bits
 		manquant à la fréquence stockée en \textbf{NR13}.
-		\subsubsection{Ton}
+	\subsubsection{Son}
 		La deuxième famille correspond à la deuxième onde carrée, elle
 		fonctionne comme la première mais sans le registre de
 		balayage. Le fonctionnement, l'ordre et les valeurs des bits
@@ -514,7 +537,7 @@ La répartition des adresses est la suivante:\\
 		\textbf{NR12}, le \textbf{NR23(FF18)} fonctionne comme le \textbf{NR13} et le
 		\textbf{NR24(FF19)} comme le \textbf{NR14}. 
 			
-		\subsubsection{Onde mémoire}
+	\subsubsection{Onde mémoire}
 		Cette famille de registres correspond principalement à
 		l'utilisation de sons pré-enregistrés dans la cartouche
 		(et certains dans la gameboy, le bruit de démarrage par
@@ -523,35 +546,35 @@ La répartition des adresses est la suivante:\\
 		la même façon que les 2 premières ondes, ce qui explique la
 		présence des registres \textbf{NR33} et \textbf{NR34}. \\ 
 		
-		\textbf{NR30(FF1A):} Trigger de son \\ 
+	\textbf{NR30(FF1A):} Trigger de son \\ 
 		Il n'est utilisé que pour indiquer via la
 		valeur du bit 7 si l'onde mémoire est à utiliser ou
 		non.\\
 		
-		\textbf{NR31(FF1B):} Longueur de son \\
+	\textbf{NR31(FF1B):} Longueur de son \\
 		La valeur entière (bits 0 à 7) du
 		registre est utilisée et donne la longueur du son à
 		jouer.\\ 
 		
-		\textbf{NR32(FF1C):} Sélecteur \\
+	\textbf{NR32(FF1C):} Sélecteur \\
 		Les bits 5 à 6 donne la valeur d'un
 		sélecteur de volume pour le son à jouer, il est joué
 		sans son pour une valeur de 0, tel quel pour 1, avec un volume à 50pourcents 
 		pour 2 (décalé d'un bit vers la droite), et un volume
 		de 25pourcents pour 3 (décalé de deux bits vers la droite). \\
 		
-		\textbf{NR33(FF1D):} Composantes basses \\
+	\textbf{NR33(FF1D):} Composantes basses \\
 		Comme pour les \textbf{NR13} et \textbf{NR23}, ce registre
 		contient les 8 premiers bits de la valeur de fréquence
 		du son à jouer.\\
 
-		\textbf{NR34(FF1E):} Composantes hautes \\
+	\textbf{NR34(FF1E):} Composantes hautes \\
 		Celui-ci fonctionne comme les \textbf{NR14} et \textbf{NR24} mais pour
 		cette 3ème onde (utilisé dans le cas d'une utilisation
 		de cette onde pour produire un son sans utiliser les
 		sons mémoire). \\
 
-		Les registres \textbf{FF30} à \textbf{FF3F} ne sont pas numérotés en NR
+	Les registres \textbf{FF30} à \textbf{FF3F} ne sont pas numérotés en NR
 		mais contiennent les sons pré-enregistrés à jouer, ils
 		sont stockés sous la forme de 32 échantillons de 4
 		bits chacun, soit 16 valeurs 8 bits lues dans l'ordre
@@ -574,17 +597,17 @@ La répartition des adresses est la suivante:\\
 		d'amplitude (qui par conséquent, n'est plus réellement
 		due au hasard). \\
 
-		\textbf{NR41(FF20):} Longueur de son \\
+	\textbf{NR41(FF20):} Longueur de son \\
 		Les bits 0 à 5 donnent la valeur de la longueur du son
 		à jouer.\\
 
-		\textbf{NR42(FF21):} Enveloppe de volume\\
+	\textbf{NR42(FF21):} Enveloppe de volume\\
 		Les bits 4 à 7 correspondent à la valeur initiale de
 		l'enveloppe, le bit numéro 3 donne sa direction
 		(montante ou descendante) et les bits 0 à 2 donnent le
 		nombre d'utilisations de l'enveloppe.\\
 
-		\textbf{NR43(FF22):} Compteur polynomial \\
+	\textbf{NR43(FF22):} Compteur polynomial \\
 		L'amplitude est modifiée aléatoirement entre haute et
 		basse sur la fréquence donnée. Plus cette fréquence
 		est haute, moins le bruit paraître rude. 
@@ -597,7 +620,7 @@ La répartition des adresses est la suivante:\\
 		aléatoires d'amplitude et les bits 0 à 2 correspondent
 		à une valeur de diviseur de fréquence.\\ 
 
-		\textbf{FF23(NR43):} Compteur consécutif\\
+	\textbf{FF23(NR43):} Compteur consécutif\\
 		Le bit 7 est un initialisateur, il réinitialise le bruit
 		lorsque sa valeur est 1.
 		Le bit 6 est l'indicateur de jeu du son, il indique
@@ -612,20 +635,20 @@ La répartition des adresses est la suivante:\\
 		gérer le volume général ou simplement activer ou
 		désactiver le son de la console. \\
 
-		\textbf{NR50(FF24):} Contrôle du signal d'entrée \\ 
+	\textbf{NR50(FF24):} Contrôle du signal d'entrée \\ 
 		Le bit 7 envoie le signal Vin vers la sortie SO2
 		lorsqu'il est activé, alors que le bit 3 l'envoie vers
 		la sortie SO1. les bits 6 à 4 correspondent au volume
 		propre à la SO2, et les 0 à 2 à celui de la SO1. \\
 
-		\textbf{NR51(FF25):} Sélection du terminal de sortie propre \\
+	\textbf{NR51(FF25):} Sélection du terminal de sortie propre \\
 		Ici les bits redirigent les 4 ondes possibles vers un
 		terminal donné.
 		Les bits 0 à 3 envoie respectivement les ondes 1 à 4
 		vers la SO1, les bits 4 à 7 envoie respectivement les
 		ondes 1 à 4 vers la SO2.\\
 
-		\textbf{NR52(FF26):} Activation du son \\
+	\textbf{NR52(FF26):} Activation du son \\
 		Les bits 0 à 3 de ce registre activent (ou
 		désactivent) respectivement les ondes 1 à 4 et le bit
 		7 indique si le son général de la console est activé
@@ -814,7 +837,7 @@ SDL_Surface* sdl_matrix[144][160];
 SDL_Surface *sdl_screen;
 \end{lstlisting}
 
-La matrice gpu_screen sert à stocker les valeurs de tout les pixels à afficher, cette matrice sera converti en surface SDL pour l'affichage et sera stockée dans sdl_matrix. Sdl_screen correspond à l'écran c'est sur cette variable que sdl_matrix sera appliquée.\\
+La matrice gpu\_screen sert à stocker les valeurs de tout les pixels à afficher, cette matrice sera converti en surface SDL pour l'affichage et sera stockée dans sdl\_matrix. Sdl\_screen correspond à l'écran c'est sur cette variable que sdl\_matrix sera appliquée.\\
 
 \subsection{initialisation}
 	L'initialisation des données est relativement simple, car seule l'écran géré par la SDL demande une initialisation particulière:\\
@@ -835,7 +858,7 @@ void gpu_init(SDL_Surface *sdl_scr){
 
 \end{lstlisting}
 
-Comme on peut le voir ci_dessus, les différents compteurs sont initialisés à 0, puis l'écran est initialisé avec la variable passé en paramêtres. On lui donne les différentes propriétés voulues grâce à "SDL_VIDEO_FLAGS", dans notre cas la possibilité d'être redimensionné.\\
+Comme on peut le voir ci-dessus, les différents compteurs sont initialisés à 0, puis l'écran est initialisé avec la variable passé en paramêtres. On lui donne les différentes propriétés voulues grâce à "SDL\_VIDEO\_FLAGS", dans notre cas la possibilité d'être redimensionné.\\
 
 \subsection{Algorithme principal}
 	Suite aux points précédents, nous avons mis en place un algorithme permettant de gérer les différentes phases du GPU (VBlank, HBlank, etc...). Cette algorithme servira de base pour les GPU car les appels de toutes les autre fonctions se feront dans des phases précises. Etudions cet algorithme plus en détails:\\
@@ -877,7 +900,7 @@ Dans cette partie, l'on ajoute le nombre de cycle fait par le CPU au compteur du
 Cette partie permet la mise à jour du "coincidence flag", en effet si la ligne actuelle est la même que celle contenue dans le registre LYC alors si le flag n'est pas mis on le met. L'utilité de cette partie est principalement de provoquer une interruption si le flag est à 1.
 
 \begin{lstlisting}
-if(vblank_clock_counter >= 65664){ //Si on entre dans la période de vblank
+if(vblank_clock_counter >= 65664){ //Si on entre dans la periode de vblank
                 if(!(lcdstat & 0x01)){
                         lcdstat &= 0xFC;
                         memory_write(0xFF41, lcdstat | 1);
@@ -917,7 +940,7 @@ if(vblank_clock_counter >= 65664){ //Si on entre dans la période de vblank
 La dernière partie de cet algorithme est très importante puisque c'est ici que l'on execute les différents taches en fonction des périodes. Si l'on est en période de VBlank alors l'on va tout d'abord dessiner l'écran puis envoyer une interruption de type VBlank ce qui va autoriser de nouveau le CPU à écrire dans la VRAM et l'OAM. SI l'on n'est pas dans une période de VBlank alors en fonction des modes vu en partie hardware, l'on va envoyer ou non une interruption, mettre à jour les différents flags et/ou dessiner une ligne.\\
 
 \subsection{Les fonctions d'affichage}
-L'algorithme principal mis en place, l'étape suivante était le remplissage de la martrice de pixels. Pour cela nous avons implémenté une fonction gpu_drawline(), qui comme son nom l'indique va remplir une ligne de la matrice, cette fonction est appelée par l'algorithme vu précédent, lorsque le GPU passe en période de HBlank. Son fonctionnement est le suivant:\\
+L'algorithme principal mis en place, l'étape suivante était le remplissage de la martrice de pixels. Pour cela nous avons implémenté une fonction gpu\_drawline(), qui comme son nom l'indique va remplir une ligne de la matrice, cette fonction est appelée par l'algorithme vu précédent, lorsque le GPU passe en période de HBlank. Son fonctionnement est le suivant:\\
 \begin{itemize}
 \item \textbf{Si le Background est établi:}
 	On regarde tout d'abord quelles sont la ligne et la colonne courante, puis l'on va chercher dans la matrice contenant les tuiles du Background, la tuile correpondante. L'on récupère ensuite la position en x et en y du pixel à déssiner par rapport à la tuile, on parcours toute la ligne en stockant dans la matrice les pixels.\\
@@ -927,7 +950,7 @@ L'algorithme principal mis en place, l'étape suivante était le remplissage de 
 	Tout d'abord l'on récupère les sprites et on les stockent dans un tableau de sprites (structure vu précédement), ensuite on les tri en fonction de leur position. Puis l'on parcours la ligne pour stocker dans la matrice les valeurs des pixels en n'oubliant pas d'appliquer les différentes options sur les sprites (flip vertical/horizontal).\\
 \end{itemize}
 
-Cette fonction implémentée, la dernière étape était d'afficher la matrice obtenue, avec la SDL, nous avons donc créer une fonction draw_screen(), qui est appelée durant la période de VBlank qui permet de redessiner l'écran à partir de la matrice.\\
+Cette fonction implémentée, la dernière étape était d'afficher la matrice obtenue, avec la SDL, nous avons donc créer une fonction draw\_screen(), qui est appelée durant la période de VBlank qui permet de redessiner l'écran à partir de la matrice.\\
 
 \begin{lstlisting}
 	if(frame_counter < frame_skip) frame_counter++;
@@ -948,7 +971,7 @@ Cette fonction implémentée, la dernière étape était d'afficher la matrice o
                         }
                 }
                 SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
-                SDL_Flip(sdl_screen); /* Mise à jour de l'écran */
+                SDL_Flip(sdl_screen); /* Mise a jour de l'ecran */
                 sleep_SDL();
         }
 
@@ -1100,7 +1123,8 @@ static inline void update_channel1(int clocks){
 	if(!apu.channel1.length.is_on)
 		return;
 	while(1){
-		soonest = frame_sequencer(apu.channel1.period_counter, apu.channel1.length.i,apu.channel1.envelope.i, apu.channel1.sweep.i, &cycle_tmp);
+		soonest = frame_sequencer(apu.channel1.period_counter, apu.channel1.length.i,
+		apu.channel1.envelope.i, apu.channel1.sweep.i, &cycle_tmp);
 		if(cycle_tmp > clocks){
 			apu.channel1.period_counter -= clocks;
 			apu.channel1.length.i -= clocks;
@@ -1155,9 +1179,11 @@ static inline void clock_lfsr(sc4_t *sc4, int time_lap){
 	if(sc4->period != 0){
 		sc4->lfsr.i = ( (sc4->lfsr.i + 1) & (lfsr_size[sc4->lfsr.size] - 1) );
 		if(sc4->is_left)
-			add_delta(LEFT, time_lap, lfsr[sc4->lfsr.size][sc4->lfsr.i] * sc4->envelope.volume, &sc4->last_delta_left);
+			add_delta(LEFT, time_lap,
+			lfsr[sc4->lfsr.size][sc4->lfsr.i] * sc4->envelope.volume, &sc4->last_delta_left);
 		if(sc4->is_right)
-			add_delta(RIGHT, time_lap, lfsr[sc4->lfsr.size][sc4->lfsr.i] * sc4->envelope.volume, &sc4->last_delta_right);
+			add_delta(RIGHT, time_lap,
+			lfsr[sc4->lfsr.size][sc4->lfsr.i] * sc4->envelope.volume, &sc4->last_delta_right);
 	}
 }
 \end{lstlisting}
