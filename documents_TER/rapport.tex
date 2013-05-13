@@ -753,6 +753,84 @@ parfois de celles indiquées par le controleur de son, afin de ne pas par exempl
 %Appel de write_sound à chaque tentative d'écriture en mémoire dans ces plages, petit détail de write_sound
 %Récupération des données, appel du sound update à chaque fois
 \subsection{Le son, le vrai}
+Comme indiqué au dessus, c'est donc à chaque appel de la fonction d'écriture que le son est mis à jour en temps réel.
+Cet appel va se "diviser" en quatre autres, chacun servant à mettre à jour l'une des quatres ondes générées, afin donc de la calculer sur un certain laps de temps, indiqué en cycles processeur.
+
+\begin{lstlisting}
+static inline void update_channel1(int clocks){
+	int cycle_tmp, soonest;
+	unsigned time_lap=0;
+
+	if(!apu.channel1.length.is_on)
+		return;
+	while(1){
+		soonest = frame_sequencer(apu.channel1.period_counter, apu.channel1.length.i,apu.channel1.envelope.i, apu.channel1.sweep.i, &cycle_tmp);
+		if(cycle_tmp > clocks){
+			apu.channel1.period_counter -= clocks;
+			apu.channel1.length.i -= clocks;
+			apu.channel1.envelope.i -= clocks;
+			apu.channel1.sweep.i -= clocks;
+			return;
+		}
+		clocks -= cycle_tmp;
+		time_lap += cycle_tmp;
+		apu.channel1.period_counter -= cycle_tmp;
+		apu.channel1.length.i -= cycle_tmp;
+		apu.channel1.envelope.i -= cycle_tmp;
+		apu.channel1.sweep.i -= cycle_tmp;
+		
+		switch(soonest){
+			case PERIOD:
+				apu.channel1.period_counter = apu.channel1.period + 1;
+				channel1_clock_square(&apu.channel1, time_lap);
+			break;
+			case LENGTH:
+				apu.channel1.length.i = 16384;
+				clock_length(&apu.channel1.length, 1);
+			break;
+			case ENVELOPE:
+				apu.channel1.envelope.i = 65536;
+				clock_envelope(&apu.channel1.envelope);
+			break;
+			case SWEEP:
+				apu.channel1.sweep.i = 32768;
+				clock_sweep(&apu.channel1);
+			break;
+		}
+	}
+}
+\end{lstlisting}
+
+Chacune des fonctions de mise à jour des ondes suit à peu près le même schéma, à la différence près que les calculs sur le sweep ou l'enveloppe ne seront 
+pas effectués pour une onde qui ne les a pas (comme la 3eme par exemple).
+
+La fonction se déroule donc comme suit :
+Si la longueur de son à jouer est arrivée à 0, alors on le booléen associé indique que le son doit être stoppé, à ce moment la fonction est quittée.
+Arrive ensuite une boucle durant laquelle on anticipe le prochain "basculement" du signal, et l'on agit en fonction.
+La nature de ce basculement est donnée par la fonction "frame sequencer", qui par un simple jeu de comparaisons, détermine la nature du prochain basculement, 
+à savoir s'il correspond à une opération de controle de longueur, d'enveloppe, de periode ou de balayage.
+La fréquence du signal en sera modifiée localement en fonction, et c'est ce qui est représenté par les fonctions "clock xxx" où xxx peut être square, length, envelope, sweep ou lfsr.
+
+C'est au sein de ces fonctions qu'est calculée la variation d'amplitude à utiliser par la librairie blip pour générer l'onde finale.
+Illustré ci-dessous avec l'exemple de "clock lfsr", qui pour rappel correspond au signal de bruit dont l'amplitude peut varier aléatoirement dans 
+un certain intervalle de valeurs, et signifie "Linear Feedback Shift Register".
+\begin{lstlisting}
+static inline void clock_lfsr(sc4_t *sc4, int time_lap){
+	if(sc4->period != 0){
+		sc4->lfsr.i = ( (sc4->lfsr.i + 1) & (lfsr_size[sc4->lfsr.size] - 1) );
+		if(sc4->is_left)
+			add_delta(LEFT, time_lap, lfsr[sc4->lfsr.size][sc4->lfsr.i] * sc4->envelope.volume, &sc4->last_delta_left);
+		if(sc4->is_right)
+			add_delta(RIGHT, time_lap, lfsr[sc4->lfsr.size][sc4->lfsr.i] * sc4->envelope.volume, &sc4->last_delta_right);
+	}
+}
+\end{lstlisting}
+
+La fonction "add delta" utilise la librairie "blip buff" pour exploiter les paramètres qu'elle reçoit et créer 
+les variations d'amplitudes correspondant au signal souhaité en sortie.
+Après tout ceci, c'est dans la fonction "callback", associée à l'objet SDL que le son est finalement joué et produit par l'ordinateur, puisque l'objet blip est fermé, et son contenu est lu par la SDL.
+
+Ce fonctionnement est répété en boucle dès la première écriture dans les plages mémoires dédiées au son, et permet donc un comportement très fidèle à celui du circuit son de la fameuse GameBoy.
 %Quelques mots sur les fonctions de clock, le frame sequencer, je trouve la prochaine variation d'amplitude et je l'envoie, gauche droite ou les deux
 %La wave, les aléatoires, les sons pré-enregistrés.
 \section{Interruptions/Synchronisations}
