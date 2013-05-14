@@ -463,10 +463,16 @@ La répartition des adresses est la suivante:\\
 	et un pour la droite), reliés aux terminaux de sortie appelés
 	SO1 et SO2 par le constructeur, ainsi que d'un terminal
 	d'entrée appelé Vin, recevant le signal électrique
-	correspondant au son et pouvant être redirigé après
+	correspondant au son de la cartouche et pouvant être redirigé après
 	traitement vers le terminal SO1, SO2, ou les deux en même
 	temps (pour passer d'un son mono à un son stéréo par
-	exemple).CA SERAIT BIEN DE RAJOUTER UN SCHEMA\\
+	exemple).
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{images/GBSound1.jpg}
+\caption{Le son Game Boy : entrées et sorties}
+\label{GBS1}
+\end{figure}
 
 	Grossièrement, les composants de l'appareil permettent de
 	créer un son de quatre façons différentes : 
@@ -1427,7 +1433,7 @@ Nous ne détaillerons pas plus comment nous avons réalisé cette GUI car elle n
 \label{GUI4}
 \end{figure}
 \chapter*{Conclusion}
-\section*{Bilan}
+\section*{Bilan technique}
 Au final, groboy est fonctionnel et jouable pour une grande majorité de jeux, nous allons lister pour chaque module le travail accompli. 
 \subsection*{CPU}
 Toutes les instructions sont bien implémentées, car groboy passe le test cpu de "blargg" sans erreur (il faudrait en parler dans les chap prec.). 
@@ -1451,6 +1457,11 @@ Le son tend à être fidèle au son d'origine, cependant il ne l'est pas encore 
 La Game Boy dispose d'un port link pour pouvoir communiquer avec une autre Game Boy, il serait agréable de pouvoir faire de même entre deux processus groboy.
 \subsection*{Implémenter la Game Boy color}
 La Game Boy color a une architecture basée sur la Game Boy et donc très similaire, son portage est donc réalisable. 
+\section*{Bilan collectif}
+L'objectif principal de notre projet était l'étude d'un émulateur suffisemment abordable pour être réalisé, afin d'en tirer un maximum de connaissances sur le fonctionnement bas niveau d'un système relativement proche des ordinateurs que nous connaissons.
+Si le physique de la machine et la personnalisation de son processeur par ses fabriquants laissent à penser qu'il n'y a aucun lien avec celles que nous utilisons, les idées que nous avons su tirer de ce projet nous ont, elles, donné un réel bagage pratique sur le fonctionnement de nos outils de travail préférés. 
+De plus, le travail en équipe sur un projet relativement conséquent est toujours source d'apports utiles à nos futurs métiers. N'étant pas notre premier projet, les difficultés d'organisation furent moins nombreuses que les années précédentes, mais le développement de ce projet n'a pas été sans nous rappeler l'importance de bonnes prévisions, d'une bonne communication entre membres, et d'une répartition des taches équitables.
+Une fois de plus, le travail d'étude et de recherche est un véritable apport pour chacun de nous, tant sur l'aspect technique que sur l'expérience d'un travail sur un projet collectif, et peut-être même un premier pas dans le monde de l'émulation pour certains d'entre nous.
 \section*{Emulation aujourd'hui}
 Aujourd'hui l'émulation est procédé extrèmement utile pour différentes tâches. Une des principales utilitées de l'émulation concerne les serveurs. Les serveurs actuels étant extrêment puissant, ils sont souvent utilisés dans les entreprises pour créer une multitude d'environnements de travail, en créant des machines virtuelles en leur sein. Cette technique est extrêment utile lorqu'il sagit de gérer plusieurs logiciels sur un même serveur mais aussi pour créer des environnements de test. 
 Les principales avancées et recherches actuelles dans le domaine de l'émulation concernent en grande partie, l'optimisation de la gestions des processus et la répartition des charges sur les différents coeurs pour les processeurs multi-coeurs.
@@ -1521,7 +1532,123 @@ Objectifs pour la prochaine réunion :\\
 	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de répartition du travail\\
 Les nouveaux diagrammes de Gantt sont disponibles à cette adresse : https://github.com/joakim-d/GroBoy/tree/master/Documents\_TER.\\
 \end{quotation}
-\chapter{Générer un son en temps réel et sans fichier avec la SDL}
+\chapter{Blip buff et la génération d'ondes}
+Le développeur "Blargg" cité en remerciement, a beaucoup travaillé sur les sons de synthèses à bandes passantes limitées, et principalement dans le cadre de l'émulation de systèmes de jeux relativement anciens, comme la Game Boy et la Nintendo NES par exemple. Ses travaux ont donc été d'une grande utilité pour le développement de la partie son de notre émulateur, sur laquelle la documentation est rare, avec notamment la librairie "blip buff" citée plus haut, qui permet de générer des ondes échantillonées à partir d'informations sur les ondes habituellement traitées par le processeur lui même. Par soucis d'efficacité et de temps, la programmation de ce module dépend fortemment du fonctionnement de cette librairie, c'est pourquoi nous avons choisi d'expliquer son fonctionnement général dans cette partie.\\
+\section*{Vue d'ensemble}
+Cette librairie réechantillonne donc des formes d'ondes audio à partir d'une fréquence d'horloge, vers une fréquence d'échantillonnage pour un signal.
+Son utilisation suit généralement le schéma suivant :
+- Créer un tampon mémoire avec la fonction 
+\begin{lstlisting} 
+		blip_new() 
+\end{lstlisting}
+- Paramétrer les fréquences d'horloge et d'échantillonage avec 
+\begin{lstlisting} 
+		blip_set_rates() 
+\end{lstlisting}
+- Lancer la boucle de génération d'onde :
+\begin{itemize}
+	\item Générer quelques basculement d'horloge avec 
+	\begin{lstlisting}
+			blip_add_delta()
+	\end{lstlisting}
+	\item Terminer le laps de temps avec 
+	\begin{lstlisting}
+			blip_end_frame()
+	\end{lstlisting}
+	\item Lire les échantillons dans le tampon avec 
+	\begin{lstlisting}
+			blip_read_samples()
+	\end{lstlisting}
+\end{itemize}
+- Libérer le tampon avec 
+\begin{lstlisting}
+		blip_delete()
+\end{lstlisting}
+
+\subsection{Création du tampon mémoire}
+Avant la création du son, un tampon mémoire doit etre créé avec la fonction  "blip\_new()". Sa taille correspond au nombre maximum d'échantillons non lus qu'il contiendra. La plupart du temps, un dixieme de la fréquence d'échantillonage suffit, puisque les échantillons seront généralement lus directement après leur génération.\\
+La fonction "blip\_set\_rates()" permettra de fixer le nombre de basculements d'horloge par seconde, et combien d'échantillons par seconde y correspondront. 
+\subsection{Génération d'onde}
+Par soucis de clarté, les exemples de cette section illustrent des ondes de faible amplitude, donc inaudibles. Des ondes codées sur 16 bits ont des valeurs allant de -32768 à + 32767.
+Les ondes sont générées à la fréquence d'horloge en entrée.
+Considérons une onde carrée simple avec 8 pas ("ticks d'horloge) d'horloge par cycle (4 pas hauts, 4 pas bas) : 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{images/Wave1.jpg}
+\caption{Une onde carrée simple}
+\label{WAV1}
+\end{figure}
+
+L'onde change d'amplitude aux points de temps 0, 4, 8, 12, 16, etc.
+Le code suivant génère l'amplitude à chaque pas de l'onde ci-dessus à la fréquence d'horloge d'entrée : 
+\begin{lstlisting}
+int wave [30];
+for(int i=4; i<30;++i){
+	if( i%8 < 4)
+		wave[i] = -5;
+	else 
+		wave[i] = +5;
+}
+\end{lstlisting}
+Sans utiliser cette librairie, le tableau wave devrait ensuite être ré-échantillonné de la fréquence d'entrée à la fréquence d'échantillonnage de sortie. La librairie "blip buff" fait se ré-échantillonage en interne, le code de génération de l'onde peut donc se focaliser entièrement sur l'horloge d'entrée.\\
+Plutot que spécifier l'amplitude à chaque pas, blip buff n'a besoin que de connaitre les points de basculement d'amplitude (i.e, où l'amplitude change, généralement à la demi periode), qui sont nommés "deltas" par le développeur. Les temps correspondant à ces variations d'amplitudes sont donnés par des pas de l'horloge processeur (qui dans notre cas, correspondent aux cycles du z80). 
+Le schéma ci-dessous indique les "deltas" en dessous des points de temps auxquels ils interviennent.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{images/Wave2.jpg}
+\caption{L'intervention des deltas}
+\label{WAV2}
+\end{figure}
+
+Le code suivant génère l'onde ci-dessus:
+\begin{lstlisting}
+blip_add_delta(blip, 4, +5);
+blip_add_delta(blip, 8, -10);
+blip_add_delta(blip, 12, 10);
+blip_add_delta(blip, 16, -10);
+blip_add_delta(blip, 20, 10);
+blip_add_delta(blip, 24, -10);
+blip_add_delta(blip, 28, 10);
+\end{lstlisting}
+
+\subsection{Gestion des laps de temps}
+Le temps continuant d'augmenter, laisser l'onde avancer telle qu'elle provoquerait un dépassement de valeur d'entiers. 
+La librairie permet d'éviter ceci en procédant à la génération de l'onde par laps de temps de longueur controlée.
+Les pas d'horloge dans un laps de temps deviennent donc relatifs aux temps de début et de fin dudit laps.
+Le temps d'un fin d'un laps de temps correspondra alors au temps du début du suivant.
+Le schéma utilisé précédemment donne donc la division en laps de temps qui suit :
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{images/Wave3.jpg}
+\caption{Division en laps de temps}
+\label{WAV3}
+\end{figure}
+
+Et cette onde peut etre générée par le code qui suit, dans lequel les échantillons sont sortis 10 par 10, peuvent donc etre lus à la chaine sans risque de dépassement avec la fonction "blip read samples()".
+
+\begin{lstlisting}
+	blip_add_delta(blip,4,5);
+	blip_add_delta(blip,8,-10);
+	blip_end_frame(blip, 10);
+	
+	blip_add_delta(blip,2,10);
+	blip_add_delta(blip,6,-10);
+	blip_end_frame(blip, 10);
+	
+	blip_add_delta(blip,0,10);
+	blip_add_delta(blip,4,-10);
+	blip_add_delta(blip,8,10);
+	blip_end_frame(blip, 10);
+\end{lstlisting}
+
+La longueur des laps de temps peut bien sur varier d'une lecture à l'autre.
+
+Il existe une limite de 4000 échantillons de sortie par laps de temps, le nombre de pas d'horloge dépendant de la fréquence de cette dernière.
+Pour des fréquences d'échantillonage classique, on arrive à des laps de temps d'un quinzieme de seconde, plus que suffisant pour nombre d'uilisations.
+
 \chapter{Méthodes de débuggage et roms de test}
 Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par un dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une Game Boy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et par conséquent d'obtenir un CPU stable \ref{testcpu}.
 \begin{figure}[!h]
