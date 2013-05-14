@@ -36,6 +36,7 @@
 \chapter*{Remerciements}
 Nous souhaitons tout d'abord remercier M. William PUECH notre tuteur qui a bien voulu nous encadrer pour ce travail d'études et de recherches, ainsi que son doctorant M. Vincent ITIER qui a été présent lors des réunions. \\Nous remercions également la communauté présente sur internet qui participe activement au développement d'émulateurs ainsi qu'à la rédaction de documentations abordables. Et tout spécialement le dénommé "Blargg" qui a produit et mis à disposition toutes sortes d'outils destinés au développement d'émulateurs.
 \tableofcontents
+\listoffigures
 \chapter*{Introduction}
 	Dans le cadre de la 1ère année de Master Informatique à l'Université de Montpellier
 	2, tous les élèves de la promotion ont été amenés à réaliser un projet
@@ -121,6 +122,8 @@ Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte Game Boy, 
 \subsection{No\$GMB}
 No\$GMB \cite{nogmb} est un émulateur de Game Boy, Game Boy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
 \section{Articles de recherches}
+Le choix des articles de recherches a été plutôt délicat, car les composants de la Game Boy étant relativement anciens aucun article ne traitait réellement du sujet. Nous avons donc porter notre choix, tout d'abord sur un document qui n'est pas réellement un article de recherches mais plutot une documentation sur les techniques de programmation permettant de réaliser un émulateur. Cette article est très interessant pour nous car il traite de différentes méthodes que nous avons du utiliser pour réaliser notre projet. Les deux articles suiavnt sont des plutôt des choix personnels car ne traitant pas de l'émulation de consoles mais de différentes techniques actuelles utilisées pour optimiser l'émulation de processeurs qu'ils soient multi-coeurs ou non. Ces articles restent relativement complexes du au techniques utilisées mais compréhensibles dans la mesure ou nous connaissons les bases de l'émulations.
+
 
 \chapter{Etude du Hardware}
 \section{CPU}
@@ -181,9 +184,16 @@ Le GPU de la Game Boy est intégré dans le même circuit intégre que le CPU. S
 L'affichage de la Game Boy se fait via un ecran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.
 Ces périodes de VBlank ou de HBlank ont un nombre de cycles défini, c'est
 durant ces périodes que l'accés au différentes matrices en écriture va être
-débloqué pour que le CPU puisse modifier les éléments à afficher.\\
+débloqué pour que le CPU puisse modifier les éléments à afficher.\\\\
 
-->schéma d'affichage
+Schéma des cycles du GPU:\\
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.8]{images/gpu_cycles.png}
+\caption{Schéma des cycles d'affichage du GPU}
+\label{gpucycles}
+\end{figure}
+
 
 \subsection{Génération d'une ligne}
 
@@ -297,12 +307,9 @@ Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'ad
 \end{itemize}
 
 \subsection{VRAM}
+La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 KBytes. Elle est donc utilisée pour tout ce qui touche à l'affichage que ce soit les couleurs ou les différentes couches d'affichage. Tout les registres que nous avons vu précédement sont contenus en sont sein.
 	
 
-
-\subsection{Exemple d'affichage}
-
-->schéma
 
 \section{MMU}
 le MMU soit Memory Management Unit est un composant qui autorise ou non l'accès en mémoire demandée par le processeur.
@@ -1443,12 +1450,75 @@ La Game Boy dispose d'un port link pour pouvoir communiquer avec une autre Game 
 \subsection*{Implémenter la Game Boy color}
 La Game Boy color a une architecture basée sur la Game Boy et donc très similaire, son portage est donc réalisable. 
 \section*{Emulation aujourd'hui}
+Aujourd'hui l'émulation est procédé extrèmement utile pour différentes tâches. Une des principales utilitées de l'émulation concerne les serveurs. Les serveurs actuels étant extrêment puissant, ils sont souvent utilisés dans les entreprises pour créer une multitude d'environnements de travail, en créant des machines virtuelles en leur sein. Cette technique est extrêment utile lorqu'il sagit de gérer plusieurs logiciels sur un même serveur mais aussi pour créer des environnements de test. 
+Les principales avancées et recherches actuelles dans le domaine de l'émulation concernent en grande partie, l'optimisation de la gestions des processus et la répartition des charges sur les différents coeurs pour les processeurs multi-coeurs.
 %bibliographie
 \bibliographystyle{plain}
 \bibliography{rapport}
 %annexes
 \appendix
 \chapter{Comptes rendus de réunion}
+\begin{quotation}
+Compte rendu de la réunion de projet du 13/02/13\\
+Travail réalisé :\\
+	-Création des tables du Z80 (tables contenant tous les opcodes du processeur)\\
+	-Ajout des fonctions de gestion du MBC1 et MBC2 (puces des cartouches Gameboy)\\
+	-Une grande partie de la gestion de la mémoire a été implémentée\\
+	-Rédaction et envoi de la feuille de route\\
+	-Choix de trois articles en rapport avec notre sujet\\
+Sujet abordé lors de la réunion :\\
+	-Impossibilité de gérer les interruptions sans la partie graphique et sonore, de ce fait on ne peut tester correctement le processeur car celui-ci boucle sur certaines adresses mémoire car il attend une interruption et une modification de ces adresses\\
+Objectifs pour la prochaine réunion :\\
+	-Commencer la partie graphique et la partie son, pour pouvoir gérer les interruptions\\
+	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de priorités dans les tâches\\
+	-Faire un résumer des articles de recherche choisis en rapport avec notre sujet\\
+
+Les deux diagrammes de Gantt celui créé après la première réunion et le nouveau sont joints dans le mail.\\
+Concernant les tables du Z80 la liste des opcodes se trouve à l’adresse ci-dessous : http://www.pastraiser.com/cpu/gameboy/gameboy\_opcodes.html\\
+\end{quotation}
+
+\begin{quotation}
+Compte rendu de la réunion de projet du 06/03/13\\
+Travail réalisé :\\
+	-Base de la partie graphique mise en place\\
+	-Base de la partie son mise en place\\
+	-Résumés des trois articles mis en ligne\\
+Sujet abordé lors de la réunion :\\
+	-Explications du travail effectué sur la partie graphique et la partie sonore, résumé du fonctionnement des deux parties et des problèmes rencontrés.\\
+Objectifs pour la prochaine réunion :\\
+	-Pour la partie sonore : finir de récupérer des informations sur les sons puis commencer à utiliser SDL pour produire un son.\\
+	-Pour la partie graphique : finir de mettre en place la SDL et commencer la phase de débug.\\
+\end{quotation}
+
+\begin{quotation}
+Compte rendu de la réunion de projet du 20/03/13\\
+Travail réalisé :\\
+	-Partie graphique en partie fonctionnelle avec la SDL\\
+	-Partie son mise en place\\
+	-Début de la mise en place du Joypad\\
+Sujets abordés lors de la réunion :\\
+	-Impossibilité de tester la partie son tant que toutes les autres parties ne sont pas finalisées.\\
+	-Changement de répartition du travail\\
+	-Problèmes de synchronisation de la partie graphique avec le moteur et quelques problèmes d’affichage des sprites\\
+Objectifs pour la prochaine réunion :\\
+	-Commencer à débuguer le CPU et le GPU\\
+	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de répartition du travail\\
+Les nouveaux diagrammes de Gantt sont disponibles à cette adresse : https://github.com/joakim-d/GroBoy/tree/master/Documents\_TER.\\
+\end{quotation}
+
+\begin{quotation}
+Compte rendu de la réunion de projet du 03/04/13\\
+Travail réalisé :\\
+	-Emulateur en partie fonctionnel (possibilité de faire marcher les jeux en mbc1)\\
+Sujets abordé lors de la réunion :\\
+	-Changement de répartition du travail, retour à l’ancienne répartition\\
+	-Quelques problèmes à finir de débuguer\\
+Objectifs pour la prochaine réunion :\\
+	-Commencer les parties optionnelles (sauvegarde, menu, …)\\
+	-Continuer la partie son\\
+	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de répartition du travail\\
+Les nouveaux diagrammes de Gantt sont disponibles à cette adresse : https://github.com/joakim-d/GroBoy/tree/master/Documents\_TER.\\
+\end{quotation}
 \chapter{Générer un son en temps réel et sans fichier avec la SDL}
 \chapter{Méthodes de débuggage et roms de test}
 Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par un dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une Game Boy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et par conséquent d'obtenir un CPU stable \ref{testcpu}.
@@ -1458,5 +1528,4 @@ Le développement de la partie CPU a été épineux. Dans le sens où la moindre
 \caption{Capture des tests réussis des instructions CPU avec groboy}
 \label{testcpu}
 \end{figure}
-\listoffigures
 \end{document}
