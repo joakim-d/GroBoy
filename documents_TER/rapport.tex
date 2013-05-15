@@ -217,11 +217,25 @@ l'écran sur une zone d'une des matrices via la modification des valeurs de
 deux registres. L'écran peut ainsi naviguer sur ces matrices pour modifier
 l'affichage.\\
 
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.8]{images/background.png}
+\caption{Schéma d'affichage du background}
+\label{background}
+\end{figure}
+
 \item \textbf{La couche Window:}
 	Cette couche est généralement utilisée pour tous les éléments statique
 d'un jeu, comme la barre de menu ou les scores. Elle a un comportement
 similaire à celui de la couche Background si ce n'est qu'elle ne possède qu'une seule
 matrice et qu'elle est positionnée par rapport à l'écran et non l'inverse.\\
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.8]{images/window.png}
+\caption{Schéma d'affichage de la window}
+\label{background}
+\end{figure}
 
 \item \textbf{La couche Sprites:}
 	Cette couche est utilisées pour représenter les objets d'intérets d'un
@@ -914,7 +928,7 @@ Comme on peut le voir ci-dessus, les différents compteurs sont initialisés à 
 	reset_force_write();
 \end{lstlisting}	
 
-Dans cette partie, l'on ajoute le nombre de cycle fait par le CPU au compteur du VBlank et si le compteur dépasse 70224, qui est le nombre de cycles correspondant à une réactualisation de l'écran alors on déduit ce nombre du compteur. Cela permet de gérer les différents cycles d'affichage. Ensuit l'on écrit dans le registre de position de l'écran, la ligne où l'on se trouve.
+Dans cette partie, l'on ajoute le nombre de cycle fait par le CPU au compteur du VBlank et si le compteur dépasse 70224, qui est le nombre de cycles correspondant à une réactualisation de l'écran alors on déduit ce nombre du compteur. Cela permet de gérer les différents cycles d'affichage. Ensuite l'on écrit dans le registre de position de l'écran, la ligne où l'on se trouve.
 
 \begin{lstlisting}                                        
      	lyc = memory_read(0xFF45);
@@ -978,7 +992,7 @@ if(vblank_clock_counter >= 65664){ //Si on entre dans la periode de vblank
 La dernière partie de cet algorithme est très importante puisque c'est ici que l'on execute les différents taches en fonction des périodes. Si l'on est en période de VBlank alors l'on va tout d'abord dessiner l'écran puis envoyer une interruption de type VBlank ce qui va autoriser de nouveau le CPU à écrire dans la VRAM et l'OAM. SI l'on n'est pas dans une période de VBlank alors en fonction des modes vu en partie hardware, l'on va envoyer ou non une interruption, mettre à jour les différents flags et/ou dessiner une ligne.\\
 
 \subsection{Les fonctions d'affichage}
-L'algorithme principal mis en place, l'étape suivante était le remplissage de la martrice de pixels. Pour cela nous avons implémenté une fonction gpu\_drawline(), qui comme son nom l'indique va remplir une ligne de la matrice, cette fonction est appelée par l'algorithme vu précédent, lorsque le GPU passe en période de HBlank. Son fonctionnement est le suivant:\\
+L'algorithme principal mis en place, l'étape suivante était le remplissage de la matrice de pixels. Pour cela nous avons implémenté une fonction gpu\_drawline(), qui comme son nom l'indique va remplir une ligne de la matrice, cette fonction est appelée par l'algorithme vu précédent, lorsque le GPU passe en période de HBlank. Son fonctionnement est le suivant:\\
 \begin{itemize}
 \item \textbf{Si le Background est établi:}
 	On regarde tout d'abord quelles sont la ligne et la colonne courante, puis l'on va chercher dans la matrice contenant les tuiles du Background, la tuile correpondante. L'on récupère ensuite la position en x et en y du pixel à déssiner par rapport à la tuile, on parcours toute la ligne en stockant dans la matrice les pixels.\\
