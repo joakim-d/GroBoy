@@ -78,25 +78,25 @@ Nous souhaitons tout d'abord remercier M. William PUECH notre tuteur qui a bien 
 \chapter{Organisation du projet}
 \section{Choix des outils}
 Ce projet a été réalisé grâce à de nombreux outils, les voici, avec les raisons qui ont motivés nos choix.\\
-Si cette partie est importante, le nombre de projets que nous avons déjà réalisé par le passé nous a apporté une expérience et un bagage suffisants pour prendre ces décisions rapidement. Les motivations présentés ci-dessous sont par conséquent d'apparence courtes, mais la réflexion qui a précédé les choix n'en a pas pour autant été altérée.
+Si cette partie est importante, le nombre de projets que nous avons déjà réalisé par le passé nous a apporté une expérience et un bagage suffisants pour prendre ces décisions rapidement. Les motivations présentés ci-dessous sont par conséquent d'apparences courtes, mais la réflexion qui a précédé les choix n'en a pas pour autant été altérée.
 
 \subsection{Environnement de travail}
-Linux, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques d'un ensemble d'outils pour développer tel que gcc, gdb, etc. De plus l'installation de librairies et ou de logiciels supplémentaires est relativement aisée grâce aux systèmes de logithèques.
+\textbf{Linux}, car il est confortable pour les développeurs. Linux dispose dans la plupart des distributions classiques d'un ensemble d'outils pour développer tel que gcc, gdb, etc. De plus l'installation de librairies et/ou de logiciels supplémentaires est relativement aisée grâce au système de logithèques.
 
 \subsection{Langage}
-C, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des exécutables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
+\textbf{C}, un des langages les plus utilisés dans le monde de l'émulation. Il permet d'obtenir des exécutables compilés rapides, et selon les compilateurs de mettre en place des stratégies d'optimisations, afin de rendre l'émulateur plus fluide et rapide.
 
 \subsection{Compilateur}
-gcc, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'exécutable compilé.
+\textbf{gcc}, compilateur du langage C, il accepte beaucoup d'options permettant d'optimiser l'exécutable compilé.
 
 \subsection{Librairie multimédia}
-SDL, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de Game Boy: affichage de fenêtre, son, interruptions et autres.
+\textbf{SDL}, une librairie multimédia pour le langage C. Elle dispose d'un ensemble de primitives permettant de gérer tout ce qui est nécessaire pour créer un jeu en 2D et donc un émulateur de Game Boy: affichage de fenêtre, son, interruptions et autres.
 
 \subsection{Dépôt}
-Github, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version. Le lien vers notre dépôt se trouve sur la page de bibliographie à \cite{github}.
+\textbf{Github}, un site permettant de créer gratuitement un dépôt git. git est un logiciel de contrôle de version, permettant aux membres d'un même projet de modifier ce projet, en faisant en sorte que chacun puisse travailler sur la même version. Le lien vers notre dépôt se trouve sur la page de bibliographie à \cite{github}.
 
 \subsection{IDE}
-Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du projet il a été propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte vim.
+Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du projet il a été propre à chacun d'utiliser l'IDE qui lui convient. Cependant la plupart du code a été édité avec l'éditeur de texte \textbf{Vim}.
 
 \subsection{Documentation et Information}
 Comme indiqué un peu plus haut, l'étude de la documentation a occupé une part importante de notre projet. Nous avons donc du nous concerter pour se mettre d'accord sur les documentations à utiliser, étant donné leur nombre, afin de ne pas être victime des petites différences que l'on peut trouver entre certaines d'entre elles.
@@ -124,8 +124,7 @@ Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte Game Boy, 
 \subsection{No\$GMB}
 No\$GMB \cite{nogmb} est un émulateur de Game Boy, Game Boy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
 \section{Articles de recherches}
-Le choix des articles de recherches a été plutôt délicat, car les composants de la Game Boy étant relativement anciens aucun article ne traitait réellement du sujet. Nous avons donc porter notre choix, tout d'abord sur un document qui n'est pas réellement un article de recherches mais plutot une documentation sur les techniques de programmation permettant de réaliser un émulateur. Cette article est très interessant pour nous car il traite de différentes méthodes que nous avons du utiliser pour réaliser notre projet. Les deux articles suiavnt sont des plutôt des choix personnels car ne traitant pas de l'émulation de consoles mais de différentes techniques actuelles utilisées pour optimiser l'émulation de processeurs qu'ils soient multi-coeurs ou non. Ces articles restent relativement complexes du au techniques utilisées mais compréhensibles dans la mesure ou nous connaissons les bases de l'émulations.
-
+Le choix des articles de recherches a été plutôt délicat, car les composants de la Game Boy étant relativement anciens aucun article ne traitait réellement du sujet. Nous avons donc porté notre choix, tout d'abord sur un document qui n'est pas réellement un article de recherche mais plutot une documentation sur les techniques de programmation permettant de réaliser un émulateur. Cette article est très intéressant pour nous car il traite de différentes méthodes que nous avons dû utiliser pour réaliser notre projet. Les deux articles suivants relèvent plus de choix personnels car ils ne traitent pas de l'émulation de consoles mais de différentes techniques actuelles utilisées pour optimiser l'émulation de processeurs qu'ils soient multi-coeurs ou non. Ces articles restent relativement complexes de part leur aspect technique mais compréhensibles dans la mesure où nous connaissons les bases de l'émulations.
 
 \chapter{Etude du Hardware}
 \section{CPU}
@@ -135,7 +134,7 @@ Une de ses spécificités est qu'il est capable de faire des opérations 16 bits
 Il est cadencé à 4,194304 MHz, possède un peu moins de 512 instructions et est de type little endian.
 \subsection{Registres}
 
-Un registre interne est un espace mémoire interne au CPU, ce qui donne au CPU un accés en temps réel à cet espace mémoire. Aucun autre composant ne peut y accéder.
+Un registre interne est un espace mémoire interne au CPU, ce qui donne au CPU un accès en temps réel à cet espace mémoire. Aucun autre composant ne peut y accéder.
 Le LR35902 possède 10 registres internes: 2 registres 16 bits PC et SP, et 8 registres 8 bits A, F, B, C, D, E, H, L.
 Ce CPU est capable pour certaines opérations de coupler certains registres tels A et F, B et C, D et E, H et L, pour en faire des registres 16 bits, AF, BC, DE, HL.
 Pratiquement tous les registres ont des rôles spécifiques:\\\\
@@ -144,7 +143,7 @@ Le registre SP appelé "Stack Pointer" est le registre pointant vers le sommet d
 Le registre A appelé "Accumulator" est celui dans lequel la plupart des résultats des opérations sont stockés.\\\\
 Le registre F appelé "Flags" est modifié par certaines circonstances.
 Il possède 4 drapeaux, Z, N, H, C. Un drapeau n'est rien d'autre qu'un certain bit activé ou non, mais qui a une signification spécifique.
-Le registre F étant rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux, 
+Le registre F étant, rappelons le, un registre 8 bits, seuls les 4 bits de hauts niveaux servent pour les drapeaux, 
 ils sont disposés tels quels: \\Z N H C - - - -.\\Les 4 bits de bas niveaux sont eux toujours à 0.
 Généralement, \\Le drapeau Z est à 1 lorsque le résultat d'une opération vaut 0, 0 sinon.\\
 Le drapeau N est à 1 lorsque l'opération est une soustraction, 0 pour une addition, sinon il garde son état.\\
@@ -159,7 +158,7 @@ Une instruction est un calcul ou un ordre que va exécuter/commander le processe
 \textbf{instructions en 16 bits de chargement/sauvegarde/déplacement} | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.\\\\
 \textbf{instructions de sauts et d'appels} | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.\\\\
 \textbf{instructions de contrôles/diverses} | exemple: "NOP", soit, ne rien faire.\\\\
-Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre maximum d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant:\\ 
+Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant:\\ 
 Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x2000) = 0x00, (0x2001) = 0xCA, (0x2002) = 0xEF, (0x2003) = 0xBE.
 
 Comme PC vaut 0x2000 le processeur lit d'abord 0x00 ce qui correspond à l'instruction "NOP", ne rien faire. 
@@ -171,7 +170,6 @@ Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH 
 Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
 Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
 \\\\
-Schéma réprésentant le LR35902:\\
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.80]{images/schema_cpu.png}
@@ -179,16 +177,15 @@ Schéma réprésentant le LR35902:\\
 \end{figure}
 \section{GPU}
 
-Le GPU de la Game Boy est intégré dans le même circuit intégre que le CPU. Sa fonction est de générer une image à partit des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+Le GPU de la Game Boy est intégré dans le même circuit physique que le CPU. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
-L'affichage de la Game Boy se fait via un ecran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dites de HBlank ce qui correspond à un retour à la ligne puis afficher la ligne suivante. Ce cycle s'effectue jusqu'à la dernière ligne, s'en suit alors une période de VBlank qui correspond à un retour à la première ligne.
+L'affichage de la Game Boy se fait via un écran LCD d'une résolution de 160*144 pixels. Cet affichage se fait en périodes, il va tout d'abord afficher une ligne puis passer dans une période dite de HBlank, ce qui correspond à un retour à la ligne, puis afficher la ligne suivante. Cette routine s'effectue jusqu'à la ligne 144, s'ensuit alors une période de VBlank qui correspond à un retour à la première ligne.
 Ces périodes de VBlank ou de HBlank ont un nombre de cycles défini, c'est
-durant ces périodes que l'accés au différentes matrices en écriture va être
+durant ces périodes que l'accès aux différentes matrices en écriture va être
 débloqué pour que le CPU puisse modifier les éléments à afficher.\\\\
 
-Schéma des cycles du GPU:\\
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.8]{images/gpu_cycles.png}
@@ -199,23 +196,23 @@ Schéma des cycles du GPU:\\
 
 \subsection{Génération d'une ligne}
 
-Trois types de couches peuvent être affichés: la couche background, la couche
-window et la couche sprites, les deux première peuvent être activées ou
-désactivées selon les jeu en modifiant un registre ( à l'adresse FF40 ).
+Trois types de couches graphiques peuvent être affichées: la couche background, la couche
+window et la couche sprites, les deux premières peuvent être activées ou
+désactivées selon les jeux en modifiant un registre ( à l'adresse FF40 ).
 
 Ces trois couches ont des rôles différents et servent à séparer différents
 éléments graphiques d'un jeu.\\
 
 \begin{itemize}
 \item \textbf{La couche Background:}
-	Cette couche comprends tout les éléments qui appartiennent au décor du
-jeu. Elle est représentée par deux matrice de 256*256 pixels, soit 32*32
-tuiles (carré de 8*8 pixels). La Game Boy peut donc passer d'une matrice à
-l'autre pour afficher les différents éléments du décor. Ces matrices étant
-d'une taille supérieure à celle de l'écran lors de l'affichage, la positionne
-l'écran sur une zone d'une des matrices via la modification des valeurs de
-deux registres. L'écran peut ainsi naviguer sur ces matrices pour modifier
-l'affichage.\\
+	Cette couche comprend tous les éléments qui appartiennent au décor du
+jeu. Elle est représentée par deux matrices de 256*256 pixels, soit 32*32
+tuiles (carrés de 8*8 pixels). La Game Boy peut donc passer d'une matrice à
+l'autre pour réaliser des transitions vidéos entre deux scènes. Ces matrices étant
+d'une taille supérieure à celle de l'écran lors de l'affichage, il est possible de gérer la position de
+l'écran sur une zone desdites matrices via la modification des valeurs de
+deux registres. 
+\\
 
 \begin{figure}[!h]
 \centering
@@ -225,10 +222,9 @@ l'affichage.\\
 \end{figure}
 
 \item \textbf{La couche Window:}
-	Cette couche est généralement utilisée pour tous les éléments statique
+	Cette couche est généralement utilisée pour tous les éléments statiques
 d'un jeu, comme la barre de menu ou les scores. Elle a un comportement
-similaire à celui de la couche Background si ce n'est qu'elle ne possède qu'une seule
-matrice et qu'elle est positionnée par rapport à l'écran et non l'inverse.\\
+similaire à celui de la couche Background si ce n'est qu'elle est positionnée par rapport à l'écran et non l'inverse.\\
 
 \begin{figure}[!h]
 \centering
@@ -238,9 +234,8 @@ matrice et qu'elle est positionnée par rapport à l'écran et non l'inverse.\\
 \end{figure}
 
 \item \textbf{La couche Sprites:}
-	Cette couche est utilisées pour représenter les objets d'intérets d'un
-jeu (personnages, objets, etc). Elle est représentée en mémoire par un maximum
-de 40 tuiles différentes. Ces tuiles sont positionnées à l'écran via un registre indiquant leur position absolue, ainsi que diverses options d'affichage comme la possibilité d'appliquer une symétrie verticale ou horizontale sur la tuile.\\
+	Cette couche est utilisée pour représenter les éléments mobiles d'un jeu (personnages, objets, etc). Elle est représentée en mémoire par un maximum
+de 40 tuiles différentes. Ces tuiles sont positionnées à l'écran via un registre indiquant leur position absolue, ainsi que diverses options d'affichage, comme la possibilité d'appliquer une symétrie verticale ou horizontale sur la tuile.\\
 \end{itemize}
 
 \subsection{Les couleurs}
@@ -249,8 +244,7 @@ Les couches Background et Window utilisent un registre (palette monochrome) pour
 couleurs des différents pixels, dans le cas de la Game Boy ce registre contient
 4 niveaux de gris codés sur 2 bits.
 
-La couche Sprite peux utiliser deux palettes qui diffèrent en un point de la
-palette précédente, la valeur 00 ne correspond pas au blanc mais au fait que
+La couche Sprite peut utiliser deux palettes qui diffèrent en un point de la précédente : la valeur 00 ne correspond pas au blanc mais au fait que
 le pixel soit transparent.\\
 
 \subsection{Les registres d'affichage}
@@ -259,21 +253,21 @@ C'est un registre 8 bits accessible en lecture et écriture situé à l'adresse 
 
 \begin{itemize}
 \item \textbf{bit 0:}
-	Permet de gérer l'affichage du Background, mis à 0 il permet d'afficher un fond blanc à la place du Background. mis à 1 le Background sera affiché normalement.\\
+	Permet de gérer l'affichage du Background, mis à 0 il permet d'afficher un fond blanc à la place du Background. Mis à 1 le Background sera affiché normalement.\\
 \item \textbf{bit 1:}
 	Permet l'affichage ou non des sprites.\\
 \item \textbf{bit 2:}
 	Ce bit indique la taille des sprites utilisés. S'il est mis à 0, des sprites de 8*8 seront utilisés, par contre s'il est mis à 1 les sprites auront une taille de 8*16.\\
 \item \textbf{bit 3:}
-	Ce bit permet de choisir qu'elle matrice de tuiles l'on va utilisée pour afficher le Background. Mis: à 0 la matrice située entre 0x9800 et 0x9BFF sera utilisée, à 1 la matrice située entre 0x9C00 et 0x9FFF sera utilisée.\\
+	Ce bit permet de choisir quelle matrice de tuiles à utiliser pour afficher le Background. Mis à 0, la matrice située entre 0x9800 et 0x9BFF sera utilisée, à 1 la matrice située entre 0x9C00 et 0x9FFF sera utilisée.\\
 \item \textbf{bit 4:}
-	Même fonctionnement que le bit précédent sauf que celui-ci sert à choisir la matrice contenant les données des tuiles. La matrice contenu entre les adresses 0x8800 et 0x97FF est choisi si le bit est à 0, sinon c'est celle entre les adresses 0x8000 et 0x8FFF si le bit est à 1.\\
+	Même fonctionnement que le bit précédent sauf que celui-ci sert à choisir la matrice contenant les données des tuiles. La matrice contenue entre les adresses 0x8800 et 0x97FF est choisie si le bit est à 0, sinon c'est celle entre les adresses 0x8000 et 0x8FFF.\\
 \item \textbf{bit 5:}
-	Permet de choisir si l'on affiche ou non la Window. Si 0 elle n'est pas affichée, si 1 on l'affiche.\\
+	Permet de gérer l'affichage de la couche Window. Si 0 elle n'est pas affichée, si 1 elle l'est.\\
 \item \textbf{bit 6:}
 	Même fonctionnement que le bit 3 sauf qu'il permet de choisr la matrice de tuiles pour afficher la Window.\\
 \item \textbf{bit 7:}
-	Ce bit sert à activer ou désactiver l'écran LCD. Il ne doit être désactiver seulement pendant les périodes de VBlank sous peine d'endommager la Game Boy. Mettre à 0 ce bit rend aussi accessible librement la VRAM et OAM.\\
+	Ce bit sert à activer ou désactiver l'écran LCD. Il doit être désactivé seulement pendant les périodes de VBlank sous peine d'endommager la Game Boy. Mettre à 0 ce bit rend aussi accessible librement la VRAM et OAM.\\
 \end{itemize}
 
 \subsubsection{LCD Status Register}
@@ -281,54 +275,54 @@ Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'ad
 
 \begin{itemize}
 \item \textbf{bit 0-1}
-	Ces bits correspondent au Mode Flag et sont accessibles seulement en lecture, ils déterminent dans quelle période l'on se trouve: 0 pour le HBlank, 1 pour le VBlank, 2 pour la lecture de la mémoire OAM et 3 pour le transfert des données vers l'écran LCD.\\
+	Ces bits correspondent au Mode Flag et sont accessibles seulement en lecture. Ils déterminent dans quelle période l'écran LCD se trouve: 0 pour le HBlank, 1 pour le VBlank, 2 pour la lecture de la mémoire OAM et 3 pour le transfert des données vers l'écran LCD.\\
 \item \textbf{bit 2:}
 	Accessible seulement en lecture, il représente le "Coincidence Flag", il est mis à 0 si les registres LYC et LY sont différents, à 1 sinon.\\
 \item \textbf{bit 3:}
-	Ce bit est mis à 1 si il y a une interruption liée au HBlank qui doit être faite.\\
+	Ce bit est mis à 1 si une interruption liée au HBlank est nécessaire.\\
 \item \textbf{bit 4:} 
 	Idem que le bit précédent mais pour le VBlank.\\
 \item \textbf{bit 5:}
 	Idem mais pour la mémoire OAM.\\
 \item \textbf{bit 6:}
-	Ce bit est activé si la valeur du registre LYC et celle du registre LY sont égale, une interruption sera alors déclenchée.\\
+	Ce bit est activé si la valeur du registre LYC et celle du registre LY sont égales, une interruption sera alors déclenchée.\\
 \item \textbf{bit 7:}
 	Il n'est pas utilisé.\\
 \end{itemize}
 
 \subsection{OAM}
-	La table OAM (Object Attribute Memory) est située entre les adresse 0xFE00 et 0xFE9F, elle contient tout les attributs liés au sprites. Elle est accessible uniquement pendant les périodes de HBlank et de VBlank. Elle est composée de 40 entrées de 4 bytes chacunes:\\
+	La table OAM (Object Attribute Memory) est située entre les adresses 0xFE00 et 0xFE9F, elle contient tous les attributs liés aux sprites. Elle est accessible uniquement pendant les périodes de HBlank et de VBlank. Elle est composée de 40 entrées de 4 octets chacunes:\\
 
 \begin{itemize}
-\item \textbf{byte 0:}
-	Ce byte spécifie la position verticale du sprite, suivant sa valeur le sprites sera visible ou non (les valeurs verticales de l'écran allant de 16 à 160).\\
-\item \textbf{byte 1:}
-	Ce byte spécifie la position horizontale du sprite, les valeurs doivent être comprises entre 8 et 168 pour que le sprite soit visible.\\
-\item \textbf{byte 2:}
-	Ce byte correspond au numéro de la tuile à aller chercher dans la matrice contenant toutes les tuiles située entre 0x8000 et 0x8FFF.\\
-\item \textbf{byte 3:}
+\item \textbf{octet 0:}
+	Cet octet spécifie la position verticale du sprite, qui sera invisible si sa position dépasse la largeur de l'écran.\\
+\item \textbf{octet 1:}
+	Cet octet spécifie la position horizontale du sprite, les valeurs doivent être comprises entre 8 et 168 pour qu'il soit visible.\\
+\item \textbf{octet 2:}
+	Cet octet correspond à la position d'une tuile dans la matrice qui les contient toutes, située entre 0x8000 et 0x8FFF.\\
+\item \textbf{octet 3:}
 	\begin{itemize}
 	\item \textbf{bit 0-3:}
 		Utilisés uniquement pour la Game Boy Color.\\
 	\item \textbf{bit 4:}
-		Permet de choisir laquelle des deux palettes de couleurs, l'on va utiliser.\\
+		Permet de choisir laquelle des deux palettes de couleurs est à utiliser.\\
 	\item \textbf{bit 5:}
-		S'il est activé, l'on applique une symétrie horizontale sur le sprite.\\
+		S'il est activé, applique une symétrie horizontale sur le sprite.\\
 	\item \textbf{bit 6:}
-		S'il est activé, l'on applique une symétrie verticale sur le sprite.\\
+		S'il est activé, applique une symétrie verticale sur le sprite.\\
 	\item \textbf{bit 7:}
-		Ce bit indique la priorité entre le sprite et le Background, s'il est à 0 le sprite a la priorité sinon c'est l'inverse.\\
+		Ce bit indique qui, du sprite ou de la couche Background est prioritaire sur l'affichage. \\
 	\end{itemize}
 	
 \end{itemize}
 
 \subsection{VRAM}
-La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 KBytes. Elle est donc utilisée pour tout ce qui touche à l'affichage que ce soit les couleurs ou les différentes couches d'affichage. Tout les registres que nous avons vu précédement sont contenus en sont sein.
+La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 KBytes. Elle est donc utilisée pour tout ce qui touche à l'affichage, qu'il s'agisse des nuances de gris ou des différentes couches d'affichage. Tous les registres que nous avons vu précédemment sont contenus en son sein.
 	
 
 
 \section{MMU}
-le MMU soit Memory Management Unit est un composant qui autorise ou non l'accès en mémoire demandée par le processeur.
+Le MMU (soit Memory Management Unit) est un composant qui autorise ou non l'accès en mémoire demandé par le processeur.
 En fait la Game Boy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
 Pour mieux comprendre à quoi correspond cet espace, l'espace d'adressage sera
 dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
@@ -344,18 +338,18 @@ plus en détails:\\
 \subsection{0x0000-0x7FFF ROM de la cartouche}
 \begin{itemize}
 \item \textbf{0x0000-0x3FFF:} Banque 0 de la ROM de la cartouche.
-\item \textbf{0x4000-0x7FFF:} Banque 1-n de la ROM de la cartouche (Voir partie Cartouche de jeu).
+\item \textbf{0x4000-0x7FFF:} Banque 1-n de la ROM de la cartouche (voir partie Cartouche de jeu).
 \end{itemize}
 
 \subsection{0x8000-0x9FFF RAM interne dédiée aux dessins du jeu}
 \begin{itemize}
 \item \textbf{0x8000-0x97FF:} Données des dessins, où sont stockés tous les dessins du jeu.
-\item \textbf{0x9800-0x9BFF:} "Background Map" 1, zone spécifiant les dessins à utiliser pour dessiner l'arrière plan 1.
-\item \textbf{0x9C00-0x9FFF:} "Background Map" 2, zone spécifiant les dessins à utiliser pour dessiner l'arrière plan 2. 
+\item \textbf{0x9800-0x9BFF:} "Background Map" 1, zone spécifiant les dessins à utiliser pour dessiner l'arrière-plan 1.
+\item \textbf{0x9C00-0x9FFF:} "Background Map" 2, zone spécifiant les dessins à utiliser pour dessiner l'arrière-plan 2. 
 \end{itemize} 
 
 \subsection{0xA000-0xBFFF RAM de la cartouche}
-Zone dédiée à la RAM de la cartouche (Voir Partie Cartouche de jeu)
+Zone dédiée à la RAM de la cartouche (Voir Partie Cartouche de jeu).
 
 \subsection{0xC000-0xFDFF RAM interne}
 \begin{itemize}
@@ -379,23 +373,23 @@ non. (Voir partie Interruptions)
 \end{itemize} 
 
 \section{Cartouche de jeu}
-Une cartouche de jeu est composée au minimum d'une mémoire (un circuit intégré) appelée ROM (Read Only Memory), mais peut aussi contenir dans certains cas de la RAM (Random Access Memory) ou d'autres composants que nous verrons un peu plus loin.
+Une cartouche de jeu est composée au minimum d'une mémoire morte, appelée ROM (Read Only Memory), mais peut aussi contenir dans certains cas de la RAM (Random Access Memory) ou d'autres composants que nous verrons un peu plus loin.
 
 \subsection{Le header}
 Dans chaque cartouche, une zone d'information la concernant est située entre les adresses 0x0100 et 0x014F, cette zone est appelée le header. Les différentes informations contenues dans cette zone sont les suivantes:\\
 
 \begin{itemize}
 
-\item \textbf{0x0100-0x0103:} Cette addresse est le point d'entrée du programme, après l'affichage du logo Nintendo, le processeur va faire un "jump" vers cette adresse, puis faire un autre "jump" vers la valeur qu'elle contient qui est en fait l'adresse du début du programme.\\
+\item \textbf{0x0100-0x0103:} Cette adresse est le point d'entrée du programme. Après l'affichage du logo Nintendo, le processeur exécute un "jump" vers cette adresse, puis un second vers la valeur qu'elle contient qui est en fait celle du début du programme.\\
 
-\item \textbf{0x0104-0x0133:} Cette addresse contient les bytes permettant l'affichage du logo Nintendo quand la Game Boy s'allume. Les valeurs sont les suivantes:
+\item \textbf{0x0104-0x0133:} Cette addresse contient les octets définissant le logo Nintendo quand la Game Boy s'allume. Les valeurs sont les suivantes:
 \\CE ED 66 66 CC 0D 00 0B 03 73 00 83 00 0C 00 0D
 \\00 08 11 1F 88 89 00 0E DC CC 6E E6 DD DD D9 99
 \\BB BB 67 63 6E 0E EC CC DD DC 99 9F BB B9 33 3E\\
 
 \item \textbf{0x0134-0x0143:} Le titre du jeu est stocké à cette adresse, il est écrit en majuscule et en ASCII.\\
 
-\item \textbf{0x013F-0x0142:} Cette adresse correspond au code de l'entreprise qui a créée le jeu, par exemple pour Nintendo cette adresse aura la valeur: 0x33.\\
+\item \textbf{0x013F-0x0142:} Cette adresse correspond au code de l'entreprise qui a créé le jeu, par exemple pour Nintendo, cette adresse aura la valeur 0x33.\\
 
 \item \textbf{0x0143:} Le CGB (Color Game Boy) Flag est contenu à cette adresse, il permet d'indiquer si le jeu est compatible avec les autres Game Boy ou seulement avec la Game Boy Color.\\
 
@@ -409,14 +403,7 @@ Dans chaque cartouche, une zone d'information la concernant est située entre le
 \\00h -  32KByte (pas de banque)
 \\01h -  64KByte (4 banques)
 \\02h - 128KByte (8 banques)
-\\03h - 256KByte (16 banques)
-\\04h - 512KByte (32 banques)
-\\05h -   1MByte (64 banques)
-\\06h -   2MByte (128 banques)
-\\07h -   4MByte (256 banques)
-\\52h - 1.1MByte (72 banques)
-\\53h - 1.2MByte (80 banques)
-\\54h - 1.5MByte (96 banques)\\
+\\...
 
 \item \textbf{0x0149:} La taille de la RAM est indiquée à cette adresse:
 \\00h - Aucune
@@ -431,45 +418,40 @@ Dans chaque cartouche, une zone d'information la concernant est située entre le
 \end{itemize}
 
 \subsection{Memory Bank Controllers}
-Les bus d'adressage de 16 bits de la Game Boy offrent un espace d'adressage limité pour la ROM et la RAM , de ce fait la plupart des cartouches utilisent une puce nommée MBC qui permet d'étendre cet espace en changeant de banque. Les différents types de puces MBC utilisées par la Game Boy sont les suivantes:\\
+Les bus d'adressage de 16 bits de la Game Boy offrent un espace d'adressage limité pour la ROM et la RAM. De ce fait, la plupart des cartouches utilisent une puce nommée MBC qui permet d'étendre cet espace en changeant de banque. Les différents types de puces MBC utilisés par la Game Boy sont les suivants:\\
 
-
-\subsubsection{aucun}
-	Les petits jeu qui ne dépassent pas 32 KBytes de ROM ne requièrent pas de puce MBC, la ROM est directement répartit sur les adresses 0x0000 à 0x7FFF et la RAM de 0xA000 à 0xBFFF. Ces jeu contiennent tout de même une petite puce qui ressemble à une puce MBC mais n'en est pas une.\\
 \subsubsection{MBC1}
-	La puce MBC1 est la première puce MBC, toute les suivantes fonctionnent de manière similaire, ce qui permet une compatibilité et une mise à niveau relativement simple. Cette puce est utilisée pour les jeux ne dépassant pas 2MByte de ROM et/ou 32 KByte de RAM.
+	La puce MBC1 est la première puce MBC, toutes les suivantes fonctionnent de manière similaire, ce qui permet une compatibilité et une mise à niveau relativement simple. Cette puce est utilisée par les jeux ne dépassant pas 2MByte de ROM et/ou 32 KByte de RAM.
 
 La répartition des adresses est la suivante:\\
 \begin{itemize}
 \item \textbf{0x0000-0x3FFF:} La banque de ROM 00 , cette banque contient toujours les 16 premiers KBytes de la ROM de la cartouche.\\
 \item \textbf{0x4000-0x7FFF:} Les banques de ROM 01 à 7F, cette zone contient toutes les autres banques de 16 KBytes, ce qui correspond à un total de 125 banques utilisables car les banques 0x20, 0x40 et 0x60 ne sont pas accessibles.\\
-\item \textbf{0xA000-0xBFFF:} Les banques de RAM 00 à 03 si elles existent. La RAM de la cartouche est principalement utilisée en complément d'un batterie pour pouvoir stocker les scores ou les sauvegardes et cela même si la Game Boy est éteinte ou la cartouche retirée.\\
-\item \textbf{0x0000-0x1FFF:} Cette adresse permet d'autoriser ou d'interdire l'écriture dans la RAM, écrire la valeur 0x0A permet d'autoriser l'écriture et 0x00 de l'interdire.\\
+\item \textbf{0xA000-0xBFFF:} Les banques de RAM 00 à 03 si elles existent. La RAM de la cartouche est principalement utilisée en complément d'une batterie pour pouvoir stocker les scores ou les sauvegardes et cela même si la Game Boy est éteinte ou la cartouche retirée.\\
+\item \textbf{0x0000-0x1FFF:} Cette adresse permet d'autoriser ou d'interdire l'écriture dans la RAM. Y écrire la valeur 0x0A permet d'autoriser l'écriture et 0x00 de l'interdire.\\
 \item \textbf{0x2000-0x3FFF:} Ecrire à cette adresse permet de sélectionner une banque. La banque est sélectionnée en fonction des 5 bits de poids faible, par contre si 0x00 est écrit la banque sélectionnée sera la banque 01, la même chose se passe pour les banques 20, 40 et 60.\\
-\item \textbf{0x4000-0x5FFF:} Ce registre de 2 bits permet de sélectionner une banque de RAM. Suivant le mode sélectionner (voir plus bas) il pourra aussi servir à sélectionner les 2 bits de poids fort de la banque de ROM.\\
-\item \textbf{0x6000-0x7FFF:} Ce registre de 1 bits va permettre de savoir comment vont être utilisés les 2 bits du registre précédent. Si l'on écrit la valeur 0x00 alors on les utilisera pour choisir la banque de ROM, par contre si 0x01 est écrit se sera pour choisir la banque de RAM.\\
+\item \textbf{0x4000-0x5FFF:} Ce registre de 2 bits permet de sélectionner une banque de RAM. Suivant le mode sélectionné (voir plus bas) il pourra aussi servir à sélectionner les 2 bits de poids fort de la banque de ROM.\\
+\item \textbf{0x6000-0x7FFF:} Ce registre de 1 bit va permettre de savoir comment vont être utilisés les 2 bits du registre précédent. Si la valeur 0x00 s'y trouve, ils sont utilisés pour choisir la banque de ROM, de RAM pour 0x01.\\
 \end{itemize}
 \subsubsection{MBC2}
-	La puce MBC2 est une version améliorée de la puce précédente, elle est utilisée pour les jeu ayant au plus 256 KByte de ROM et 4x512 bits de RAM.
+	La puce MBC2 est une version améliorée de la puce précédente, elle est utilisée par les jeux ayant au plus 256 KByte de ROM et 4x512 bits de RAM.
 \\Les différences entre les deux puces sont les suivantes:\\
 \begin{itemize}
-\item \textbf{0x4000-0x7FFF:} Même chose que la puce précédente sauf qu'un total de 16 banques de ROM est supporté.\\
-\item \textbf{0A000-A1FF:} Le MBC2 n'étant pas compatible avec la RAM externe, 512*4 bits de RAM sont inclus directement dans la puce du MBC, ce qui requiert une batterie pour sauvegarder les données durant les périodes ou la Game Boy est éteinte.\\
-\item \textbf{0x0000-0x1FFF:} Cette adresse permet de d'activer ou de désactiver la RAM. Le plsu petit bit signifiactif de l'adresse haute du Byte doit être 0, pour activer ou désactiver la RAM.\\
-\item \textbf{0x2000-0x3FFF:} Les 4 bits de poids faible écris ici serve à sélectionner la banque de ROM.\\
+\item \textbf{0x4000-0x7FFF:} Même chose que la précédente sauf qu'un total de 16 banques de ROM est supporté.\\
+\item \textbf{0A000-A1FF:} Le MBC2 n'étant pas compatible avec la RAM externe, 512*4 bits de RAM sont inclus directement dans la puce du MBC, ce qui requiert une batterie pour sauvegarder les données durant les périodes où la Game Boy est éteinte.\\
+\item \textbf{0x0000-0x1FFF:} Cette adresse permet d'activer ou de désactiver la RAM.\\
+\item \textbf{0x2000-0x3FFF:} Les 4 bits de poids faible écrits ici servent à sélectionner la banque de ROM.\\
 \end{itemize}
 \subsubsection{MBC3}
-	La puce MBC3 est la dernière version de la puce MBC1, compatible avec la Game Boy, elle est principalement utilisée pour les jeux prenant en compte l'heure actuelle et donc ayant besoin d'une horloge interne à la cartouche.\\
+	La puce MBC3 est la dernière version de la puce MBC1, compatible avec la Game Boy, elle est principalement utilisée par les jeux prenant en compte l'heure actuelle et donc ayant besoin d'une horloge interne à la cartouche.\\
+La plupart des registres fonctionnent de la même façon que son ancêtre, à quelques détails techniques près, les suivants permettant d'ajouter les fonctionnalités de gestion du temps.
 \begin{itemize}
-\item \textbf{0x0000-0x3FFF:} Même chose que le MBC1.\\
-\item \textbf{0x4000-0x7FFF:} Même chose que le MBC1 sauf que les banques 20, 40 et 60 sont accessibles.\\
-\item \textbf{0xA000-0xBFFF:} Cette espace est utilisé pour accéder à une banque de RAM externe ou au registre d'horloge.\\
-\item \textbf{0x0000-0x1FFF:} Même chose que le MBC1.\\
-\item \textbf{0x2000-0x3FFF:} Même chose que le MBC1 sauf que les 7 bits du numéro de banque sont directement écris ici.\\
-\item \textbf{0x4000-0x5FFF:} Même chose que pour le MBC1 écrire une valeur entre 0x00 et 0x03 permet de choisir la banque de RAM correspondante, par contre écrire une valeur entre 0x08 et 0x0C permet de sélectionner le registre d'horloge correspondant.\\
-\item \textbf{0x6000-0x7FFF:} Faire passer la valeur de 0x00 à 0x01 permet de verrouiller l'heure actuelle dans les registres d'horloge. Pour la déverrouiller la même procédure doit être répétée.\\ 
+\item \textbf{0xA000-0xBFFF:} Cet espace est utilisé pour accéder à une banque de RAM externe ou au registre d'horloge.\\
+\item \textbf{0x6000-0x7FFF:} Faire basculer la valeur de ce registre permet de verrouiller ou déverrouiller l'heure actuelle dans les registres d'horloge.\\ 
 \end{itemize}
 
+\subsubsection{Aucun}
+	Les petits jeux qui ne dépassent pas 32 KBytes de ROM ne requièrent pas de puce MBC. La ROM est directement répartie sur les adresses 0x0000 à 0x7FFF et la RAM de 0xA000 à 0xBFFF. Ces jeux contiennent tout de même une petite puce semblable à une MBC.\\
 
 \section{APU}
 \subsection{Présentation générale}
@@ -501,7 +483,7 @@ La répartition des adresses est la suivante:\\
 		volume.
 		\end{itemize}
 	Ces quatre ondes sont générées indépendamment et finalement
-	"mixées" pour diriger vers les canaux de sortie l'onde
+	"mixées" pour diriger vers les canaux de sortie celle
 	correspondant au son à produire pour le jeu.
 
 \subsection{Registres, valeurs et contrôles} 
@@ -513,7 +495,7 @@ La répartition des adresses est la suivante:\\
 	Ces registres sont séparés en 5 "familles" (4 pour les quatre
 	ondes, et une pour les contrôles du son) numérotés et appelés
 	par convention \textbf{NRXX} où NR signifie "Noise Register", et XX le
-	numéro du-dit registre. \\
+	numéro dudit registre. \\
 	Chacun de ces registres peut être utilisé pour stocker une
 	ou plusieurs valeurs, en utilisant tout ou seulement une
 	partie des 8 bits qu'il contient.\\
@@ -546,7 +528,7 @@ La répartition des adresses est la suivante:\\
 		une valeur de "temps montant" (1/8 pour 0, 1/4 pour
 		1, 1/2 pour 2 et 3/4 pour 3).
 		Les bits 0 à 5 donnent la valeur de la longueur
-		(période) du son à jouer. Cette valeur n'est prise en
+		du son à jouer. Cette valeur n'est prise en
 		compte que si c'est indiqué dans le registre \textbf{NR14}.\\
 	
 	\textbf{NR12(FF12):} Enveloppe de volume \\
@@ -660,11 +642,11 @@ La répartition des adresses est la suivante:\\
 	\textbf{NR43(FF22):} Compteur polynomial \\
 		L'amplitude est modifiée aléatoirement entre haute et
 		basse sur la fréquence donnée. Plus cette fréquence
-		est haute, moins le bruit paraître rude. 
+		est haute, moins le bruit paraîtra rude. 
 		Si le bit 3 est activé, l'intervalle de valeurs
 		aléatoires est réduit, et la sortie devient plus
-		régulière, rendant la sortie plus proche d'un réel
-		son que d'un bruit (au sens mathématique du terme).
+		régulière, la rendant la plus proche d'un réel
+		son que d'un bruit (au sens physique du terme).
 		Les bits 4 à 7 donnent la fréquence utilisée, le bit 3
 		indique la taille de l'intervalle des valeurs
 		aléatoires d'amplitude et les bits 0 à 2 correspondent
@@ -704,7 +686,7 @@ La répartition des adresses est la suivante:\\
 		7 indique si le son général de la console est activé
 		ou non.
 \section{Interruptions/Synchronisations}
-Comme vu dans les parties précédentes, le processeur de la Game Boy travaille conjointement avec d'autres composants. Afin d'éviter un chaos général voir l'endommagement de certains composants, un système d'interruptions a été intégré dans l'architecture de la Game Boy.
+Comme vu dans les parties précédentes, le processeur de la Game Boy travaille conjointement avec d'autres composants. Afin d'éviter un chaos général voire l'endommagement de certains composants, un système d'interruptions a été intégré dans l'architecture de la Game Boy.
 \subsection{Que fait une interruption?}
 Lorsqu'une interruption est déclenchée, le processeur va interrompre ses calculs afin d'exécuter une routine. Pour cela le processeur va ajouter dans la pile le registre PC et remplacer la valeur du registre PC par l'adresse de la routine. L'adresse de la routine est différente selon le type d'interruption déclenchée.
 \subsection{Registres d'interruption}
@@ -712,7 +694,7 @@ Afin qu'une interruption soit déclenchée il faut qu'un certain nombre de condi
 \subsubsection{Registre IME}
 En premier lieu le processeur dispose d'un registre spécial appelé IME (Interrupt Master Enabled), qui va contrôler si les interruptions peuvent être déclenchées ou non. Si IME est à 0 aucune interruption ne sera déclenchée, sinon si IME est à 1 les interruptions peuvent être déclenchées.
 \subsubsection{Registres IE et IF} 
-IE correspond à 'Interrupt Enable' et IF correspond à 'Interrupt Flag', ces deux registres sont stockées en mémoire. IE est disponible à l'adresse 0xFFFF et IF à l'adresse 0xFF0F. Le registres IE signale quelles interruptions peuvent être déclenchées. Le registre IF signale quelles interruptions veulent être déclenchées.
+IE correspond à 'Interrupt Enable' et IF correspond à 'Interrupt Flag', ces deux registres sont stockés en mémoire. IE est disponible à l'adresse 0xFFFF et IF à l'adresse 0xFF0F. Le registre IE signale quelles interruptions peuvent être déclenchées. Le registre IF signale quelles interruptions veulent être déclenchées.
 Comme il existe cinq types d'interruptions, cinq bits de ces registres vont servir à savoir quelle interruption est demandée/activée:\\\\
 \textbf{0xFFFF - IE - Interrupt Enable} \\
 Bit 0: V-Blank  Interruption Autorisée  (1=Autorisée)\\
@@ -732,19 +714,19 @@ Pour qu'une interruption soit déclenchée, par exemple l'interruption VBlank, I
 Lorsqu'elle sera déclenchée le bit 0 de IF sera mis à 0. IME sera mis à 0 également pour éviter qu'une interruption soit déclenchée pendant la routine d'une autre interruption (bien que cela soit possible pour le développeur en utilisant l'instruction "EI" dans une routine d'interruption).
 \subsection{Les différents types d'interruptions}
 \subsubsection{Interruption VBlank}
-L'interruption VBlank est demandée par l'écran LCD, cette demande est faites à chaque fois que l'écran rentre dans la période de VBlank (Voir partie GPU), l'interruption sert généralement à mettre à jour les dessins du jeu avant l'affichage d'une nouvelle image. La routine se trouve à l'adresse 0x0040.
+L'interruption VBlank est demandée par l'écran LCD, cette demande est faite à chaque fois que l'écran rentre dans la période de VBlank (Voir partie GPU), l'interruption sert généralement à mettre à jour les dessins du jeu avant l'affichage d'une nouvelle image. La routine se trouve à l'adresse 0x0040.
 \subsubsection{Interruption LCD STAT}
-Cette interruption est également demandée par l'écran LCD, elle sert généralement à exécuter des routines lorsque l'écran LCD change d'état (Voir partie GPU). Elle peut aussi intervenir lorsque la ligne actuellement dessinée par l'écran LCD correspond au registre LYC (LY compare) situé à l'adresse 0xFF45. la routine se trouve à l'adresse 0x0048.
+Cette interruption est également demandée par l'écran LCD, elle sert généralement à exécuter des routines lorsque l'écran LCD change d'état (Voir partie GPU). Elle peut aussi intervenir lorsque la ligne actuellement dessinée par l'écran LCD correspond au registre LYC (LY compare). la routine se trouve à l'adresse 0x0048.
 \subsubsection{Interruption Timer}
-Interruption générée par le timer interne de la Game Boy, à chaque fois que celui ci dépasse une certaine durée. La routine se trouve à l'adresse 0x0050.
+Interruption générée par le timer interne de la Game Boy, à chaque fois que celui-ci dépasse une certaine durée. La routine se trouve à l'adresse 0x0050.
 \subsubsection{Interruption Serial}
 Interruption générée lorsqu'un transfert d'un octet à été fait (reçu ou transmis) à l'aide du câble Link servant à communiquer entre deux Game Boy ou entre une Game Boy et un ordinateur. La routine se trouve à l'adresse 0x0058.
 \subsubsection{Interruption Joypad}
 Interruption générée lors de l'appui sur une touche par le joueur. La routine se trouve à l'adresse 0x0060.
 \section{Autres composants}
-La Game Boy comprend d'autres composants tels un timer interne, ou un port appelé "link" permettant de communiquer avec une autre Game Boy. Ces composants ne seront pas détaillés, en raison pour le timer du fait que son mécanisme est assez simple et dispensable pour la compréhension du fonctionnement général d'un émulateur. Pour le port link bien que ce composant soit très intéressant nous n'avons pas eu le temps à notre regret de nous y pencher et de l'implémenter.
+La Game Boy comprend d'autres composants tels un timer interne, ou un port appelé "link" permettant de communiquer avec une autre Game Boy. Ces composants ne seront pas détaillés, en raison pour le timer du fait que son mécanisme est assez simple et dispensable pour la compréhension du fonctionnement général d'un émulateur. Pour le port link bien que ce composant soit très intéressant nous n'avons pas eu le temps, à notre regret, de nous y pencher et de l'implémenter.
 \chapter{Réalisation}
-Ce chapitre synthétise la manière dont nous avons réalisé groboy notre émulateur.
+Ce chapitre synthétise la manière dont nous avons réalisé groboy, notre émulateur.
 \section{CPU}
 Le processeur a été le premier "composant" à être développé. Nous allons donc décrire dans cette partie comment il a été réalisé.
 \subsection{Structure}
@@ -764,7 +746,7 @@ typedef struct {
 	unsigned char L;	
 } z80_t;
 \end{lstlisting}
-On retrouve bien tous les registres ainsi que leur taille respective, à noté que nous avons préféré l'appeler z80\_t au lieu de lr35902\_t par commodité.
+On retrouve bien tous les registres ainsi que leur taille respective, à noter que nous avons préféré l'appeler z80\_t au lieu de lr35902\_t par commodité.
 \subsection{Algorithme principal}
 Une fois la structure définie nous avons mis en place un algorithme servant de "base" au comportement de notre CPU. Pour cela nous nous sommes largement inspiré des conseils de la page de KomKon\cite{komkon}. Voici son allure générale:
  \begin{lstlisting}
@@ -797,7 +779,7 @@ for(;;){
 	...
 }
 \end{lstlisting}
-Le processeur est un composant qui travaille sans relâche jusqu'à sa mise en éteinte, d'où la boucle infinie. On préférera déclarer la boucle infinie de cette manière plutôt qu'avec un simple "while(1)" évitant à certains compilateurs de faire vérifier la condition.
+Le processeur est un composant qui travaille sans relâche jusqu'à sa mise hors tension, d'où la boucle infinie. On préférera déclarer la boucle infinie de cette manière plutôt qu'avec un simple "while(1)" évitant à certains compilateurs de faire vérifier la condition.
 \begin{lstlisting}
 op_code = memory_read(z80.PC++);
 \end{lstlisting}
@@ -805,7 +787,7 @@ Pour pouvoir lire la prochaine instruction à exécuter, nous avons implémenté
 \begin{lstlisting}
 unsigned char memory_read(unsigned short addr);
 \end{lstlisting}
-En fait cette fonction retourne la valeur située en mémoire à l'adresse "addr", comme dit précédemment dans la section MMU. Le processeur à une plage d'adresse de 16 bits, d'où le type unsigned short de la variable addr.
+En fait cette fonction retourne la valeur située en mémoire à l'adresse "addr", comme dit précédemment dans la section MMU. Le processeur à une plage d'adresses de 16 bits, d'où le type unsigned short de la variable addr.
 Vous vous en doutez alors, nous avons également implémenté une fonction pour écrire en mémoire. Sa signature est:
 \begin{lstlisting}
 void memory_write(unsigned short addr, unsigned char data);
@@ -814,7 +796,7 @@ void memory_write(unsigned short addr, unsigned char data);
 \begin{lstlisting}
 cycles = z80_cycles[op_code];
 \end{lstlisting}
-Comme décrit dans la section Hardware-CPU chaque instruction a un nombre de cycles représentant son coût en temps. cette ligne sert à récupérer dans le tableau "z80\_cycles" ce nombre de cycles.
+Comme décrit dans la section Hardware-CPU chaque instruction a un nombre de cycles représentant son coût en temps. Cette ligne sert à récupérer dans le tableau "z80\_cycles" ce nombre de cycles.
 \begin{lstlisting}
 switch(op_code){	
 	case 0x00:
@@ -856,14 +838,12 @@ static inline void inc_smpl(BYTE *reg);
 \end{lstlisting}
 Il suffit donc de passer en paramètre l'adresse du registre désiré pour que l'instruction soit exécutée sur le bon registre.
 Le préfixe static indique juste que cette fonction est uniquement disponible pour le processeur, ce qui est logique car aucun autre composant ne devrait pouvoir exécuter cette fonction. Ensuite le préfixe inline est présent dans un soucis d'optimisation, en effet lors de sa présence le compilateur peut prendre en compte ou non ce mot clé. Si le compilateur le prend en compte cela aura pour effet d'incorporer le corps de la fonction aux endroits où elle est appelée, plutôt que de faire appel à elle.\\\\ 
-Enfin toutes les instructions du processeur ont pus être développées principalement grâce aux trois références suivantes \cite{pastraiser}, \cite{clrhome}, \cite{pinaud}.
+Enfin toutes les instructions du processeur ont pu être développées principalement grâce aux trois références suivantes :
+La table des instructions du LR35902\cite{pastraiser}, La table des instructions du Z80\cite{clrhome} et le livre traitant de la programmation en assembleur avec le Z80 \cite{pinaud}.
 \section{GPU}
-Le GPU a été l'un des composants clé à développer, car il provoque un grand nombre d'interruption et nous ne pouvions pas réellement tester notre émulateur avant de l'avoir terminé.\\
+Le GPU a été l'un des composants clé à développer, car il provoque un grand nombre d'interruptions et nous ne pouvions pas réellement tester notre émulateur avant de l'avoir terminé.\\
 
-\subsection{SDL}
-	La première étape a été le choix des outils à utiliser pour implémenter les fonctionnalité de l'écran lCD. Le choix de la SDL (Simple Directmedia Layer) s'est fait naturellement de part sa simplicité et le fait que certains d'entre nous l'aient déja utilisée dans le passé, mais aussi pour sa puissance et ses fonctionnalités bas niveau adaptées à nos besoins.\\
-
-\subsection{structures de données}
+\subsection{Structures de données}
 	Nous savions qu'une grande partie des opérations du GPU porterait sur les tuiles et les sprites, nous avons donc choisis de créer deux structures de données pour pouvoir gérer et manipuler efficacement ceux-ci:\\ 
 \begin{lstlisting}
 typedef struct{
@@ -889,10 +869,10 @@ SDL_Surface* sdl_matrix[144][160];
 SDL_Surface *sdl_screen;
 \end{lstlisting}
 
-La matrice gpu\_screen sert à stocker les valeurs de tout les pixels à afficher, cette matrice sera converti en surface SDL pour l'affichage et sera stockée dans sdl\_matrix. Sdl\_screen correspond à l'écran c'est sur cette variable que sdl\_matrix sera appliquée.\\
+La matrice "gpu\_screen" sert à stocker les valeurs de tous les pixels à afficher, cette matrice sera convertie en surface SDL pour l'affichage et sera stockée dans "sdl\_matrix". "sdl\_screen" correspond à l'écran c'est sur cette variable que "sdl\_matrix" sera appliquée.\\
 
-\subsection{initialisation}
-	L'initialisation des données est relativement simple, car seule l'écran géré par la SDL demande une initialisation particulière:\\
+\subsection{Initialisation}
+	L'initialisation des données est relativement simple, car seul l'écran géré par la SDL demande un traitement particulier:\\
 \begin{lstlisting}
 void gpu_init(SDL_Surface *sdl_scr){
         current_line = 0;
@@ -902,7 +882,7 @@ void gpu_init(SDL_Surface *sdl_scr){
         frame_counter = 0;
         
 	sdl_screen = sdl_scr;
-        sdl_screenTemp = SDL_CreateRGBSurface(SDL_VIDEO_FLAGS,160,144,32, 0, 0, 0, 0);
+        sdl_screen_temp = SDL_CreateRGBSurface(SDL_VIDEO_FLAGS,160,144,32, 0, 0, 0, 0);
         SDL_WM_SetCaption("Groboy", NULL);
         screen_mode = 0;
         set_speed(60);
@@ -910,10 +890,10 @@ void gpu_init(SDL_Surface *sdl_scr){
 
 \end{lstlisting}
 
-Comme on peut le voir ci-dessus, les différents compteurs sont initialisés à 0, puis l'écran est initialisé avec la variable passé en paramêtres. On lui donne les différentes propriétés voulues grâce à "SDL\_VIDEO\_FLAGS", dans notre cas la possibilité d'être redimensionné.\\
+Comme indiqué ci-dessus, les différents compteurs sont initialisés à 0, puis l'écran est initialisé avec la variable passée en paramètres. Il récupère les différentes propriétés voulues grâce à "SDL\_VIDEO\_FLAGS", dans notre cas la possibilité d'être redimensionné.\\
 
 \subsection{Algorithme principal}
-	Suite aux points précédents, nous avons mis en place un algorithme permettant de gérer les différentes phases du GPU (VBlank, HBlank, etc...). Cette algorithme servira de base pour les GPU car les appels de toutes les autre fonctions se feront dans des phases précises. Etudions cet algorithme plus en détails:\\
+	Suite aux points précédents, nous avons mis en place un algorithme permettant de gérer les différentes phases du GPU (VBlank, HBlank, etc...) qui servira de base à ce dernier. Etudions cet algorithme plus en détails:\\
 
 \begin{lstlisting}
 	vblank_clock_counter += cycles;
@@ -928,7 +908,7 @@ Comme on peut le voir ci-dessus, les différents compteurs sont initialisés à 
 	reset_force_write();
 \end{lstlisting}	
 
-Dans cette partie, l'on ajoute le nombre de cycle fait par le CPU au compteur du VBlank et si le compteur dépasse 70224, qui est le nombre de cycles correspondant à une réactualisation de l'écran alors on déduit ce nombre du compteur. Cela permet de gérer les différents cycles d'affichage. Ensuite l'on écrit dans le registre de position de l'écran, la ligne où l'on se trouve.
+Dans cette partie, le nombre de cycle fait par le CPU est ajouté au compteur du VBlank, si ce compteur dépasse 70224, qui est le nombre de cycles correspondant à une réactualisation de l'écran alors on déduit ce nombre du compteur. Cela permet de gérer les différents cycles d'affichage. Ensuite la ligne actuelle est écrite dans le registre de position de l'écran.
 
 \begin{lstlisting}                                        
      	lyc = memory_read(0xFF45);
@@ -949,7 +929,7 @@ Dans cette partie, l'on ajoute le nombre de cycle fait par le CPU au compteur du
          	}
 
 \end{lstlisting}
-Cette partie permet la mise à jour du "coincidence flag", en effet si la ligne actuelle est la même que celle contenue dans le registre LYC alors si le flag n'est pas mis on le met. L'utilité de cette partie est principalement de provoquer une interruption si le flag est à 1.
+Cette partie permet la mise à jour du "coincidence flag", en effet si la ligne actuelle est la même que celle contenue dans le registre LYC, le flag est modifié en conséquence. L'utilité de cette partie est principalement de provoquer une interruption si le flag est à 1.
 
 \begin{lstlisting}
 if(vblank_clock_counter >= 65664){ //Si on entre dans la periode de vblank
@@ -989,56 +969,53 @@ if(vblank_clock_counter >= 65664){ //Si on entre dans la periode de vblank
         }
 
 \end{lstlisting}
-La dernière partie de cet algorithme est très importante puisque c'est ici que l'on execute les différents taches en fonction des périodes. Si l'on est en période de VBlank alors l'on va tout d'abord dessiner l'écran puis envoyer une interruption de type VBlank ce qui va autoriser de nouveau le CPU à écrire dans la VRAM et l'OAM. SI l'on n'est pas dans une période de VBlank alors en fonction des modes vu en partie hardware, l'on va envoyer ou non une interruption, mettre à jour les différents flags et/ou dessiner une ligne.\\
+La dernière partie de cet algorithme est très importante puisque c'est ici que sont exécutées les différentes tâches selon les périodes. Lorsque la période VBlank intervient, l'appel à la fonction "draw\_screen" est effectué, cette fonction actualise l'écran et par conséquent l'affichage SDL. Une interruption de type VBlank est demandée. Si la période actuelle n'est pas celle du VBlank alors c'est une routine de gestion des différents modes de l'écran LCD qui est déclenchée.\\
 
 \subsection{Les fonctions d'affichage}
-L'algorithme principal mis en place, l'étape suivante était le remplissage de la matrice de pixels. Pour cela nous avons implémenté une fonction gpu\_drawline(), qui comme son nom l'indique va remplir une ligne de la matrice, cette fonction est appelée par l'algorithme vu précédent, lorsque le GPU passe en période de HBlank. Son fonctionnement est le suivant:\\
+Une fois l'algorithme principal mis en place, l'étape suivante est le remplissage de la matrice de pixels. Pour celà nous avons implémenté une fonction "gpu\_drawline()", qui va remplir une ligne de la matrice "gpu\_screen". Cette fonction est appelée par l'algorithme vu précédemment, lorsque le GPU passe en période de HBlank. Son fonctionnement est le suivant:\\
+
 \begin{itemize}
 \item \textbf{Si le Background est établi:}
-	On regarde tout d'abord quelles sont la ligne et la colonne courante, puis l'on va chercher dans la matrice contenant les tuiles du Background, la tuile correpondante. L'on récupère ensuite la position en x et en y du pixel à déssiner par rapport à la tuile, on parcours toute la ligne en stockant dans la matrice les pixels.\\
-\item \textbf{Si la Window est établie:}
-	Même principe que le Background, sauf qu'il faut en plus regarder si la tuile est visible à l'écran ou non.\\
+	Le programme récupère dans la matrice contenant les tuiles du Background celle qui correpond à la ligne et à la colonne courante, la position du pixel de cette dernière qui est à dessiner, et stocke le tout. L'opération est réitérée pour chaque pixel de la ligne.
+
+\item \textbf{Si la couche Window est établie:}
+	Même principe que le Background, sauf qu'il faut en plus vérifier si la tuile est visible à l'écran ou non.\\
 \item \textbf{Si les sprites sont établis:}
-	Tout d'abord l'on récupère les sprites et on les stockent dans un tableau de sprites (structure vu précédement), ensuite on les tri en fonction de leur position. Puis l'on parcours la ligne pour stocker dans la matrice les valeurs des pixels en n'oubliant pas d'appliquer les différentes options sur les sprites (flip vertical/horizontal).\\
+	L'ensemble des sprites est filtré selon leur apparition dans la ligne actuelle, puis triés en fonction de leur position. 
+	Leurs pixels à afficher sont récupérés après transformation éventuelle (flip) du sprite.
 \end{itemize}
 
-Cette fonction implémentée, la dernière étape était d'afficher la matrice obtenue, avec la SDL, nous avons donc créer une fonction draw\_screen(), qui est appelée durant la période de VBlank qui permet de redessiner l'écran à partir de la matrice.\\
+Cette fonction implémentée, il ne reste plus qu'à afficher la matrice obtenue. 
 
 \begin{lstlisting}
-	if(frame_counter < frame_skip) frame_counter++;
-        else{
-                frame_counter = 0;
                 for(int i=0; i<144; i++)
                 {
                         for(int j=0; j<160; j++)
                         {
                                 if(gpu_screen[i][j] == 0)
-                                        *((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 255,255,255);
+                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 255,255,255);
                                 else if(gpu_screen[i][j] == 1)
-                                        *((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 170,170,170);
+                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 170,170,170);
                                 else if(gpu_screen[i][j] == 2)
-                                        *((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 85,85,85);
+                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 85,85,85);
                                 else
-                                        *((Uint32*)(sdl_screenTemp->pixels) + j + i * sdl_screenTemp->w) = SDL_MapRGB(sdl_screenTemp->format, 0,0,0);
+                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 0,0,0);
                         }
                 }
-                SDL_SoftStretch(sdl_screenTemp, NULL, sdl_screen, NULL);
+                SDL_SoftStretch(sdl_screen_temp, NULL, sdl_screen, NULL);
                 SDL_Flip(sdl_screen); /* Mise a jour de l'ecran */
                 sleep_SDL();
-        }
-
 \end{lstlisting}
-Comme on peut le voir ci-dessus, la mise à jour de l'écran se fait en fonction du nombre de frame définit, cela permet d'éviter à l'écran de se mettre à jour tout le temps alors que rien n'as changé. La matrice est transformée (en fonction des couleurs de chaque pixels) en matrice RGB utilisable par la SDL. Cette matrice est ensuite ajustée à la taille de l'écran puis appliquée à l'écran.\\
-
+Pour toutes les valeurs (de 0 à 3) récupérées dans "gpu\_screen", une conversion est faite afin d'exporter ces valeurs dans "sdl\_screen\_temp" qui est une matrice supportée par la SDL. Ces valeurs récupérées, la fonction "SDL\_SoftStretch" opère une mise à l'échelle (scaling) de la matrice "sdl\_screen\_temp" vers "sdl\_screen". La fonction "SDL\_Flip" met à jour l'écran SDL. Enfin la fonction "sleep\_SDL" permet de mettre en pause l'émulateur, et de le réveiller de sorte à ce qu'il y ait une fréquence de rafraîchissement de 60 images par secondes.
 \section{MMU}
 Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
 \subsection{Initialisation} 
-Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accés à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la Game Boy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la Game Boy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
-Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche de jeu selon les jeux leurs tailles sont différentes, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux.
-Les fichiers de jeu (que l'on peut retrouver sur internet) représente en fait la partie ROM des cartouches.
+Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accès à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la Game Boy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la Game Boy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
+Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche, les tailles sont différentes selon les jeux, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux (roms).
+Les fichiers .gb (que l'on peut retrouver sur internet) représentent en fait la partie ROM des cartouches.
 Lorsqu'un fichier est ouvert avec groboy son chemin est envoyé au module mémoire du programme avec la fonction "memory\_init", cette dernière s'occupe d'afficher sur la sortie standard les informations relatives au fichier et d'initialiser les différents buffers. Voici un exemple avec la cartouche de jeu Zelda.
 \begin{lstlisting}
-$ ./groboy roms/Zelda\ -\ Link\'s\ Awakening.gb
+$ ./groboy roms/Zelda\ -\ Links\ Awakening.gb
 Game title: ZELDA
 Cartridge type: MBC1+RAM+BATTERY
 Rom Size 512KB: 32 Banks
@@ -1063,7 +1040,7 @@ if(read(file_d, cartridge_rom_buffer, file_stat.st_size) == -1){
 }    
 close(file_d);
 \end{lstlisting}
-On récupère la taille du fichier lu grâce à la fonction fstat, et on alloue à cartridge\_rom\_buffer la taille du fichier lu, puis on lit l'intégralité du fichier que l'on place dans le buffer.\\
+On récupère la taille du fichier lu grâce à la fonction fstat, et on alloue à "cartridge\_rom\_buffer" la taille du fichier lu, puis on lit l'intégralité du fichier que l'on place dans le buffer.\\
 Voici maintenant la façon dont elle procède pour la RAM:
 \begin{lstlisting}
 switch(*(cartridge_rom_buffer + 0x0149)){
@@ -1073,10 +1050,10 @@ switch(*(cartridge_rom_buffer + 0x0149)){
 	case 3: alloc_ram_mem(0x8000);break;
 }
 \end{lstlisting}
-Un switch est placé sur l'octet 0x0149 de cartridge\_rom\_buffer, contenant la taille de la RAM. Si la valeur vaut 0, il n'y'a pas de RAM dans la cartouche, sinon le buffer cartridge\_ram\_buffer est initialisé avec la fonction alloc\_ram\_mem.
+Un switch est placé sur l'octet 0x0149 de "cartridge\_rom\_buffer", contenant la taille de la RAM. Si la valeur vaut 0, il n'y a pas de RAM dans la cartouche, sinon le buffer "cartridge\_ram\_buffer" est initialisé avec la fonction "alloc\_ram\_mem".
 Enfin l'initialisation de la mémoire interne se fait en mettant toutes les valeurs du buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
 \subsection{Lecture/Ecriture}
-Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction memory\_read, si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet.
+Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction "memory\_read", si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet.
 \begin{lstlisting}
 inline BYTE memory_read(unsigned short addr){
 	if(addr <= 0x3FFF) 	//Banque 0 ROM cartouche
@@ -1097,7 +1074,7 @@ inline BYTE memory_read(unsigned short addr){
 		return internal_ram[addr];
 }
 \end{lstlisting}
-On peut voir dans cette fonction que pour chaque plage d'adresse demandée on retourne soit les valeurs de "cartridge\_rom\_buffer", de "cartridge\_ram\_buffer" ou de "internal\_ram".
+Nous pouvons voir dans cette fonction que pour chaque plage d'adresse demandée, la fonction retourne soit les valeurs de "cartridge\_rom\_buffer", de "cartridge\_ram\_buffer" ou de "internal\_ram".
 Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs de banques de ROM et de RAM des cartouches.
 
 \section{APU}
@@ -1109,11 +1086,9 @@ Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs
 	Cette librairie s'appelle "blip buff", et permet de rééchantillonner des ondes audio à partir d'une fréquence d'horloge vers une fréquence d'échantillonage, soit créer une onde discrétisée (donc utilisable par des librairies pour produire du son) à partir d'informations sur une onde carrée. 
 	Une explication plus détaillée se trouve en annexe, il peut être nécessaire de la lire afin de bien comprendre la démarche utilisée ici pour produire du son.
 \subsection{Initialisation}
-%Premières valeurs à placer dans les registres, Initialisation de la wave ?
-%Fonction callback et structure sdl
 Les premières fonctions appelées dans notre programme principal sont les diverses fonctions d'initialisation, dont celle du son.
 La cartouche de jeu étant seule à modifier les valeurs des registres, et ceux dès son lancement, ils n'ont pas à l'être au cours de cette initialisation, ce qui limite le nombre de traitements effectués ici.
-La fonction "sound init()" se contente donc de remplir les tableaux appelés LFSR servant d'ensembles de valeurs pour les variations aléatoires d'amplitudes de la 4eme chaine, ainsi que de fixer des contraintes physiques pour la SDL.
+La fonction "sound\_init()" se contente donc de remplir les tableaux appelés LFSR servant d'ensembles de valeurs pour les variations aléatoires d'amplitudes de la 4eme chaine, ainsi que de fixer des contraintes physiques pour la SDL.
 \begin{lstlisting}
 SDL_InitSubSystem(SDL_INIT_AUDIO); //Initialisation de la branche son de la SDL
 desired.freq = sample_rate; //Frequence d'echantillonage de sortie, 44100Hz ici
@@ -1127,7 +1102,7 @@ La fonction callback est la fonction qui remplit en permanence le buffer SDL ave
 Après cette initialisation, on instancie des structures dites "blip", une pour chaque haut parleur de sortie, qui vont faire l'intermediaire entre les données réellement récoltées et celles que l'on va donner à la SDL pour produire un son.
 \subsection{Appels principaux et écritures permanentes}
 Dès lors que le CPU a démarré sa boucle de lecture des instructions dans la cartouche, le son peut démarrer à tout moment, et une fois que c'est le cas, la génération d'onde est permanente.
-C'est l'écriture d'une valeur dans la plage mémoire consacrée aux registres NR (donc géré par le MMU) qui va déclencher la génération de son.
+C'est l'écriture d'une valeur dans la plage mémoire consacrée aux registres NR (donc gérée par le MMU) qui va déclencher la génération de son.
 \begin{lstlisting}
 else if(addr >= 0xFF10 && addr <= 0xFF26){
 	write_sound(addr, data); //Ecriture d'une valeur dans les registres son
@@ -1137,7 +1112,7 @@ else if(addr >= 0xFF30 && addr <= 0xFF3F){
 }
 \end{lstlisting}
 Ce mode de fonctionnement n'est pas obligatoire, mais il permet au système apu de l'émulateur de gérer lui même tout ce qui concerne le son, tant pour la génération, la lecture et l'écriture des valeurs de registres qui y correspondent.
-La fonction "write sound" va directement faire appel à la fonction de mise à jour du son à proprement parler, avant de récupérer les informations que la cartouche envoie, et les écrire dans le registre correspondant. Le fonctionnement au tout premier appel est assuré via l'initialisation de tous les registres par le MMU.
+La fonction "write\_sound()" va directement faire appel à la fonction de mise à jour du son à proprement parler, avant de récupérer les informations que la cartouche envoie, et les écrire dans le registre correspondant. Le fonctionnement au tout premier appel est assuré via l'initialisation de tous les registres par le MMU.
 \begin{lstlisting}
 void write_sound(unsigned short addr, BYTE data){
 	...
@@ -1160,9 +1135,6 @@ void write_sound(unsigned short addr, BYTE data){
 \end{lstlisting}
 La récupération de toutes les données intéressantes contenues dans chaque registre se fait par suite de comparaisons, tests et décalages éventuels, en fonction de la place de l'information dans le registre, mais aussi 
 parfois de celles indiquées par le controleur de son, afin de ne pas par exemple prendre en compte la 4eme onde lorsque la cartouche indique le contraire.
-%Plage mémoire dédiée au son, écriture de son gérée par le core du son (apu) lui même.
-%Appel de write_sound à chaque tentative d'écriture en mémoire dans ces plages, petit détail de write_sound
-%Récupération des données, appel du sound update à chaque fois
 \subsection{Le son, le vrai}
 Comme indiqué au dessus, c'est donc à chaque appel de la fonction d'écriture que le son est mis à jour en temps réel.
 Cet appel va se "diviser" en quatre autres, chacun servant à mettre à jour l'une des quatres ondes générées, afin donc de la calculer sur un certain laps de temps, indiqué en cycles processeur.
@@ -1217,14 +1189,14 @@ Chacune des fonctions de mise à jour des ondes suit à peu près le même sché
 pas effectués pour une onde qui ne les a pas (comme la 3eme par exemple).
 
 La fonction se déroule donc comme suit :
-Si la longueur de son à jouer est arrivée à 0, alors on le booléen associé indique que le son doit être stoppé, à ce moment la fonction est quittée.
-Arrive ensuite une boucle durant laquelle on anticipe le prochain "basculement" du signal, et l'on agit en fonction.
-La nature de ce basculement est donnée par la fonction "frame sequencer", qui par un simple jeu de comparaisons, détermine la nature du prochain basculement, 
+Si la longueur de son à jouer est arrivée à 0, alors le booléen associé indique que le son doit être stoppé, à ce moment la fonction est quittée.
+Arrive ensuite une boucle durant laquelle la fonction anticipe le prochain "pas" du signal, et agit en fonction.
+La nature de ce pas est donnée par la fonction "frame sequencer", qui par un simple jeu de comparaisons, détermine la nature du prochain pas du signal d'horloge, 
 à savoir s'il correspond à une opération de controle de longueur, d'enveloppe, de periode ou de balayage.
-La fréquence du signal en sera modifiée localement en fonction, et c'est ce qui est représenté par les fonctions "clock xxx" où xxx peut être square, length, envelope, sweep ou lfsr.
+La fréquence du signal en sera modifiée localement en fonction, et c'est ce qui est représenté par les fonctions "clock\_xxx()" où xxx peut être square, length, envelope, sweep ou lfsr.
 
 C'est au sein de ces fonctions qu'est calculée la variation d'amplitude à utiliser par la librairie blip pour générer l'onde finale.
-Illustré ci-dessous avec l'exemple de "clock lfsr", qui pour rappel correspond au signal de bruit dont l'amplitude peut varier aléatoirement dans 
+Illustré ci-dessous avec l'exemple de "clock\_lfsr()", qui pour rappel correspond au signal de bruit dont l'amplitude peut varier aléatoirement dans 
 un certain intervalle de valeurs, et signifie "Linear Feedback Shift Register".
 \begin{lstlisting}
 static inline void clock_lfsr(sc4_t *sc4, int time_lap){
@@ -1240,13 +1212,11 @@ static inline void clock_lfsr(sc4_t *sc4, int time_lap){
 }
 \end{lstlisting}
 
-La fonction "add delta" utilise la librairie "blip buff" pour exploiter les paramètres qu'elle reçoit et créer 
+La fonction "add\_delta()" utilise la librairie "blip\_buff" pour exploiter les paramètres qu'elle reçoit et créer 
 les variations d'amplitudes correspondant au signal souhaité en sortie.
 Après tout ceci, c'est dans la fonction "callback", associée à l'objet SDL que le son est finalement joué et produit par l'ordinateur, puisque l'objet blip est fermé, et son contenu est lu par la SDL.
 
 Ce fonctionnement est répété en boucle dès la première écriture dans les plages mémoires dédiées au son, et permet donc un comportement très fidèle à celui du circuit son de la fameuse Game Boy.
-%Quelques mots sur les fonctions de clock, le frame sequencer, je trouve la prochaine variation d'amplitude et je l'envoie, gauche droite ou les deux
-%La wave, les aléatoires, les sons pré-enregistrés.
 \section{Interruptions/Synchronisations}
 Dans cette partie nous allons voir comment les interruptions sont gérées et déclenchées. 
 \subsection{Gestion des interruptions}
@@ -1319,7 +1289,7 @@ else if(IE & IF & 0x10){
 	execute_interrupt(JOYPAD, z80);
 }
 \end{lstlisting}
-Ici les registres IE et IF sont récupérés. Puis une comparaison est faite entre ces registres et les bits correspondants à des interruptions. Si il s'avère que les registres IE et IF ont un bit commun à 1 une interruption est déclenchée. On peut constater que l'ordre de priorité est respecté grâce aux "if, else if" (Il faut l'expliquer dans la partie Hardware-Interruptions).
+Ici les registres IE et IF sont récupérés. Puis une comparaison est faite entre ces registres et les bits correspondants à des interruptions. S'il s'avère que les registres IE et IF ont un bit commun à 1 une interruption est déclenchée. On peut constater que l'ordre de priorité est respecté grâce aux "if, else if".
 \begin{lstlisting}
 else if(is_halted()){
 	IE = memory_read(0xFFFF);
@@ -1390,9 +1360,9 @@ Ces fonctions résument au final toutes les explications décrites dans la parti
 \section{Sauvegarde de jeu}
 Nous allons dans cette partie expliquer comment nous avons réalisé les sauvegardes dites "classiques".
 \subsection{Fonctionnement général}
-Matériellement et comme expliqué dans la partie (?), certaines cartouches de jeu permettent la sauvegarde de partie. Une pile est intégrée pour maintenir l'état de la RAM lorsque la cartouche n'est pas utilisée. Pour la réalisation de ceci, à chaque fois que l'on ferme le processus groboy un fichier est écrit sur le disque. Ce fichier contient toutes les données du buffer "cartridge\_ram\_buffer" à l'état de fermeture du processus. Rappelons que "cartridge\_ram\_buffer" est le buffer contenant les données RAM de la cartouche. Enfin si le jeu est relancé, on vérifie que le fichier de sauvegarde est bien présent, dans le cas favorable il est chargé dans le buffer "cartridge\_ram\_buffer". Ceci montre que le processus de sauvegarde classique est relativement facile à implémenter, nous ne détaillerons donc pas son implémentation.\\
+Matériellement, certaines cartouches de jeu permettent la sauvegarde de partie. Une pile est intégrée pour maintenir l'état de la RAM lorsque la cartouche n'est pas utilisée. Pour la réalisation de ceci, à chaque fois que l'on ferme le processus groboy un fichier est écrit sur le disque. Ce fichier contient toutes les données du buffer "cartridge\_ram\_buffer" à l'état de fermeture du processus. Rappelons que "cartridge\_ram\_buffer" est le buffer contenant les données RAM de la cartouche. Enfin si le jeu est relancé, on vérifie que le fichier de sauvegarde est bien présent, dans le cas favorable il est chargé dans le buffer "cartridge\_ram\_buffer". Ceci montre que le processus de sauvegarde classique est relativement facile à implémenter, nous ne détaillerons donc pas son implémentation.\\
 \section{Fonctionnalités additionnelles}
-Ce que nous appelons fonctionnalités additionnelles sont en fait des fonctionnalités qui n'existent pas sur le matériel d'origine, mais qui sont intégrées dans les émulateurs afin de rendre l'expérience de jeu plus agréable. Nous allons donc présenter quelques fonctionnalités dont nous avons eu le temps d'implémenter.
+Ce que nous appelons fonctionnalités additionnelles sont en fait des fonctionnalités qui n'existent pas sur le matériel d'origine, mais qui sont intégrées dans les émulateurs afin de rendre l'expérience de jeu plus agréable. Nous allons donc présenter quelques fonctionnalités que nous avons eu le temps d'implémenter.
 \subsection{Sauvegarde par état}
 Nous allons dans cette partie expliquer qu'est-ce qu'une sauvegarde par état et comment nous avons réalisé cette fonctionnalité.
 \subsubsection{Principe}
@@ -1450,11 +1420,11 @@ Nous ne détaillerons pas plus comment nous avons réalisé cette GUI car elle n
 \section*{Bilan technique}
 Au final, groboy est fonctionnel et jouable pour une grande majorité de jeux, nous allons lister pour chaque module le travail accompli. 
 \subsection*{CPU}
-Toutes les instructions sont bien implémentées, car groboy passe le test cpu de "blargg" sans erreur (il faudrait en parler dans les chap prec.). 
+Toutes les instructions sont bien implémentées, car groboy passe le test cpu de "blargg" sans erreur (cf. annexe C). 
 \subsection*{GPU}
 Le GPU travaille correctement, les trois couches de dessins sont bien implémentées, il est possible d'élargir l'écran comme le désire l'utilisateur.
 \subsection*{APU}
-Malgré une implémentation difficile à réaliser Le son est présent et tend à être fidèle au son d'origine.
+Malgré une implémentation difficile à réaliser, le son est présent et tend à être fidèle au son d'origine.
 \subsection*{Cartouches de jeu}
 Les types de cartouche MBC1 et MBC2 ont été implémentés. Ce qui veut dire que l'ensemble des jeux utilisant ces puces sont jouables sur l'émulateur.
 \subsection*{Sauvegarde}
@@ -1469,85 +1439,46 @@ Il manque pour que l'intégralité des jeux puissent être supportés d'impléme
 Le son tend à être fidèle au son d'origine, cependant il ne l'est pas encore et rend par conséquent l'émulateur instable. Il faudrait pouvoir venir à bout de ce problème.
 \subsection*{Implémenter le système deux joueurs}
 La Game Boy dispose d'un port link pour pouvoir communiquer avec une autre Game Boy, il serait agréable de pouvoir faire de même entre deux processus groboy.
-\subsection*{Implémenter la Game Boy color}
-La Game Boy color a une architecture basée sur la Game Boy et donc très similaire, son portage est donc réalisable. 
+\subsection*{Implémenter la Game Boy Color}
+La Game Boy Color a une architecture basée sur la Game Boy et donc très similaire, son portage est donc réalisable. 
 \section*{Bilan collectif}
-L'objectif principal de notre projet était l'étude d'un émulateur suffisemment abordable pour être réalisé, afin d'en tirer un maximum de connaissances sur le fonctionnement bas niveau d'un système relativement proche des ordinateurs que nous connaissons.
+L'objectif principal de notre projet était l'étude d'un émulateur suffisamment abordable pour être réalisé, afin d'en tirer un maximum de connaissances sur le fonctionnement bas niveau d'un système relativement proche des ordinateurs que nous connaissons.
 Si le physique de la machine et la personnalisation de son processeur par ses fabriquants laissent à penser qu'il n'y a aucun lien avec celles que nous utilisons, les idées que nous avons su tirer de ce projet nous ont, elles, donné un réel bagage pratique sur le fonctionnement de nos outils de travail préférés. 
-De plus, le travail en équipe sur un projet relativement conséquent est toujours source d'apports utiles à nos futurs métiers. N'étant pas notre premier projet, les difficultés d'organisation furent moins nombreuses que les années précédentes, mais le développement de ce projet n'a pas été sans nous rappeler l'importance de bonnes prévisions, d'une bonne communication entre membres, et d'une répartition des taches équitables.
+De plus, le travail en équipe sur un projet relativement conséquent est toujours source d'apports utiles à nos futurs métiers. N'étant pas notre premier projet, les difficultés d'organisation furent moins nombreuses que les années précédentes, mais le développement de ce projet n'a pas été sans nous rappeler l'importance de bonnes prévisions, d'une bonne communication entre membres, et d'une répartition des tâches équitables.
 Une fois de plus, le travail d'étude et de recherche est un véritable apport pour chacun de nous, tant sur l'aspect technique que sur l'expérience d'un travail sur un projet collectif, et peut-être même un premier pas dans le monde de l'émulation pour certains d'entre nous.
 \section*{Emulation aujourd'hui}
-Aujourd'hui l'émulation est procédé extrèmement utile pour différentes tâches. Une des principales utilitées de l'émulation concerne les serveurs. Les serveurs actuels étant extrêment puissant, ils sont souvent utilisés dans les entreprises pour créer une multitude d'environnements de travail, en créant des machines virtuelles en leur sein. Cette technique est extrêment utile lorqu'il sagit de gérer plusieurs logiciels sur un même serveur mais aussi pour créer des environnements de test. 
-Les principales avancées et recherches actuelles dans le domaine de l'émulation concernent en grande partie, l'optimisation de la gestions des processus et la répartition des charges sur les différents coeurs pour les processeurs multi-coeurs.
+Aujourd'hui l'émulation est un procédé extrêmement utile pour différentes tâches. Une des principales utilitées de l'émulation concerne les serveurs. Les serveurs actuels étant extrêment puissants, ils sont souvent utilisés dans les entreprises pour créer une multitude d'environnements de travail, en créant des machines virtuelles en leur sein. Cette technique est largement préconisée lorqu'il s'agit de gérer plusieurs logiciels sur un même serveur mais aussi pour créer des environnements de test. 
+Les principales avancées et recherches actuelles dans le domaine de l'émulation concernent en grande partie, l'optimisation de la gestion des processus et la répartition des charges sur les différents coeurs pour les processeurs multi-coeurs.
 %bibliographie
 \bibliographystyle{plain}
 \bibliography{rapport}
 %annexes
 \appendix
 \chapter{Comptes rendus de réunion}
+Durant notre projet, nous avons fréquemment été amenés à nous réunir, étudiants et encadrants, afin de discuter de l'avancée générale de notre travail.
+Nombre de comptes rendus de ces réunions nous ont clairement guidé dans le développement.
+
+Voici un exemple type d'un de ces comptes rendus, l'ensemble de ces derniers étant disponible via l'archive jointe au rapport.
 \begin{quotation}
 Compte rendu de la réunion de projet du 13/02/13\\
 Travail réalisé :\\
 	-Création des tables du Z80 (tables contenant tous les opcodes du processeur)\\
 	-Ajout des fonctions de gestion du MBC1 et MBC2 (puces des cartouches Gameboy)\\
 	-Une grande partie de la gestion de la mémoire a été implémentée\\
-	-Rédaction et envoi de la feuille de route\\
+	-Rédaction et envoie de la feuille de route\\
 	-Choix de trois articles en rapport avec notre sujet\\
 Sujet abordé lors de la réunion :\\
 	-Impossibilité de gérer les interruptions sans la partie graphique et sonore, de ce fait on ne peut tester correctement le processeur car celui-ci boucle sur certaines adresses mémoire car il attend une interruption et une modification de ces adresses\\
 Objectifs pour la prochaine réunion :\\
 	-Commencer la partie graphique et la partie son, pour pouvoir gérer les interruptions\\
 	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de priorités dans les tâches\\
-	-Faire un résumer des articles de recherche choisis en rapport avec notre sujet\\
+	-Faire un résumé des articles de recherche choisis en rapport avec notre sujet\\
 
-Les deux diagrammes de Gantt celui créé après la première réunion et le nouveau sont joints dans le mail.\\
-Concernant les tables du Z80 la liste des opcodes se trouve à l’adresse ci-dessous : http://www.pastraiser.com/cpu/gameboy/gameboy\_opcodes.html\\
+Les deux diagrammes de Gantt celui créé après la première réunion et le nouveau sont joints au rapport.\\
 \end{quotation}
 
-\begin{quotation}
-Compte rendu de la réunion de projet du 06/03/13\\
-Travail réalisé :\\
-	-Base de la partie graphique mise en place\\
-	-Base de la partie son mise en place\\
-	-Résumés des trois articles mis en ligne\\
-Sujet abordé lors de la réunion :\\
-	-Explications du travail effectué sur la partie graphique et la partie sonore, résumé du fonctionnement des deux parties et des problèmes rencontrés.\\
-Objectifs pour la prochaine réunion :\\
-	-Pour la partie sonore : finir de récupérer des informations sur les sons puis commencer à utiliser SDL pour produire un son.\\
-	-Pour la partie graphique : finir de mettre en place la SDL et commencer la phase de débug.\\
-\end{quotation}
-
-\begin{quotation}
-Compte rendu de la réunion de projet du 20/03/13\\
-Travail réalisé :\\
-	-Partie graphique en partie fonctionnelle avec la SDL\\
-	-Partie son mise en place\\
-	-Début de la mise en place du Joypad\\
-Sujets abordés lors de la réunion :\\
-	-Impossibilité de tester la partie son tant que toutes les autres parties ne sont pas finalisées.\\
-	-Changement de répartition du travail\\
-	-Problèmes de synchronisation de la partie graphique avec le moteur et quelques problèmes d’affichage des sprites\\
-Objectifs pour la prochaine réunion :\\
-	-Commencer à débuguer le CPU et le GPU\\
-	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de répartition du travail\\
-Les nouveaux diagrammes de Gantt sont disponibles à cette adresse : https://github.com/joakim-d/GroBoy/tree/master/Documents\_TER.\\
-\end{quotation}
-
-\begin{quotation}
-Compte rendu de la réunion de projet du 03/04/13\\
-Travail réalisé :\\
-	-Emulateur en partie fonctionnel (possibilité de faire marcher les jeux en mbc1)\\
-Sujets abordé lors de la réunion :\\
-	-Changement de répartition du travail, retour à l’ancienne répartition\\
-	-Quelques problèmes à finir de débuguer\\
-Objectifs pour la prochaine réunion :\\
-	-Commencer les parties optionnelles (sauvegarde, menu, …)\\
-	-Continuer la partie son\\
-	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de répartition du travail\\
-Les nouveaux diagrammes de Gantt sont disponibles à cette adresse : https://github.com/joakim-d/GroBoy/tree/master/Documents\_TER.\\
-\end{quotation}
 \chapter{Blip buff et la génération d'ondes}
-Le développeur "Blargg" cité en remerciement, a beaucoup travaillé sur les sons de synthèses à bandes passantes limitées, et principalement dans le cadre de l'émulation de systèmes de jeux relativement anciens, comme la Game Boy et la Nintendo NES par exemple. Ses travaux ont donc été d'une grande utilité pour le développement de la partie son de notre émulateur, sur laquelle la documentation est rare, avec notamment la librairie "blip buff" citée plus haut, qui permet de générer des ondes échantillonées à partir d'informations sur les ondes habituellement traitées par le processeur lui même. Par soucis d'efficacité et de temps, la programmation de ce module dépend fortemment du fonctionnement de cette librairie, c'est pourquoi nous avons choisi d'expliquer son fonctionnement général dans cette partie.\\
+Le développeur "Blargg" cité en remerciements, a beaucoup travaillé sur les sons de synthèses à bandes passantes limitées, et principalement dans le cadre de l'émulation de systèmes de jeux relativement anciens, comme la Game Boy et la Nintendo NES par exemple. Ses travaux ont donc été d'une grande utilité pour le développement de la partie son de notre émulateur, sur laquelle la documentation est rare, avec notamment la librairie "blip buff" citée plus haut, qui permet de générer des ondes échantillonées à partir d'informations sur les ondes habituellement traitées par le processeur lui même. Par soucis d'efficacité et de temps, la programmation de ce module dépend fortemment du fonctionnement de cette librairie, c'est pourquoi nous avons choisi d'expliquer son fonctionnement général dans cette partie.\\
 \section*{Vue d'ensemble}
 Cette librairie réechantillonne donc des formes d'ondes audio à partir d'une fréquence d'horloge, vers une fréquence d'échantillonnage pour un signal.
 Son utilisation suit généralement le schéma suivant :
@@ -1580,12 +1511,12 @@ Son utilisation suit généralement le schéma suivant :
 \end{lstlisting}
 
 \subsection{Création du tampon mémoire}
-Avant la création du son, un tampon mémoire doit etre créé avec la fonction  "blip\_new()". Sa taille correspond au nombre maximum d'échantillons non lus qu'il contiendra. La plupart du temps, un dixieme de la fréquence d'échantillonage suffit, puisque les échantillons seront généralement lus directement après leur génération.\\
-La fonction "blip\_set\_rates()" permettra de fixer le nombre de basculements d'horloge par seconde, et combien d'échantillons par seconde y correspondront. 
+Avant la création du son, un tampon mémoire doit être créé avec la fonction  "blip\_new()". Sa taille correspond au nombre maximum d'échantillons non lus qu'il contiendra. La plupart du temps, un dixième de la fréquence d'échantillonage suffit, puisque les échantillons seront généralement lus directement après leur génération.\\
+La fonction "blip\_set\_rates()" permettra de fixer le nombre de pas d'horloge par seconde, et combien d'échantillons par seconde y correspondront. 
 \subsection{Génération d'onde}
 Par soucis de clarté, les exemples de cette section illustrent des ondes de faible amplitude, donc inaudibles. Des ondes codées sur 16 bits ont des valeurs allant de -32768 à + 32767.
 Les ondes sont générées à la fréquence d'horloge en entrée.
-Considérons une onde carrée simple avec 8 pas ("ticks d'horloge) d'horloge par cycle (4 pas hauts, 4 pas bas) : 
+Considérons une onde carrée simple avec 8 pas ("ticks d'horloge") d'horloge par cycle (4 pas hauts, 4 pas bas) : 
 
 \begin{figure}[!h]
 \centering
@@ -1605,8 +1536,8 @@ for(int i=4; i<30;++i){
 		wave[i] = +5;
 }
 \end{lstlisting}
-Sans utiliser cette librairie, le tableau wave devrait ensuite être ré-échantillonné de la fréquence d'entrée à la fréquence d'échantillonnage de sortie. La librairie "blip buff" fait se ré-échantillonage en interne, le code de génération de l'onde peut donc se focaliser entièrement sur l'horloge d'entrée.\\
-Plutot que spécifier l'amplitude à chaque pas, blip buff n'a besoin que de connaitre les points de basculement d'amplitude (i.e, où l'amplitude change, généralement à la demi periode), qui sont nommés "deltas" par le développeur. Les temps correspondant à ces variations d'amplitudes sont donnés par des pas de l'horloge processeur (qui dans notre cas, correspondent aux cycles du z80). 
+Sans utiliser cette librairie, le tableau wave devrait ensuite être ré-échantillonné de la fréquence d'entrée à la fréquence d'échantillonnage de sortie. La librairie "blip\_buff" fait ce ré-échantillonage en interne, le code de génération de l'onde peut donc se focaliser entièrement sur l'horloge d'entrée.\\
+Plutot que spécifier l'amplitude à chaque pas, blip buff n'a besoin que de connaître les points de basculement d'amplitude (i.e, où l'amplitude change, généralement à la demi période), qui sont nommés "deltas" par le développeur. Les temps correspondant à ces variations d'amplitudes sont donnés par des pas de l'horloge processeur (qui, dans notre cas, correspondent aux cycles du z80). 
 Le schéma ci-dessous indique les "deltas" en dessous des points de temps auxquels ils interviennent.
 
 \begin{figure}[!h]
@@ -1631,7 +1562,7 @@ blip_add_delta(blip, 28, 10);
 Le temps continuant d'augmenter, laisser l'onde avancer telle qu'elle provoquerait un dépassement de valeur d'entiers. 
 La librairie permet d'éviter ceci en procédant à la génération de l'onde par laps de temps de longueur controlée.
 Les pas d'horloge dans un laps de temps deviennent donc relatifs aux temps de début et de fin dudit laps.
-Le temps d'un fin d'un laps de temps correspondra alors au temps du début du suivant.
+Le temps de fin d'un laps de temps correspondra alors au temps de début du suivant.
 Le schéma utilisé précédemment donne donc la division en laps de temps qui suit :
 
 \begin{figure}[h]
@@ -1641,7 +1572,7 @@ Le schéma utilisé précédemment donne donc la division en laps de temps qui s
 \label{WAV3}
 \end{figure}
 
-Et cette onde peut etre générée par le code qui suit, dans lequel les échantillons sont sortis 10 par 10, peuvent donc etre lus à la chaine sans risque de dépassement avec la fonction "blip read samples()".
+Et cette onde peut etre générée par le code qui suit, dans lequel les échantillons sont sortis 10 par 10, et peuvent donc etre lus à la chaine sans risque de dépassement avec la fonction "blip\_read\_samples()".
 
 \begin{lstlisting}
 	blip_add_delta(blip,4,5);
