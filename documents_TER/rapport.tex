@@ -124,13 +124,19 @@ Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte Game Boy, 
 \subsection{No\$GMB}
 No\$GMB \cite{nogmb} est un émulateur de Game Boy, Game Boy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
 \section{Articles de recherches}
-Le choix des articles de recherches a été plutôt délicat, car les composants de la Game Boy étant relativement anciens aucun article ne traitait réellement du sujet. Nous avons donc porté notre choix, tout d'abord sur un document qui n'est pas réellement un article de recherche mais plutot une documentation sur les techniques de programmation permettant de réaliser un émulateur. Cette article est très intéressant pour nous car il traite de différentes méthodes que nous avons dû utiliser pour réaliser notre projet. Les deux articles suivants relèvent plus de choix personnels car ils ne traitent pas de l'émulation de consoles mais de différentes techniques actuelles utilisées pour optimiser l'émulation de processeurs qu'ils soient multi-coeurs ou non. Ces articles restent relativement complexes de part leur aspect technique mais compréhensibles dans la mesure où nous connaissons les bases de l'émulations.
+Le choix des articles de recherches a été plutôt délicat, car les composants de la Game Boy étant relativement anciens aucun article ne traitait réellement du sujet. Nous avons donc porté notre choix, tout d'abord sur un document qui n'est pas réellement un article de recherche mais plutot une documentation sur les techniques de programmation permettant de réaliser un émulateur. Cette article est très intéressant pour nous car il traite de différentes méthodes que nous avons dû utiliser pour réaliser notre projet. Les deux articles suivants relèvent plus de choix personnels car ils ne traitent pas de l'émulation de consoles mais de différentes techniques actuelles utilisées pour optimiser l'émulation de processeurs qu'ils soient multi-coeurs ou non. Ces articles restent relativement complexes de part leur aspect technique.
 
 \chapter{Etude du Hardware}
+Cette partie décrit les différents composants de la Game Boy. Avant de rentrer dans les détails il est important de précisé que pour ce rapport nous avons adopté les conventions d'écriture suivantes:
+\begin{itemize}
+\item{"0xHHHH" reprèsente le nombre HHHH sous forme hexadécimale.}
+\item{"(0xHHHH)" reprèsente la valeur lue à l'adresse 0xHHHH.}
+\item{Un octet contient 8 bits, le bit de poids faible est appelé "bit 0" et le bit de poids fort est appelé "bit 7".}
+\end{itemize}
 \section{CPU}
 \subsection{Caractéristiques générales}
-Le CPU de la Game Boy est un processeur 8 bits "Zilog 80" modifié, simplifié et adapté pour la Game Boy, son vrai nom est Sharp LR35902.
-Une de ses spécificités est qu'il est capable de faire des opérations 16 bits.
+Le CPU de la Game Boy est un processeur 8 bits "Zilog 80" modifié et simplifié, son vrai nom est Sharp LR35902.
+Ses spécificités se résument au fait qu'il est capable de faire des opérations 16 bits.
 Il est cadencé à 4,194304 MHz, possède un peu moins de 512 instructions et est de type little endian.
 \subsection{Registres}
 
@@ -158,16 +164,15 @@ Une instruction est un calcul ou un ordre que va exécuter/commander le processe
 \textbf{instructions en 16 bits de chargement/sauvegarde/déplacement} | exemple: "PUSH BC", soit écrire dans la pile la valeur de BC, la valeur du registre SP s'en retrouvera modifiée.\\\\
 \textbf{instructions de sauts et d'appels} | exemple: "JP Z,0xHHHH", soit changer le registre PC par l'adresse 0xHHHH si le drapeau Z est activé dans le registre F.\\\\
 \textbf{instructions de contrôles/diverses} | exemple: "NOP", soit, ne rien faire.\\\\
-Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant:\\ 
-Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x2000) = 0x00, (0x2001) = 0xCA, (0x2002) = 0xEF, (0x2003) = 0xBE.
-
+Selon l'instruction, le processeur sait s'il doit lire un, deux ou trois octets (le nombre d'octets lus par le LR35902 par opération est au maximum de 3). Pour mieux comprendre ce mécanisme prenons le cas suivant:\\\\
+Le registre PC vaut 0x2000, le registre F vaut 0x80 (Le drapeau Z est à 1), (0x2000) = 0x00, (0x2001) = 0xCA, (0x2002) = 0xEF, (0x2003) = 0xBE.\\\\
 Comme PC vaut 0x2000 le processeur lit d'abord 0x00 ce qui correspond à l'instruction "NOP", ne rien faire. 
 Le processeur ne lira donc qu'un octet pour cette instruction, le registre PC sera incrémenté et vaudra 0x2001.
 Ensuite le processeur va lire 0xCA ce qui correspond à l'opération "JP Z,0xHHHH", dans cette opération le processeur a besoin de la valeur 0xHHHH, le processeur va donc lire les 2 octets supplémentaires. Ce qui donne dans ce cas, "JP Z,0xBEEF".
 Comme le flag Z est à un, le registre PC vaut maintenant 0xBEEF, dans le cas où le flag Z aurait été à 0, PC vaudrait 0x2004.\\\\
 Les instructions ont des coûts en temps, ces coûts sont représentés en cycles d'exécutions.
 Par exemple l'instruction "NOP" coûte 4 cycles, tandis que l'instruction "PUSH BC" coûte 16 cycles.
-Certaines instructions selon leur réussite vont avoir des coûts différents, l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
+Certaines instructions selon leur réussite vont avoir des coûts différents, par exemple l'instruction "JP Z,0xHHHH" coûtera 16 cycles si le drapeau Z est à 1, 12 sinon.
 Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtant 4194304 cycles sera réalisé en 1 seconde.
 \\\\
 \begin{figure}[!h]
@@ -175,6 +180,59 @@ Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtan
 \includegraphics[scale=0.80]{images/schema_cpu.png}
 \caption{Schéma représentant le LR35902}
 \end{figure}
+
+\section{MMU}
+Le MMU (soit Memory Management Unit) est un composant qui autorise ou non l'accès en mémoire demandé par le processeur.
+En fait la Game Boy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
+Pour mieux comprendre à quoi correspond cet espace, l'espace d'adressage sera
+dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
+plus en détails:\\
+\begin{itemize}
+\item \textbf{0xFE00-0xFFFF} Espace mémoire particulier
+\item \textbf{0xC000-0xFDFF} RAM interne
+\item \textbf{0xA000-0xBFFF} RAM de la cartouche
+\item \textbf{0x8000-0x9FFF} RAM interne dédiée aux dessins du jeu
+\item \textbf{0x0000-0x7FFF} ROM de la cartouche
+\end{itemize}
+
+\subsection{0x0000-0x7FFF ROM de la cartouche}
+\begin{itemize}
+\item \textbf{0x0000-0x3FFF:} Banque 0 de la ROM de la cartouche.
+\item \textbf{0x4000-0x7FFF:} Banque 1-n de la ROM de la cartouche (voir partie Cartouche de jeu).
+\end{itemize}
+
+\subsection{0x8000-0x9FFF RAM interne dédiée aux dessins du jeu}
+\begin{itemize}
+\item \textbf{0x8000-0x97FF:} Données des dessins, où sont stockés tous les dessins du jeu.
+\item \textbf{0x9800-0x9BFF:} "Background Map" 1, zone spécifiant les dessins à utiliser pour dessiner l'arrière-plan 1.
+\item \textbf{0x9C00-0x9FFF:} "Background Map" 2, zone spécifiant les dessins à utiliser pour dessiner l'arrière-plan 2. 
+\end{itemize} 
+
+\subsection{0xA000-0xBFFF RAM de la cartouche}
+Zone dédiée à la RAM de la cartouche (Voir Partie Cartouche de jeu).
+
+\subsection{0xC000-0xFDFF RAM interne}
+\begin{itemize}
+\item \textbf{0xC000-0xDFFF:} Zone de RAM interne servant à stocker les différentes variables du jeu.
+\item \textbf{0xE000-0xFDFF:} Echo de la plage d'addresse de 0xC000 à 0xDDFF, cette zone est
+généralement inutilisée.
+\end{itemize} 
+
+\subsection{0xFE00-0xFFFF Espace mémoire particulier}
+
+\begin{itemize}
+\item \textbf{0xFE00-0xFE9F:} Object Attribute Memory (OAM), zone contenant les informations
+sur les sprites affichés.
+\item \textbf{0xFEA0-0xFEFF:} Inutilisé.
+\item \textbf{0xFF00-0xFF7F:} Cette zone contient des registres de contrôles pour tous les composants de la
+Game Boy.
+\item \textbf{0xFF80-0xFFFE:} Cette zone est réservée pour la pile, les
+développeurs initialisent généralement le registre SP à l'adresse 0xFFFE.
+\item \textbf{0xFFFF :} Cette adresse sert à savoir quelles interruptions sont autorisées ou
+non. (Voir partie Interruptions)
+\end{itemize} 
+
+
 \section{GPU}
 
 Le GPU de la Game Boy est intégré dans le même circuit physique que le CPU. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
@@ -207,11 +265,11 @@ Ces trois couches ont des rôles différents et servent à séparer différents
 \item \textbf{La couche Background:}
 	Cette couche comprend tous les éléments qui appartiennent au décor du
 jeu. Elle est représentée par deux matrices de 256*256 pixels, soit 32*32
-tuiles (carrés de 8*8 pixels). La Game Boy peut donc passer d'une matrice à
+tuiles (carrés de 8*8 pixels). Les développeurs peuvent donc passer d'une matrice à
 l'autre pour réaliser des transitions vidéos entre deux scènes. Ces matrices étant
 d'une taille supérieure à celle de l'écran lors de l'affichage, il est possible de gérer la position de
 l'écran sur une zone desdites matrices via la modification des valeurs de
-deux registres. 
+deux registres. La figure \ref{background} illustre ce principe. 
 \\
 
 \begin{figure}[!h]
@@ -224,13 +282,13 @@ deux registres.
 \item \textbf{La couche Window:}
 	Cette couche est généralement utilisée pour tous les éléments statiques
 d'un jeu, comme la barre de menu ou les scores. Elle a un comportement
-similaire à celui de la couche Background si ce n'est qu'elle est positionnée par rapport à l'écran et non l'inverse.\\
+similaire à celui de la couche Background si ce n'est qu'elle est positionnée par rapport à l'écran et non l'inverse. La figure \ref{window} illustre ce principe.\\
 
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.8]{images/window.png}
 \caption{Schéma d'affichage de la window}
-\label{background}
+\label{window}
 \end{figure}
 
 \item \textbf{La couche Sprites:}
@@ -317,60 +375,7 @@ Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'ad
 \end{itemize}
 
 \subsection{VRAM}
-La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 KBytes. Elle est donc utilisée pour tout ce qui touche à l'affichage, qu'il s'agisse des nuances de gris ou des différentes couches d'affichage. Tous les registres que nous avons vu précédemment sont contenus en son sein.
-	
-
-
-\section{MMU}
-Le MMU (soit Memory Management Unit) est un composant qui autorise ou non l'accès en mémoire demandé par le processeur.
-En fait la Game Boy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
-Pour mieux comprendre à quoi correspond cet espace, l'espace d'adressage sera
-dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
-plus en détails:\\
-\begin{itemize}
-\item \textbf{0xFE00-0xFFFF} Espace mémoire particulier
-\item \textbf{0xC000-0xFDFF} RAM interne
-\item \textbf{0xA000-0xBFFF} RAM de la cartouche
-\item \textbf{0x8000-0x9FFF} RAM interne dédiée aux dessins du jeu
-\item \textbf{0x0000-0x7FFF} ROM de la cartouche
-\end{itemize}
-
-\subsection{0x0000-0x7FFF ROM de la cartouche}
-\begin{itemize}
-\item \textbf{0x0000-0x3FFF:} Banque 0 de la ROM de la cartouche.
-\item \textbf{0x4000-0x7FFF:} Banque 1-n de la ROM de la cartouche (voir partie Cartouche de jeu).
-\end{itemize}
-
-\subsection{0x8000-0x9FFF RAM interne dédiée aux dessins du jeu}
-\begin{itemize}
-\item \textbf{0x8000-0x97FF:} Données des dessins, où sont stockés tous les dessins du jeu.
-\item \textbf{0x9800-0x9BFF:} "Background Map" 1, zone spécifiant les dessins à utiliser pour dessiner l'arrière-plan 1.
-\item \textbf{0x9C00-0x9FFF:} "Background Map" 2, zone spécifiant les dessins à utiliser pour dessiner l'arrière-plan 2. 
-\end{itemize} 
-
-\subsection{0xA000-0xBFFF RAM de la cartouche}
-Zone dédiée à la RAM de la cartouche (Voir Partie Cartouche de jeu).
-
-\subsection{0xC000-0xFDFF RAM interne}
-\begin{itemize}
-\item \textbf{0xC000-0xDFFF:} Zone de RAM interne servant à stocker les différentes variables du jeu.
-\item \textbf{0xE000-0xFDFF:} Echo de la plage d'addresse de 0xC000 à 0xDDFF, cette zone est
-généralement inutilisée.
-\end{itemize} 
-
-\subsection{0xFE00-0xFFFF Espace mémoire particulier}
-
-\begin{itemize}
-\item \textbf{0xFE00-0xFE9F:} Object Attribute Memory (OAM), zone contenant les informations
-sur les sprites affichés.
-\item \textbf{0xFEA0-0xFEFF:} Inutilisé.
-\item \textbf{0xFF00-0xFF7F:} Cette zone contient des registres de contrôles pour tous les composants de la
-Game Boy.
-\item \textbf{0xFF80-0xFFFE:} Cette zone est réservée pour la pile, les
-développeurs initialisent généralement le registre SP à l'adresse 0xFFFE.
-\item \textbf{0xFFFF :} Cette adresse sert à savoir quelles interruptions sont autorisées ou
-non. (Voir partie Interruptions)
-\end{itemize} 
+La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 Ko. C'est elle qui contient tous les dessins des jeux.
 
 \section{Cartouche de jeu}
 Une cartouche de jeu est composée au minimum d'une mémoire morte, appelée ROM (Read Only Memory), mais peut aussi contenir dans certains cas de la RAM (Random Access Memory) ou d'autres composants que nous verrons un peu plus loin.
