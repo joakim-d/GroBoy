@@ -47,7 +47,7 @@
 \newglossaryentry{APU}
 {
 	name={APU},
-	description={An anglais Audio Processing Unit, il s'agit du processeur qui traite la partie sonore d'un système.}
+	description={En anglais Audio Processing Unit, il s'agit du processeur qui traite la partie sonore d'un système.}
 }
 \definecolor{vert}{rgb}{0,0.5,0.1} 
 \definecolor{blue}{rgb}{0,0.4,0.6} 
@@ -509,7 +509,7 @@ La plupart des registres fonctionnent de la même façon que son ancêtre, à qu
 
 \section{APU}
 \subsection{Présentation générale}
-	En ce qui concerne l'\gls{APU} la Game Boy dispose de deux canaux de son (un pour la gauche,
+	En ce qui concerne l' \gls{APU} la Game Boy dispose de deux canaux de son (un pour la gauche,
 	et un pour la droite), reliés aux terminaux de sortie appelés
 	SO1 et SO2 par le constructeur, ainsi que d'un terminal
 	d'entrée appelé Vin, recevant le signal électrique
@@ -894,6 +894,76 @@ Il suffit donc de passer en paramètre l'adresse du registre désiré pour que l
 Le préfixe static indique juste que cette fonction est uniquement disponible pour le processeur, ce qui est logique car aucun autre composant ne devrait pouvoir exécuter cette fonction. Ensuite le préfixe inline est présent dans un soucis d'optimisation, en effet lors de sa présence le compilateur peut prendre en compte ou non ce mot clé. Si le compilateur le prend en compte cela aura pour effet d'incorporer le corps de la fonction aux endroits où elle est appelée, plutôt que de faire appel à elle.\\\\ 
 Enfin toutes les instructions du processeur ont pu être développées principalement grâce aux trois références suivantes :
 La table des instructions du LR35902\cite{pastraiser}, La table des instructions du Z80\cite{clrhome} et le livre traitant de la programmation en assembleur avec le Z80 \cite{pinaud}.
+\section{MMU}
+Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
+\subsection{Initialisation} 
+Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accès à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la Game Boy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la Game Boy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
+Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche, les tailles sont différentes selon les jeux, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux (roms).
+Les fichiers .gb (que l'on peut retrouver sur internet) représentent en fait la partie ROM des cartouches.
+Lorsqu'un fichier est ouvert avec groboy son chemin est envoyé au module mémoire du programme avec la fonction "memory\_init", cette dernière s'occupe d'afficher sur la sortie standard les informations relatives au fichier et d'initialiser les différents buffers. Voici un exemple avec la cartouche de jeu Zelda.
+\begin{lstlisting}
+$ ./groboy roms/Zelda\ -\ Links\ Awakening.gb
+Game title: ZELDA
+Cartridge type: MBC1+RAM+BATTERY
+Rom Size 512KB: 32 Banks
+Ram Size 8KB: 1 Bank
+Language English Game
+Manufacturer
+Version number 2
+\end{lstlisting}
+La fonction "memory\_init" s'occupe également d'initialiser le buffer de ROM avec l'intégralité du fichier lu, et le buffer de RAM en fonction des informations lus.
+Voici la façon dont elle procède pour la ROM:
+\begin{lstlisting}
+int file_d;
+struct stat file_stat;
+
+file_d = open(rom_path, O_RDONLY);
+fstat(file_d, &file_stat);
+
+cartridge_rom_buffer = (BYTE *) malloc(file_stat.st_size);
+if(read(file_d, cartridge_rom_buffer, file_stat.st_size) == -1){
+	printf("Error while reading rom file\n");
+	exit(-1);
+}    
+close(file_d);
+\end{lstlisting}
+On récupère la taille du fichier lu grâce à la fonction fstat, et on alloue à "cartridge\_rom\_buffer" la taille du fichier lu, puis on lit l'intégralité du fichier que l'on place dans le buffer.\\
+Voici maintenant la façon dont elle procède pour la RAM:
+\begin{lstlisting}
+switch(*(cartridge_rom_buffer + 0x0149)){
+       	case 0: cartridge_ram_enabled = 0;break;
+	case 1: alloc_ram_mem(0x100);break;
+	case 2: alloc_ram_mem(0x2000);break;
+	case 3: alloc_ram_mem(0x8000);break;
+}
+\end{lstlisting}
+Un switch est placé sur l'octet 0x0149 de "cartridge\_rom\_buffer", contenant la taille de la RAM. Si la valeur vaut 0, il n'y a pas de RAM dans la cartouche, sinon le buffer "cartridge\_ram\_buffer" est initialisé avec la fonction "alloc\_ram\_mem".
+Enfin l'initialisation de la mémoire interne se fait en mettant toutes les valeurs du buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
+\subsection{Lecture/Ecriture}
+Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction "memory\_read", si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet \cite{github}.
+\begin{lstlisting}
+inline BYTE memory_read(unsigned short addr){
+	if(addr <= 0x3FFF) 	//Banque 0 ROM cartouche
+		return cartridge_rom_buffer[addr];
+
+	else if(addr <= 0x7FFF) //Banque 1-n ROM cartouche
+		return 
+		cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
+
+	else if(addr <= 0x9FFF) //Memoire video interne
+		return internal_ram[addr];f
+
+	else if(addr <= 0xBFFF && cartridge_ram_enabled) //RAM cartouche
+		return 
+		cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
+
+	else 	//Memoire interne
+		return internal_ram[addr];
+}
+\end{lstlisting}
+Nous pouvons voir dans cette fonction que pour chaque plage d'adresse demandée, la fonction retourne soit les valeurs de "cartridge\_rom\_buffer", de "cartridge\_ram\_buffer" ou de "internal\_ram".
+Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs de banques de ROM et de RAM des cartouches.
+
 \section{GPU}
 Le GPU a été l'un des composants clé à développer, car il provoque un grand nombre d'interruptions et nous ne pouvions pas réellement tester notre émulateur avant de l'avoir terminé.\\
 
@@ -1059,76 +1129,6 @@ SDL_Flip(sdl_screen); /* Mise a jour de l'ecran */
 sleep_SDL();
 \end{lstlisting}
 Pour toutes les valeurs (de 0 à 3) récupérées dans "gpu\_screen", une conversion est faite afin d'exporter ces valeurs dans "sdl\_screen\_temp" qui est une matrice supportée par la SDL. Ces valeurs récupérées, la fonction "SDL\_SoftStretch" opère une mise à l'échelle (scaling) de la matrice "sdl\_screen\_temp" vers "sdl\_screen". La fonction "SDL\_Flip" met à jour l'écran SDL. Enfin la fonction "sleep\_SDL" permet de mettre en pause l'émulateur, et de le réveiller de sorte à ce qu'il y ait une fréquence de rafraîchissement de 60 images par secondes.
-\section{MMU}
-Nous allons dans cette partie expliquer comment nous avons traité la mémoire. 
-\subsection{Initialisation} 
-Comme expliqué dans la partie Hardware-MMU, le processeur et autres composants ont accès à une plage mémoire de 16 bits. Plage qui peut être sectionnée en plusieurs zones. Ce que l'on peut retenir de cette partie c'est qu'il y'a une zone de RAM interne à la Game Boy, une zone de ROM contenue dans la cartouche et une zone de RAM potentiellement contenue dans la cartouche. Nous avons donc représenté ces différentes zones en créant 3 buffers différents. Un buffer nommé "internal\_ram" de taille constante de 0x10000 octets représentant la zone de RAM interne à la Game Boy. Puis les buffers "cartridge\_rom\_buffer" et "cartridge\_ram\_buffer" représentant respectivement la zone de ROM et RAM de la cartouche.
-Ces deux derniers buffers sont alloués dynamiquement en mémoire, en effet comme expliqué dans la partie Hardware-Cartouche, les tailles sont différentes selon les jeux, il est néanmoins possible de retrouver la taille en mémoire de la ROM et de la RAM de la cartouche grâce aux fichiers de jeux (roms).
-Les fichiers .gb (que l'on peut retrouver sur internet) représentent en fait la partie ROM des cartouches.
-Lorsqu'un fichier est ouvert avec groboy son chemin est envoyé au module mémoire du programme avec la fonction "memory\_init", cette dernière s'occupe d'afficher sur la sortie standard les informations relatives au fichier et d'initialiser les différents buffers. Voici un exemple avec la cartouche de jeu Zelda.
-\begin{lstlisting}
-$ ./groboy roms/Zelda\ -\ Links\ Awakening.gb
-Game title: ZELDA
-Cartridge type: MBC1+RAM+BATTERY
-Rom Size 512KB: 32 Banks
-Ram Size 8KB: 1 Bank
-Language English Game
-Manufacturer
-Version number 2
-\end{lstlisting}
-La fonction "memory\_init" s'occupe également d'initialiser le buffer de ROM avec l'intégralité du fichier lu, et le buffer de RAM en fonction des informations lus.
-Voici la façon dont elle procède pour la ROM:
-\begin{lstlisting}
-int file_d;
-struct stat file_stat;
-
-file_d = open(rom_path, O_RDONLY);
-fstat(file_d, &file_stat);
-
-cartridge_rom_buffer = (BYTE *) malloc(file_stat.st_size);
-if(read(file_d, cartridge_rom_buffer, file_stat.st_size) == -1){
-	printf("Error while reading rom file\n");
-	exit(-1);
-}    
-close(file_d);
-\end{lstlisting}
-On récupère la taille du fichier lu grâce à la fonction fstat, et on alloue à "cartridge\_rom\_buffer" la taille du fichier lu, puis on lit l'intégralité du fichier que l'on place dans le buffer.\\
-Voici maintenant la façon dont elle procède pour la RAM:
-\begin{lstlisting}
-switch(*(cartridge_rom_buffer + 0x0149)){
-       	case 0: cartridge_ram_enabled = 0;break;
-	case 1: alloc_ram_mem(0x100);break;
-	case 2: alloc_ram_mem(0x2000);break;
-	case 3: alloc_ram_mem(0x8000);break;
-}
-\end{lstlisting}
-Un switch est placé sur l'octet 0x0149 de "cartridge\_rom\_buffer", contenant la taille de la RAM. Si la valeur vaut 0, il n'y a pas de RAM dans la cartouche, sinon le buffer "cartridge\_ram\_buffer" est initialisé avec la fonction "alloc\_ram\_mem".
-Enfin l'initialisation de la mémoire interne se fait en mettant toutes les valeurs du buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
-\subsection{Lecture/Ecriture}
-Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction "memory\_read", si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet \cite{github}.
-\begin{lstlisting}
-inline BYTE memory_read(unsigned short addr){
-	if(addr <= 0x3FFF) 	//Banque 0 ROM cartouche
-		return cartridge_rom_buffer[addr];
-
-	else if(addr <= 0x7FFF) //Banque 1-n ROM cartouche
-		return 
-		cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
-
-	else if(addr <= 0x9FFF) //Memoire video interne
-		return internal_ram[addr];f
-
-	else if(addr <= 0xBFFF && cartridge_ram_enabled) //RAM cartouche
-		return 
-		cartridge_ram_buffer[0x2000*(ram_selector) + addr - 0xA000];
-
-	else 	//Memoire interne
-		return internal_ram[addr];
-}
-\end{lstlisting}
-Nous pouvons voir dans cette fonction que pour chaque plage d'adresse demandée, la fonction retourne soit les valeurs de "cartridge\_rom\_buffer", de "cartridge\_ram\_buffer" ou de "internal\_ram".
-Les variables "rom\_selector" et "ram\_selector" sont les sélecteurs respectifs de banques de ROM et de RAM des cartouches.
-
 \section{APU}
 	Si le fonctionnement général de l'unité son de la console n'est pas d'une extrême complexité, sa réalisation sur un émulateur nous aura donné, elle, beaucoup de fil à retordre.
 	En effet, la technologie de la Game Boy permettant de produire un son efficacement et simplement, en fonctionnant comme expliqué dans la partie hardware, la documentation à ce sujet est relativement difficile à trouver, puis à exploiter pour l'émulation.\\
@@ -1659,5 +1659,5 @@ Le développement de la partie CPU a été épineux. Dans le sens où la moindre
 \vspace{2cm}
 Ce document est un rapport de Travail d'Etude et de Recherche. A travers notre sujet qui est l'étude et la réalisation d'un émulateur pour Game Boy, nous avons voulu montrer comment il est possible de réaliser un émulateur en prenant l'exemple de la Game Boy. Ce document est composé de plusieurs parties, en partant du choix des outils jusqu'à la réalisation finale et en passant par les problèmes de législations, d'étude du hardware, et d'une ouverture sur l'intérêt de l'émulation aujourd'hui. Nous espérons que ce document vous donnera envie de rentrer dans le merveilleux monde de l'émulation (si ce n'est pas déjà fait). 
 \\\\\\
-This document is a Study and Research Work report. Through our subject which is the study and the implementation of a Game Boy emulator, we wanted to show how implementing an emulator is possible with the Game Boy example. This document is composed with several parts, starting with tools choice up to the final realisation with legislation problems, hardware study, and an opening on nowadays emulation interest. We hope that this document will make you want to get into the wonderful emulation world (if it's not already did).
+This document is a Study and Research Work report. Through our subject which is the study and the implementation of a Game Boy emulator, we wanted to show how implementing an emulator is possible with the Game Boy example. This document is composed with several parts, starting with tools choice up to the final realization with legislation problems, hardware study, and an opening on nowadays emulation interest. We hope that this document will make you want to get into the wonderful emulation world (if it's not already did).
 \end{document}
