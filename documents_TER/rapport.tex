@@ -6,6 +6,29 @@
 \usepackage{color}
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[toc]{glossaries}
+\makeglossary
+\newglossaryentry{ROMS}
+{
+  name={ROMS},
+  description={est utilisé pour désigner des copies de puce sur un fichier. On utilisera par exemple "la rom de Mario" pour indiquer la copie de la cartouche du jeu sur un fichier informatique lisible par un émulateur.} 
+}
+\newglossaryentry{ROM}
+{
+  name={ROM},
+  description={signifie mémoire en lecture seule, elle correspond à la mémoire "morte" car elle ne s'éfface pas lors de la mise hors tension du système.}
+}
+\newglossaryentry{RAM}
+{
+  name={RAM},
+  description={il s'agie de la mémoire vive, c'est-à-dire qu'elle peut être utilisée par l'ordinateur à n'importe quel moment et rapidement pour travailler avec des applications en temps réel.}
+}
+\newglossaryentry{VRAM}
+{
+ name={VRAM},
+ description={La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 Ko. C'est elle qui contient tous les dessins des jeux.}
+}
 
 
 \definecolor{vert}{rgb}{0,0.5,0.1} 
@@ -102,7 +125,7 @@ Le projet n'a pas été conçu avec un IDE particulier. Lors de la conception du
 Comme indiqué un peu plus haut, l'étude de la documentation a occupé une part importante de notre projet. Nous avons donc du nous concerter pour se mettre d'accord sur les documentations à utiliser, étant donné leur nombre, afin de ne pas être victime des petites différences que l'on peut trouver entre certaines d'entre elles.
 La plus importante de celles-ci est la documentation "pandocs" \cite{nocash}, utilisée par chacun d'entre nous principalement pour l'étude du hardware, elle fournit un condensé assez complet du fonctionnement réel de la Game Boy.\\
 En dehors des simples aspects de documentation, nous avons du passer par un peu d'information, car si l'idée de créer un émulateur séduit rapidement, il va sans dire qu'elle implique forcément une prise en compte de certains aspects de législation.
-En effet, la programmation d'un émulateur à proprement parler ne va à l'encontre d'aucune loi, cependant, même en n'ayant aucunement pour but de commercialiser la création, il faut savoir que l'utilisation et l'obtention de ROMS, est, elle, soumise à de nombreuses lois, pour des raisons de protection des droits d'auteurs.\\
+En effet, la programmation d'un émulateur à proprement parler ne va à l'encontre d'aucune loi, cependant, même en n'ayant aucunement pour but de commercialiser la création, il faut savoir que l'utilisation et l'obtention de \gls{ROMS}, est, elle, soumise à de nombreuses lois, pour des raisons de protection des droits d'auteurs.\\
 Voici brièvement ce que ces lois indiques concernant les ROMS :
 \begin{itemize}
 \item Copier le contenu d'une ROM et la vendre ou la distribuer sans l'accord de son auteur est assimilé à de la contrefaçon et est illégal.
@@ -189,10 +212,10 @@ dans un premier temps découpé grossièrement, puis chaque partie sera étudié
 plus en détails:\\
 \begin{itemize}
 \item \textbf{0xFE00-0xFFFF} Espace mémoire particulier
-\item \textbf{0xC000-0xFDFF} RAM interne
+\item \textbf{0xC000-0xFDFF} \gls{RAM} interne
 \item \textbf{0xA000-0xBFFF} RAM de la cartouche
 \item \textbf{0x8000-0x9FFF} RAM interne dédiée aux dessins du jeu
-\item \textbf{0x0000-0x7FFF} ROM de la cartouche
+\item \textbf{0x0000-0x7FFF} \gls{ROM} de la cartouche
 \end{itemize}
 
 \subsection{0x0000-0x7FFF ROM de la cartouche}
@@ -235,7 +258,7 @@ non. (Voir partie Interruptions)
 
 \section{GPU}
 
-Le GPU de la Game Boy est intégré dans le même circuit physique que le CPU. Sa fonction est de générer une image à partir des données contenues dans la VRAM (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+Le GPU de la Game Boy est intégré dans le même circuit physique que le CPU. Sa fonction est de générer une image à partir des données contenues dans la \gls{VRAM} (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
@@ -385,8 +408,6 @@ Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'ad
 	
 \end{itemize}
 
-\subsection{VRAM}
-La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 Ko. C'est elle qui contient tous les dessins des jeux.
 
 \section{Cartouche de jeu}
 Une cartouche de jeu est composée au minimum d'une mémoire morte, appelée ROM (Read Only Memory), mais peut aussi contenir dans certains cas de la RAM (Random Access Memory) ou d'autres composants que nous verrons un peu plus loin.
@@ -1078,7 +1099,7 @@ inline BYTE memory_read(unsigned short addr){
 		cartridge_rom_buffer[0x4000*(rom_selector - 1) + addr];
 
 	else if(addr <= 0x9FFF) //Memoire video interne
-		return internal_ram[addr];
+		return internal_ram[addr];f
 
 	else if(addr <= 0xBFFF && cartridge_ram_enabled) //RAM cartouche
 		return 
@@ -1615,4 +1636,5 @@ Le développement de la partie CPU a été épineux. Dans le sens où la moindre
 \caption{Capture des tests réussis des instructions CPU avec groboy}
 \label{testcpu}
 \end{figure}
+\printglossaries
 \end{document}
