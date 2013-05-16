@@ -1067,7 +1067,7 @@ switch(*(cartridge_rom_buffer + 0x0149)){
 Un switch est placé sur l'octet 0x0149 de "cartridge\_rom\_buffer", contenant la taille de la RAM. Si la valeur vaut 0, il n'y a pas de RAM dans la cartouche, sinon le buffer "cartridge\_ram\_buffer" est initialisé avec la fonction "alloc\_ram\_mem".
 Enfin l'initialisation de la mémoire interne se fait en mettant toutes les valeurs du buffer "internal\_ram" à 0 à part pour certains registres qui ont besoin d'être initialisés avec des valeurs spéciales.
 \subsection{Lecture/Ecriture}
-Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction "memory\_read", si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet.
+Les lectures et écritures en mémoire sont gérées par les fonctions "memory\_read" et "memory\_write". Afin de rester dans des cas "simples" nous allons uniquement étudier le corps de la fonction "memory\_read", si cela vous intéresse vous pouvez toujours retrouver le corps de la fonction "memory\_write" dans les sources du projet \cite{github}.
 \begin{lstlisting}
 inline BYTE memory_read(unsigned short addr){
 	if(addr <= 0x3FFF) 	//Banque 0 ROM cartouche
