@@ -985,7 +985,7 @@ if(vblank_clock_counter >= 65664){ //Si on entre dans la periode de vblank
         }
 
 \end{lstlisting}
-La dernière partie de cet algorithme est très importante puisque c'est ici que sont exécutées les différentes tâches selon les périodes. Lorsque la période VBlank intervient, l'appel à la fonction "draw\_screen" est effectué, cette fonction actualise l'écran et par conséquent l'affichage SDL. Une interruption de type VBlank est demandée. Si la période actuelle n'est pas celle du VBlank alors c'est une routine de gestion des différents modes de l'écran LCD qui est déclenchée.\\
+La dernière partie de cet algorithme est très importante puisque c'est ici que sont exécutées les différentes tâches selon les périodes. Lorsque la période VBlank intervient, l'appel à la fonction "draw\_screen" est effectué, cette fonction actualise l'écran et par conséquent l'affichage SDL. Une interruption de type VBlank est demandée. Si la période actuelle n'est pas celle du VBlank alors c'est une routine de gestion des différents modes de l'écran LCD qui est exécutée.\\
 
 \subsection{Les fonctions d'affichage}
 Une fois l'algorithme principal mis en place, l'étape suivante est le remplissage de la matrice de pixels. Pour celà nous avons implémenté une fonction "gpu\_drawline()", qui va remplir une ligne de la matrice "gpu\_screen". Cette fonction est appelée par l'algorithme vu précédemment, lorsque le GPU passe en période de HBlank. Son fonctionnement est le suivant:\\
@@ -993,34 +993,32 @@ Une fois l'algorithme principal mis en place, l'étape suivante est le remplissa
 \begin{itemize}
 \item \textbf{Si le Background est établi:}
 	Le programme récupère dans la matrice contenant les tuiles du Background celle qui correpond à la ligne et à la colonne courante, la position du pixel de cette dernière qui est à dessiner, et stocke le tout. L'opération est réitérée pour chaque pixel de la ligne.
-
 \item \textbf{Si la couche Window est établie:}
-	Même principe que le Background, sauf qu'il faut en plus vérifier si la tuile est visible à l'écran ou non.\\
+	Même principe que le Background, sauf qu'il faut également vérifier si la tuile est visible à l'écran ou non.
 \item \textbf{Si les sprites sont établis:}
 	L'ensemble des sprites est filtré selon leur apparition dans la ligne actuelle, puis triés en fonction de leur position. 
 	Leurs pixels à afficher sont récupérés après transformation éventuelle (flip) du sprite.
 \end{itemize}
-
-Cette fonction implémentée, il ne reste plus qu'à afficher la matrice obtenue. 
+Cette fonction implémentée, il ne reste plus qu'à afficher la matrice obtenue grâce à la fonction "draw\_screen". 
 
 \begin{lstlisting}
-                for(int i=0; i<144; i++)
-                {
-                        for(int j=0; j<160; j++)
-                        {
-                                if(gpu_screen[i][j] == 0)
-                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 255,255,255);
-                                else if(gpu_screen[i][j] == 1)
-                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 170,170,170);
-                                else if(gpu_screen[i][j] == 2)
-                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 85,85,85);
-                                else
-                                        *((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 0,0,0);
-                        }
-                }
-                SDL_SoftStretch(sdl_screen_temp, NULL, sdl_screen, NULL);
-                SDL_Flip(sdl_screen); /* Mise a jour de l'ecran */
-                sleep_SDL();
+for(int i=0; i<144; i++)
+{
+	for(int j=0; j<160; j++)
+        {
+        	if(gpu_screen[i][j] == 0)
+                	*((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 255,255,255);
+                else if(gpu_screen[i][j] == 1)
+                	*((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 170,170,170);
+                else if(gpu_screen[i][j] == 2)
+                	*((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 85,85,85);
+                else
+                	*((Uint32*)(sdl_screen_temp->pixels) + j + i * sdl_screen_temp->w) = SDL_MapRGB(sdl_screen_temp->format, 0,0,0);
+         }
+}
+SDL_SoftStretch(sdl_screen_temp, NULL, sdl_screen, NULL);
+SDL_Flip(sdl_screen); /* Mise a jour de l'ecran */
+sleep_SDL();
 \end{lstlisting}
 Pour toutes les valeurs (de 0 à 3) récupérées dans "gpu\_screen", une conversion est faite afin d'exporter ces valeurs dans "sdl\_screen\_temp" qui est une matrice supportée par la SDL. Ces valeurs récupérées, la fonction "SDL\_SoftStretch" opère une mise à l'échelle (scaling) de la matrice "sdl\_screen\_temp" vers "sdl\_screen". La fonction "SDL\_Flip" met à jour l'écran SDL. Enfin la fonction "sleep\_SDL" permet de mettre en pause l'émulateur, et de le réveiller de sorte à ce qu'il y ait une fréquence de rafraîchissement de 60 images par secondes.
 \section{MMU}
@@ -1474,7 +1472,7 @@ Les principales avancées et recherches actuelles dans le domaine de l'émulatio
 Durant notre projet, nous avons fréquemment été amenés à nous réunir, étudiants et encadrants, afin de discuter de l'avancée générale de notre travail.
 Nombre de comptes rendus de ces réunions nous ont clairement guidé dans le développement.
 
-Voici un exemple type d'un de ces comptes rendus, l'ensemble de ces derniers étant disponible via l'archive jointe au rapport.
+Voici un exemple type d'un de ces comptes rendus, l'ensemble de ces derniers ainsi que les diagrammes de Gannt étant disponible via l'archive jointe au rapport.
 \begin{quotation}
 Compte rendu de la réunion de projet du 13/02/13\\
 Travail réalisé :\\
@@ -1490,7 +1488,6 @@ Objectifs pour la prochaine réunion :\\
 	-Modifier le diagramme de Gantt (planning prévisionnel) pour qu’il reflète les changements de priorités dans les tâches\\
 	-Faire un résumé des articles de recherche choisis en rapport avec notre sujet\\
 
-Les deux diagrammes de Gantt celui créé après la première réunion et le nouveau sont joints au rapport.\\
 \end{quotation}
 
 \chapter{Blip buff et la génération d'ondes}
@@ -1611,7 +1608,7 @@ Il existe une limite de 4000 échantillons de sortie par laps de temps, le nombr
 Pour des fréquences d'échantillonage classique, on arrive à des laps de temps d'un quinzieme de seconde, plus que suffisant pour nombre d'uilisations.
 
 \chapter{Méthodes de débuggage et roms de test}
-Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par un dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une Game Boy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et par conséquent d'obtenir un CPU stable \ref{testcpu}.
+Le développement de la partie CPU a été épineux. Dans le sens où la moindre petite erreur immiscée dans le code pouvait mettre à mal l'ensemble de l'émulation. Fort heureusement il est trouvable sur internet des roms de domaine public accompagnées de leur sources permettant de tester le bon fonctionnement de l'émulateur. Ces roms ont été créées par le dénommé "Blargg" (le même individu qui a créé la librairie de son). Elles sont fiables car elles ont été testées avec une Game Boy physique. Dans ces roms il en existe une qui teste toutes les instructions du CPU, c'est elle que nous avons utilisé. Son principe est plutôt clair, la rom teste l'ensemble des instructions par groupe et vérifie pour chaque groupe si le résultat est correct grâce à un checksum. Si un groupe d'instructions échoue ce dernier est indiqué, sinon un message "ok" apparaît. Enfin il est possible de voir dans le code source quelles instructions ont eu un problème ce qui cible l'erreur immiscée dans le code de notre CPU. Grâce à ceci nous avons réussi à passer l'ensemble des instructions et par conséquent d'obtenir un CPU stable. La figure \ref{testcpu} représente le succès des tests par notre émulateur.
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.4]{images/screenshot_cpu_blargg.png}
