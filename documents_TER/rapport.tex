@@ -11,26 +11,44 @@
 \makeglossary
 \newglossaryentry{ROMS}
 {
-  name={ROMS},
-  description={est utilisé pour désigner des copies de puce sur un fichier. On utilisera par exemple "la rom de Mario" pour indiquer la copie de la cartouche du jeu sur un fichier informatique lisible par un émulateur.} 
+	name={ROMS},
+  	description={Terme utilisé pour désigner des copies de cartouche de jeu sous forme de fichier et donc lisible par un émulateur. Par exemple "la rom de Mario" désigne la copie du jeu Mario.}
 }
 \newglossaryentry{ROM}
 {
-  name={ROM},
-  description={signifie mémoire en lecture seule, elle correspond à la mémoire "morte" car elle ne s'éfface pas lors de la mise hors tension du système.}
+	name={ROM},
+        description={En anglais Read Only Memory, il s'agit de la mémoire morte. Elle ne s'efface pas lors de la mise hors tension du système.}
 }
 \newglossaryentry{RAM}
 {
-  name={RAM},
-  description={il s'agie de la mémoire vive, c'est-à-dire qu'elle peut être utilisée par l'ordinateur à n'importe quel moment et rapidement pour travailler avec des applications en temps réel.}
+	name={RAM},
+	description={En anglais Random Access Memory, il s'agit de la mémoire vive. Elle est accessible en lecture/écriture par les différents composants reliés à elle. Néanmoins une fois le circuit hors tension, cet espace mémoire devient instable.}
 }
 \newglossaryentry{VRAM}
 {
- name={VRAM},
- description={La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 Ko. C'est elle qui contient tous les dessins des jeux.}
+	name={VRAM},
+	description={La VRAM correspond à la RAM vidéo de la Game Boy, sa taille est de 8 Ko. C'est elle qui contient tous les dessins des jeux.}
 }
-
-
+\newglossaryentry{CPU}
+{
+	name={CPU},
+	description={En anglais Central Processing Unit, il s'agit du processeur principal d'un système. Il a pour rôle d'exécuter les programmes.}
+}
+\newglossaryentry{GPU}
+{
+	name={GPU},
+	description={En anglais Graphical Processing Unit, il s'agit du processeur qui traite la partie graphique d'un système.}
+}
+\newglossaryentry{MMU}
+{
+	name={MMU},
+	description={En anglais Memory Management Unit, il s'agit d'un composant responsable de l'accès à la mémoire demandée par le processeur.}
+}
+\newglossaryentry{APU}
+{
+	name={APU},
+	description={An anglais Audio Processing Unit, il s'agit du processeur qui traite la partie sonore d'un système.}
+}
 \definecolor{vert}{rgb}{0,0.5,0.1} 
 \definecolor{blue}{rgb}{0,0.4,0.6} 
 \definecolor{red}{rgb}{1,0,0} 
@@ -158,7 +176,7 @@ Cette partie décrit les différents composants de la Game Boy. Avant de rentrer
 \end{itemize}
 \section{CPU}
 \subsection{Caractéristiques générales}
-Le CPU de la Game Boy est un processeur 8 bits "Zilog 80" modifié et simplifié, son vrai nom est Sharp LR35902.
+Le \gls{CPU} de la Game Boy est un processeur 8 bits "Zilog 80" modifié et simplifié, son vrai nom est Sharp LR35902.
 Ses spécificités se résument au fait qu'il est capable de faire des opérations 16 bits.
 Il est cadencé à 4,194304 MHz, possède un peu moins de 512 instructions et est de type little endian.
 \subsection{Registres}
@@ -205,8 +223,7 @@ Le processeur étant cadencé à 4,194304 MHz, un ensemble d'opérations coûtan
 \end{figure}
 
 \section{MMU}
-Le MMU (soit Memory Management Unit) est un composant qui autorise ou non l'accès en mémoire demandé par le processeur.
-En fait la Game Boy ne possède pas de tel composant, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
+En fait la Game Boy ne possède pas de \gls{MMU}, seulement le processeur est bien raccordé directement à un espace d'adressage de 16 bits.
 Pour mieux comprendre à quoi correspond cet espace, l'espace d'adressage sera
 dans un premier temps découpé grossièrement, puis chaque partie sera étudiée
 plus en détails:\\
@@ -258,7 +275,7 @@ non. (Voir partie Interruptions)
 
 \section{GPU}
 
-Le GPU de la Game Boy est intégré dans le même circuit physique que le CPU. Sa fonction est de générer une image à partir des données contenues dans la \gls{VRAM} (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
+Le \gls{GPU} de la Game Boy est intégré dans le même circuit physique que le CPU. Sa fonction est de générer une image à partir des données contenues dans la \gls{VRAM} (vidéo ram) puis de l'envoyer à l'écran LCD, il possède différents registres de configuration.
 
 \subsection{Fonctionnement de l'écran}
 
@@ -492,7 +509,7 @@ La plupart des registres fonctionnent de la même façon que son ancêtre, à qu
 
 \section{APU}
 \subsection{Présentation générale}
-	La Game Boy dispose de deux canaux de son (un pour la gauche,
+	En ce qui concerne l'\gls{APU} la Game Boy dispose de deux canaux de son (un pour la gauche,
 	et un pour la droite), reliés aux terminaux de sortie appelés
 	SO1 et SO2 par le constructeur, ainsi que d'un terminal
 	d'entrée appelé Vin, recevant le signal électrique
@@ -1637,4 +1654,10 @@ Le développement de la partie CPU a été épineux. Dans le sens où la moindre
 \label{testcpu}
 \end{figure}
 \printglossaries
+\newpage
+\section*{\centering{TER, développement d'un émulateur de \\Game Boy}}
+\vspace{2cm}
+Ce document est un rapport de Travail d'Etude et de Recherche. A travers notre sujet qui est l'étude et la réalisation d'un émulateur pour Game Boy, nous avons voulu montrer comment il est possible de réaliser un émulateur en prenant l'exemple de la Game Boy. Ce document est composé de plusieurs parties, en partant du choix des outils jusqu'à la réalisation finale et en passant par les problèmes de législations, d'étude du hardware, et d'une ouverture sur l'intérêt de l'émulation aujourd'hui. Nous espérons que ce document vous donnera envie de rentrer dans le merveilleux monde de l'émulation (si ce n'est pas déjà fait). 
+\\\\\\
+This document is a Study and Research Work report. Through our subject which is the study and the implementation of a Game Boy emulator, we wanted to show how implementing an emulator is possible with the Game Boy example. This document is composed with several parts, starting with tools choice up to the final realisation with legislation problems, hardware study, and an opening on nowadays emulation interest. We hope that this document will make you want to get into the wonderful emulation world (if it's not already did).
 \end{document}
