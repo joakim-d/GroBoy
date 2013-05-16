@@ -124,7 +124,7 @@ Visual Boy Advance \cite{visualboyadv} est un émulateur qui supporte Game Boy, 
 \subsection{No\$GMB}
 No\$GMB \cite{nogmb} est un émulateur de Game Boy, Game Boy Color fonctionnant sous DOS/Windows. Il est écrit en pur assembleur et est très orienté optimisation, il est donc supporté par de vieux ordinateurs avec des processeurs i386 de 33MHz.
 \section{Articles de recherches}
-Le choix des articles de recherches a été plutôt délicat, car les composants de la Game Boy étant relativement anciens aucun article ne traitait réellement du sujet. Nous avons donc porté notre choix, tout d'abord sur un document qui n'est pas réellement un article de recherche mais plutot une documentation sur les techniques de programmation permettant de réaliser un émulateur. Cette article est très intéressant pour nous car il traite de différentes méthodes que nous avons dû utiliser pour réaliser notre projet. Les deux articles suivants relèvent plus de choix personnels car ils ne traitent pas de l'émulation de consoles mais de différentes techniques actuelles utilisées pour optimiser l'émulation de processeurs qu'ils soient multi-coeurs ou non. Ces articles restent relativement complexes de part leur aspect technique.
+Le choix des articles de recherches a été plutôt délicat, car les composants de la Game Boy étant relativement anciens aucun article ne traitait réellement du sujet. Nous avons donc porté notre choix, tout d'abord sur un document qui n'est pas réellement un article de recherche mais plutôt une documentation sur les techniques de programmation permettant de réaliser un émulateur. Cette article est très intéressant pour nous car il traite de différentes méthodes que nous avons dû utiliser pour réaliser notre projet. Les deux articles suivants relèvent plus de choix personnels car ils ne traitent pas de l'émulation de consoles mais de différentes techniques actuelles utilisées pour optimiser l'émulation de processeurs qu'ils soient multi-coeurs ou non. Ces articles restent relativement complexes de part leur aspect technique.
 
 \chapter{Etude du Hardware}
 Cette partie décrit les différents composants de la Game Boy. Avant de rentrer dans les détails il est important de précisé que pour ce rapport nous avons adopté les conventions d'écriture suivantes:
@@ -252,7 +252,7 @@ débloqué pour que le CPU puisse modifier les éléments à afficher.\\\\
 \end{figure}
 
 
-\subsection{Génération d'une ligne}
+\subsection{Les couches graphiques}
 
 Trois types de couches graphiques peuvent être affichées: la couche background, la couche
 window et la couche sprites, les deux premières peuvent être activées ou
@@ -296,6 +296,17 @@ similaire à celui de la couche Background si ce n'est qu'elle est positionnée 
 de 40 tuiles différentes. Ces tuiles sont positionnées à l'écran via un registre indiquant leur position absolue, ainsi que diverses options d'affichage, comme la possibilité d'appliquer une symétrie verticale ou horizontale sur la tuile.\\
 \end{itemize}
 
+\subsection{Comment l'écran accéde aux dessins?}
+
+Comme dit précédemment les couches Background et Window sont des matrices de 32*32 tuiles. Ces couches sont en fait représentées par des "cartes" de 32*32 octets qui contiennent les numéros des tuiles à aller chercher en mémoire. Il existe deux cartes de ce type. Les couches Background et Window sont modulables pour être représentées par la même carte, ou par deux cartes différentes. Il existe dans la mémoire deux matrices de dessins sur les plages 0x8000-0x8FFF et 0x8800-0x9FFF. Le numéro d'une tuile correspond à son emplacement sur une des deux matrices de dessins. Sur ces matrices une tuile occupe 16 octets. En exemple, si sur une carte la troisième tuile à représenter a le numéro 4 et que la matrice de dessin sélectionnée est celle de la plage 0x8000-0x8FFF, alors les données concernant cette tuile sont sur la plage 0x8040-0x804F. Ce principe est illustré par la figure \ref{gpu_dessins}.\\Pour les sprites voir la sous-partie OAM.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.8]{images/schema_matrice_dessin.png}
+\caption{Schéma de la représentation en mémoire des dessins pour les couches Background et Window.}
+\label{gpu_dessins}
+\end{figure}
+
 \subsection{Les couleurs}
 
 Les couches Background et Window utilisent un registre (palette monochrome) pour gérer les
@@ -311,57 +322,57 @@ C'est un registre 8 bits accessible en lecture et écriture situé à l'adresse 
 
 \begin{itemize}
 \item \textbf{bit 0:}
-	Permet de gérer l'affichage du Background, mis à 0 il permet d'afficher un fond blanc à la place du Background. Mis à 1 le Background sera affiché normalement.\\
+	Permet d'afficher ou non la couche Background.\\
 \item \textbf{bit 1:}
-	Permet l'affichage ou non des sprites.\\
+	Permet d'afficher ou non la couche Sprites.\\
 \item \textbf{bit 2:}
-	Ce bit indique la taille des sprites utilisés. S'il est mis à 0, des sprites de 8*8 seront utilisés, par contre s'il est mis à 1 les sprites auront une taille de 8*16.\\
+	Indique la taille des sprites utilisés, 8*8 pixels ou 8*16 pixels.\\
 \item \textbf{bit 3:}
-	Ce bit permet de choisir quelle matrice de tuiles à utiliser pour afficher le Background. Mis à 0, la matrice située entre 0x9800 et 0x9BFF sera utilisée, à 1 la matrice située entre 0x9C00 et 0x9FFF sera utilisée.\\
+	Indique la carte de 32*32 tuiles utilisée par la couche Background. Soit la carte située sur la plage 0x9800-0x9BFF sinon celle sur la plage 0x9C00-0x9FFF.\\
 \item \textbf{bit 4:}
-	Même fonctionnement que le bit précédent sauf que celui-ci sert à choisir la matrice contenant les données des tuiles. La matrice contenue entre les adresses 0x8800 et 0x97FF est choisie si le bit est à 0, sinon c'est celle entre les adresses 0x8000 et 0x8FFF.\\
+	Indique quelle matrice de dessins sera utilisée pour les couches Background et Window. Soit la matrice sur la plage 0x8800-0x97FF sinon celle sur la plage 0x8000-0x8FFF.\\
 \item \textbf{bit 5:}
-	Permet de gérer l'affichage de la couche Window. Si 0 elle n'est pas affichée, si 1 elle l'est.\\
+	Permet d'afficher ou non la couche Window.\\
 \item \textbf{bit 6:}
-	Même fonctionnement que le bit 3 sauf qu'il permet de choisr la matrice de tuiles pour afficher la Window.\\
+	Même fonctionnement que le bit 3, ormis le fait que c'est pour la couche Window.\\
 \item \textbf{bit 7:}
-	Ce bit sert à activer ou désactiver l'écran LCD. Il doit être désactivé seulement pendant les périodes de VBlank sous peine d'endommager la Game Boy. Mettre à 0 ce bit rend aussi accessible librement la VRAM et OAM.\\
+	Sert à activer ou désactiver l'écran LCD. Il doit être désactivé seulement pendant les périodes de VBlank sous peine d'endommager la Game Boy. Mettre à 0 ce bit rend aussi accessible librement la VRAM et OAM.\\
 \end{itemize}
 
 \subsubsection{LCD Status Register}
-Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'adresse 0xFF41 et permet de gérer les interruptions liées au GPU:\\
+Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'adresse 0xFF41 et permet entre autres de gérer l'interruption LCD STAT:\\
 
 \begin{itemize}
 \item \textbf{bit 0-1}
-	Ces bits correspondent au Mode Flag et sont accessibles seulement en lecture. Ils déterminent dans quelle période l'écran LCD se trouve: 0 pour le HBlank, 1 pour le VBlank, 2 pour la lecture de la mémoire OAM et 3 pour le transfert des données vers l'écran LCD.\\
+	Ces bits correspondent au Mode Flag et sont accessibles seulement en lecture par le CPU. Ils déterminent dans quelle période l'écran LCD se trouve: 0 pour le HBlank, 1 pour le VBlank, 2 pour la lecture de la mémoire OAM et 3 pour le transfert des données vers l'écran LCD.\\
 \item \textbf{bit 2:}
-	Accessible seulement en lecture, il représente le "Coincidence Flag", il est mis à 0 si les registres LYC et LY sont différents, à 1 sinon.\\
+	Accessible seulement en lecture par le CPU, il représente le "Coincidence Flag", il est mis à 0 si les registres LYC et LY sont différents, à 1 sinon.\\
 \item \textbf{bit 3:}
-	Ce bit est mis à 1 si une interruption liée au HBlank est nécessaire.\\
+	Mis à 1 si une interruption "LCD STAT" liée au HBlank est nécessaire (voir partie Hardware-Interruptions).\\
 \item \textbf{bit 4:} 
 	Idem que le bit précédent mais pour le VBlank.\\
 \item \textbf{bit 5:}
 	Idem mais pour la mémoire OAM.\\
 \item \textbf{bit 6:}
-	Ce bit est activé si la valeur du registre LYC et celle du registre LY sont égales, une interruption sera alors déclenchée.\\
+	Permet de déclencher une interruption "LCD STAT" si les registres LYC et LY sont égaux.\\
 \item \textbf{bit 7:}
 	Il n'est pas utilisé.\\
 \end{itemize}
 
 \subsection{OAM}
-	La table OAM (Object Attribute Memory) est située entre les adresses 0xFE00 et 0xFE9F, elle contient tous les attributs liés aux sprites. Elle est accessible uniquement pendant les périodes de HBlank et de VBlank. Elle est composée de 40 entrées de 4 octets chacunes:\\
+	La table OAM (Object Attribute Memory) est située entre les adresses 0xFE00 et 0xFE9F, elle contient tous les attributs liés aux sprites. Elle est accessible par le CPU uniquement pendant les périodes de HBlank et de VBlank. Elle est composée de 40 entrées de 4 octets chacunes:\\
 
 \begin{itemize}
 \item \textbf{octet 0:}
-	Cet octet spécifie la position verticale du sprite, qui sera invisible si sa position dépasse la largeur de l'écran.\\
+	Spécifie la position verticale du sprite, qui sera invisible si sa position dépasse la largeur de l'écran.\\
 \item \textbf{octet 1:}
-	Cet octet spécifie la position horizontale du sprite, les valeurs doivent être comprises entre 8 et 168 pour qu'il soit visible.\\
+	Spécifie la position horizontale du sprite, qui sera invisible si sa position dépasse la hauteur de l'écran.\\
 \item \textbf{octet 2:}
-	Cet octet correspond à la position d'une tuile dans la matrice qui les contient toutes, située entre 0x8000 et 0x8FFF.\\
+	Correspond à la position d'une tuile dans la matrice de dessin des sprites, sur la plage 0x8000-0x8FFF.\\
 \item \textbf{octet 3:}
 	\begin{itemize}
 	\item \textbf{bit 0-3:}
-		Utilisés uniquement pour la Game Boy Color.\\
+		Utilisés uniquement par la Game Boy Color.\\
 	\item \textbf{bit 4:}
 		Permet de choisir laquelle des deux palettes de couleurs est à utiliser.\\
 	\item \textbf{bit 5:}
@@ -369,7 +380,7 @@ Ce registre 8 bits est accessible en lecture et écriture, il est situé à l'ad
 	\item \textbf{bit 6:}
 		S'il est activé, applique une symétrie verticale sur le sprite.\\
 	\item \textbf{bit 7:}
-		Ce bit indique qui, du sprite ou de la couche Background est prioritaire sur l'affichage. \\
+		Indique qui, du sprite ou de la couche Background est prioritaire sur l'affichage. \\
 	\end{itemize}
 	
 \end{itemize}
