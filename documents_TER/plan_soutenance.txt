@@ -1,0 +1,33 @@
+Présentation
+
+2minmax{
+
+Présentation du groupe, du contexte
+Présenter plan
+Intro emulation (pls types d'émulation, on a choisi jv)
+quesaco?
+La gameboy
+}
+
+15minmax{
+	1ere partie
+	5min{
+	Schema général emulation
+	cpu(coeur de l'emu)
+	+ modules
+	graphique sonore mémoire
+	synchro
+	}
+	2eme partie
+	10min{
+	Appliqué à la GB et comment nous l'avons fait
+	}
+}
+
+3min{
+	Bilan de réalisation
+	Conclusion
+	ouverture(plus détaillée que dans le rapport
+	jv, serveur, smartphone etc)
+}
+
