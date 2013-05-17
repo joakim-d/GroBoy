@@ -2,32 +2,35 @@ Présentation
 
 2minmax{
 
-Présentation du groupe, du contexte
-Présenter plan
-Intro emulation (pls types d'émulation, on a choisi jv)
-quesaco?
-La gameboy
+Présentation du groupe, du contexte ->mick
+Présenter plan ->mick
+Intro emulation (pls types d'émulation, on a choisi jv) -> jo
+quesaco? -> jo
+La gameboy -> flo
 }
 
 15minmax{
 	1ere partie
 	5min{
-	Schema général emulation
-	cpu(coeur de l'emu)
-	+ modules
-	graphique sonore mémoire
-	synchro
+	Schema général emulation -> jo
+	cpu(coeur de l'emu) -> jo
+	+ modules -> jo
+	graphique ->flo
+	sonore -> mick
+	mémoire -> jo
+	synchro -> mick
 	}
 	2eme partie
 	10min{
-	Appliqué à la GB et comment nous l'avons fait
+	Appliqué à la GB et comment nous l'avons fait -> pareil
+	(si cartouche alors flo)
 	}
 }
 
 3min{
-	Bilan de réalisation
-	Conclusion
+	Bilan de réalisation -> jo
+	Conclusion -> mick
 	ouverture(plus détaillée que dans le rapport
-	jv, serveur, smartphone etc)
+	jv, serveur, smartphone etc) ->flo
 }
 
