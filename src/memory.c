@@ -1,5 +1,5 @@
 #include "memory.h"
-
+#define SOUND 0
 static void read_rom_info(char* rom_path);
 static void alloc_ram_mem(size_t size);
 static inline void write_mbc1(unsigned short addr, BYTE data);
@@ -205,10 +205,10 @@ inline void memory_write(unsigned short addr, BYTE data){
 	else{
 		if(!force_write){
 			if(addr == 0xFF04 || addr == 0xFF44) {internal_ram[addr] = 0;}	//reset counter
-			else if(addr >= 0xFF10 && addr <= 0xFF26){
+			else if(addr >= 0xFF10 && addr <= 0xFF26 && SOUND){
 				write_sound(addr,data);	
 			}
-			else if(addr >= 0xFF30 && addr <= 0xFF3F){
+			else if(addr >= 0xFF30 && addr <= 0xFF3F && SOUND){
 				write_wave(addr,data);
 			}
 			else if(addr == 0xFF46) {dma_transfer(data);}					//dma transfer
