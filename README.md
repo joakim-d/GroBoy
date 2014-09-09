@@ -1,4 +1,4 @@
 GroBoy
 ======
 
-A Nintendo Gameboy Emulator
+A Nintendo Gameboy Emulator written in C for Linux
