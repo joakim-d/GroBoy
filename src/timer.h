@@ -3,14 +3,20 @@
 #include "def.h"
 #include "cpu.h"
 #include "memory.h"
-#define CLOCK_SPEED 4194304
-#define DIVIDER_TIMER_SPEED 256
-static const int tac_speed[] = {1024, 16, 64, 256};
-void timer_update(BYTE cycles);
-unsigned int div_timer;
-unsigned int tac_timer;
-void restore_timer(FILE *file);
-void save_timer(FILE *file);
-void timer_init();
+#include <tr1/functional>
+class Timer{
+public:
+    Timer();
+    void set_memory(Memory *memory);
+    void set_request_callback(std::tr1::function<void (int)> const &callback);
+    void update(BYTE cycles);
+
+private:
+    unsigned int div_timer_;
+    unsigned int tac_timer_;
+    Memory *memory_;
+
+    std::tr1::function<void (int)> request_callback_;
+};
 
 #endif
