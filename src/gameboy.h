@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "gpu.h"
 #include "timer.h"
+#include "joypad.h"
 
 #include <string>
 
@@ -13,14 +14,18 @@ public:
     Gameboy();
     void setGame(const std::string &path);
     void play();
-    virtual void update_screen(const unsigned char *buffer, unsigned int width, unsigned int height) = 0;
-    void handle_ready();
+    void updateInput(BYTE touches);
+    virtual void updateScreen(const unsigned char *buffer, unsigned int width, unsigned int height) = 0;
+
 private:
     Cpu cpu_;
     Gpu gpu_;
     Timer timer_;
     Memory memory_;
+    Joypad joypad_;
     std::string game_;
+
+    void handle_ready();
 };
 
 #endif

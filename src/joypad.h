@@ -1,15 +1,36 @@
 #ifndef JOYPAD_H
 #define JOYPAD_H
-	#include "save_manager.h"
-	#include "memory.h"
-	#include "interrupts.h"
-	void joypad_update(int cycles);
-	void joypad_init();
-	SDL_Joystick *joystick;
-	enum {right, left, up, down, b, a, select_, start};
-	int keyboard_config[8];
-	int joystick_config[8];
-	BYTE joy_old;
-	void save_joypad(FILE* file);
-	void restore_joypad(FILE* file);
+
+#include "memory.h"
+#include "interrupts.h"
+#include <tr1/functional>
+
+class Joypad{
+public:
+    enum Input{
+        RIGHT   = 0x01,
+        LEFT    = 0x02,
+        UP      = 0x04,
+        DOWN    = 0x08,
+        A       = 0x10,
+        B       = 0x20,
+        SELECT  = 0x40,
+        START   = 0x80
+    };
+    Joypad();
+    void update(int cycles);
+    void updateInput(BYTE input);
+    void set_request_callback(std::tr1::function<void(int)> const &callback);
+    void set_memory(Memory *memory);
+
+private:
+    Memory *memory_;
+    std::tr1::function<void(int)> request_callback_;
+    int joypad_counter_ {0};
+    BYTE keystate_ {0};
+    BYTE joy_new_ {0};
+    BYTE joy_old_ {0};
+    BYTE key_buttons_{0xFF};
+};
+
 #endif

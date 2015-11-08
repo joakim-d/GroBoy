@@ -44,7 +44,7 @@ int main(int argc, char * argv[]){
         exit(-1);
     }
 
-    Gameboy gb;
-    gb.play(std::string(argv[1]));
+    //Gameboy gb;
+    //gb.play(std::string(argv[1]));
 	return 0;
 }

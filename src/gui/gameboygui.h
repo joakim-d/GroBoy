@@ -5,11 +5,17 @@
 #include <QLabel>
 #include <QThread>
 
-class GameboyGui : public Gameboy, public QThread{
+class GameboyGui : public QThread, public Gameboy {
+    Q_OBJECT
 public:
-    GameboyGui();
+    GameboyGui(QObject *parent = 0);
     void run();
-    void update_screen(const unsigned char *buffer, unsigned int width, unsigned int height);
+    void updateScreen(const unsigned char *buffer, unsigned int width, unsigned int height);
+
+public slots:
+    void handleNewInput(uint8_t input);
+signals:
+    void frameReady(const QImage &frame);
 private:
     QLabel label_;
 };

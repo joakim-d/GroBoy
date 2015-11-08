@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "gameboygui.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -15,11 +16,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void handle_open_rom();
+    void handle_configure_input();
 private:
     Ui::MainWindow *ui;
     GameboyGui gb_;
-
-    void handle_open_rom();
 };
 
 #endif // MAINWINDOW_H

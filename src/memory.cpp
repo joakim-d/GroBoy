@@ -3,10 +3,10 @@
 #include <string.h>
 #include <fstream>
 #include <iostream>
-Memory::Memory(){
+
+Memory::Memory() : force_write_(false){
     int i;
     //read_rom_info(rom_path);
-    force_write_ = false;
     for(i = 0; i < 0x10000; i++){
         internal_ram_[i] = 0;
     }

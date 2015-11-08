@@ -1,15 +1,13 @@
 #include "gameboygui.h"
 
-GameboyGui::GameboyGui(){
-    label_.show();
-    label_.setMinimumSize(QSize(160, 144));
+GameboyGui::GameboyGui(QObject *parent) : QThread(parent){
 }
 
 void GameboyGui::run(){
     play();
 }
 
-void GameboyGui::update_screen(const unsigned char *buffer, unsigned int width, unsigned int height){
+void GameboyGui::updateScreen(const unsigned char *buffer, unsigned int width, unsigned int height){
     QImage img = QImage(buffer, width, height, QImage::Format_Indexed8);
     QVector<QRgb> color_table;
     color_table
@@ -18,6 +16,9 @@ void GameboyGui::update_screen(const unsigned char *buffer, unsigned int width, 
             << qRgb(48,98,48)
             << qRgb(15,56,15);
     img.setColorTable(color_table);
+    emit frameReady(img);
+}
 
-    label_.setPixmap(QPixmap::fromImage(img));
+void GameboyGui::handleNewInput(uint8_t input){
+    Gameboy::updateInput(input);
 }
