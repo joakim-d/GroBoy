@@ -2,8 +2,13 @@
 #include <tr1/functional>
 #include <chrono>
 
-Gameboy::Gameboy(){
+Gameboy::Gameboy(){}
 
+Gameboy::~Gameboy(){
+    gpu_.set_ready_callback(NULL);
+    gpu_.set_request_callback(NULL);
+    timer_.set_request_callback(NULL);
+    joypad_.set_request_callback(NULL);
 }
 
 void Gameboy::setGame(const std::string &path){

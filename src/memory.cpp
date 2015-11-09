@@ -1,6 +1,7 @@
 #include "memory.h"
 #include "mbc1.h"
 #include "mbc2.h"
+#include "mbc3.h"
 #include <string.h>
 #include <fstream>
 #include <iostream>
@@ -130,19 +131,18 @@ void Memory::load_cartridge(const std::string &path){
     case 0x00:
 
         break;
-    case 0x01:
-    case 0x02:
-    case 0x03:
+    case 0x01 ... 0x03:
         cartridge_ = new MBC1();
         break;
-    case 0x05:
-    case 0x06:
+    case 0x05 ... 0x06:
         cartridge_ = new MBC2();
         break;
     case 0x08:
     case 0x09:
 
         break;
+    case 0xF ... 0x13:
+        cartridge_ = new MBC3();
     default:
         break;
     }
@@ -214,7 +214,7 @@ void Memory::load_cartridge(const std::string &path){
         case 0: printf("Japanese Game");break;
         case 1: printf("English Game");break;
     }
-    printf("\nManufacturer");
+    printf("\nManufacturer ");
     switch(*(cartridge_rom_buffer + 0x014B)){
         case 0x33: printf("Nintendo or extended");break;
         case 0x79: printf("Accolade");break;

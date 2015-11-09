@@ -12,6 +12,7 @@
 class Gameboy{
 public:
     Gameboy();
+    ~Gameboy();
     void setGame(const std::string &path);
     void play();
     void updateInput(BYTE touches);
