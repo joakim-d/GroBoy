@@ -27,3 +27,22 @@ void Cartridge::create_ram(int size){
 bool Cartridge::haveRam() const{
     return ram_ != 0;
 }
+
+BYTE Cartridge::read(int addr){
+    switch(addr){
+    case 0 ... 0x3FFF:
+        return rom_[addr];
+    case 0x4000 ... 0x7FFF:
+        return rom_[0x4000*(rom_selector_ - 1) + addr];
+    case 0xA000 ... 0xBFFF:
+        if(haveRam())
+        {
+            return ram_[(0x2000*ram_selector_) + addr - 0xA000];
+        }
+        else{
+            exit(EXIT_FAILURE);
+        }
+    default:
+        exit(EXIT_FAILURE);
+    }
+}

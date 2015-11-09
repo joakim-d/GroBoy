@@ -1,7 +1,7 @@
 #include "mbc1.h"
+#include <iostream>
 
-MBC1::MBC1() : Cartridge(), rom_mode_(true), enable_ram_(false), rom_selector_(1), ram_selector_(0){
-}
+MBC1::MBC1() : Cartridge(){}
 
 void MBC1::write(int address, BYTE data){
     switch(address){
@@ -19,8 +19,20 @@ void MBC1::write(int address, BYTE data){
         ram_selector_ = (data & 0x60) >> 5;
         break;
     case 0x6000 ... 0x7FFF:
-        if(data == 0) rom_mode_ = true; //rom mode enabled
-        else rom_mode_ = false; // ram mode enabled
+        if(data == 0) {
+            rom_mode_ = true; //rom mode enabled
+            if(ram_selector_ != 0){
+                std::cout << "Ram selector = " << ram_selector_ << "while in rom mode" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+        else {
+            rom_mode_ = false; // ram mode enabled
+            if(rom_selector_ > 0x1F){
+                std::cout << "Rom selector = " << rom_selector_ << "while in ram mode" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
         break;
     default:
         if(haveRam()){
@@ -29,21 +41,3 @@ void MBC1::write(int address, BYTE data){
     }
 }
 
-BYTE MBC1::read(int addr){
-    switch(addr){
-    case 0 ... 0x3FFF:
-        return rom_[addr];
-    case 0x4000 ... 0x7FFF:
-        return rom_[0x4000*(rom_selector_ - 1) + addr];
-    case 0xA000 ... 0xBFFF:
-        if(haveRam())
-        {
-            return ram_[(0x2000*ram_selector_) + addr - 0xA000];
-        }
-        else{
-            exit(EXIT_FAILURE);
-        }
-    default:
-        exit(EXIT_FAILURE);
-    }
-}

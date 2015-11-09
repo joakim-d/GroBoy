@@ -17,11 +17,14 @@ public:
     void create_ram(int size);
 
     virtual void write(int address, BYTE data) = 0;
-    virtual BYTE read(int address) = 0;
+    virtual BYTE read(int address);
     void open(const std::string &path);
 protected:
     BYTE *rom_;
     BYTE *ram_;
+    bool enable_ram_{false};
+    int rom_selector_ {1};
+    int ram_selector_ {0};
 };
 
 #endif

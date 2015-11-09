@@ -1,5 +1,6 @@
 #include "memory.h"
 #include "mbc1.h"
+#include "mbc2.h"
 #include <string.h>
 #include <fstream>
 #include <iostream>
@@ -136,7 +137,7 @@ void Memory::load_cartridge(const std::string &path){
         break;
     case 0x05:
     case 0x06:
-
+        cartridge_ = new MBC2();
         break;
     case 0x08:
     case 0x09:
