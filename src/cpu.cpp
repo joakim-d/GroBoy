@@ -31,10 +31,10 @@ void Cpu::set_memory(Memory *memory){
 }
 
 int Cpu::run(){
-	//int interrupt_period;
-	//int counter;
+    //int interrupt_period;
+    //int counter;
     //counter=interrupt_period;
-	BYTE op_code;
+    BYTE op_code;
 
     op_code = memory_->read(z80_.PC);
     cycles_ = z80_cycles[op_code];
@@ -855,6 +855,7 @@ int Cpu::run(){
                 break;
             case 0xCB: //Two bytes Opcode
                 op_code = memory_->read(z80_.PC++);
+                cycles_ = z80_cb_cycles[op_code];
                 switch(op_code){
                     case 0x00: //RLC B
                         rlc(&z80_.B);
@@ -1877,14 +1878,14 @@ void Cpu::reset_halt(){
         set_IME(true);
         ime_counter_ = 0;
         z80_.PC--;
-	}
-	else{
+    }
+    else{
         halted_ = 1;
-	}
+    }
 
 }
  void Cpu::stop(){
-	printf("appel de stop\n");
+    printf("appel de stop\n");
 }
 //----------Jumps/calls--------------------------------
 
@@ -1902,7 +1903,7 @@ void Cpu::reset_halt(){
         z80_.SP -= 2;
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
         cycles_ += 12;
-	}
+    }
     else z80_.PC += 2;
 }
 
@@ -1913,7 +1914,7 @@ void Cpu::reset_halt(){
         z80_.SP -= 2;
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
         cycles_ += 12;
-	}
+    }
     else z80_.PC += 2;
 }
 
@@ -1925,7 +1926,7 @@ void Cpu::reset_halt(){
     if(z80_.F & cond){
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
         cycles_ += 4;
-	}
+    }
     else z80_.PC += 2;
 }
 
@@ -1933,30 +1934,30 @@ void Cpu::reset_halt(){
     if((z80_.F & cond) == 0){
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
         cycles_ += 4;
-	}
+    }
     else z80_.PC += 2;
 }
 
  void Cpu::jr(BYTE_S d){
-	// - - - -
-	//Jump Relatif
+    // - - - -
+    //Jump Relatif
     z80_.PC += d;
 }
 
  void Cpu::jr_cond(BYTE cond, BYTE_S d){
-	// - - - -
+    // - - - -
     if(z80_.F & cond){
         z80_.PC += d;
         cycles_ += 4;
-	}
+    }
 }
 
  void Cpu::jr_n_cond(BYTE cond, BYTE_S d){
-	// - - - -
+    // - - - -
     if(!(z80_.F & cond)){
         z80_.PC += d;
         cycles_ += 4;
-	}
+    }
 }
 
  void Cpu::ret(){
@@ -1969,7 +1970,7 @@ void Cpu::reset_halt(){
         z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);
         z80_.SP += 2;
         cycles_ += 12;
-	}
+    }
 }
 
  void Cpu::ret_n_cond(BYTE cond){
@@ -1977,11 +1978,11 @@ void Cpu::reset_halt(){
         z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);;
         z80_.SP += 2;
         cycles_ += 12;
-	}
+    }
 }
 
  void Cpu::reti(){
-	//PLUS FLAG IF
+    //PLUS FLAG IF
     z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);
     z80_.SP += 2;
     set_IME(true);
@@ -1997,7 +1998,7 @@ void Cpu::reset_halt(){
 //--------8bit load/store/move instructions
 
  void Cpu::ld_reg(BYTE *reg, BYTE data){
-	*reg = data;
+    *reg = data;
 }
  void Cpu::ld_mem(unsigned short addr, BYTE data){
     memory_->write(addr, data);
@@ -2049,14 +2050,14 @@ void Cpu::reset_halt(){
 
 
  void Cpu::adc(BYTE data){
-	//Z 0 H C
+    //Z 0 H C
     BYTE op = z80_.A + data + ((z80_.F & FLAG_C)? 1:0);
     z80_.F = ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A + data + ((z80_.F & FLAG_C)? 1:0) > 0xFF) ? FLAG_C:0);
     z80_.A = op;
 }
 
  void Cpu::add(BYTE data){
-	//Z 0 H C
+    //Z 0 H C
     BYTE op = z80_.A + data;
     z80_.F = ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A + data > 0xFF) ? FLAG_C:0);
     z80_.A = op;
@@ -2068,9 +2069,9 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::ccf(){
-	// - 0 0 C
-	//Inverse le Carry Flag
-	//Clear le N flag et le H flag
+    // - 0 0 C
+    //Inverse le Carry Flag
+    //Clear le N flag et le H flag
     z80_.F = (z80_.F & FLAG_Z) | ((z80_.F & FLAG_C) ? 0:FLAG_C);
 }
 
@@ -2080,9 +2081,9 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::cpl(){
-	// - 1 1 -
-	//Inverse tous les bits de A
-	//( == A XOR 0xFF)
+    // - 1 1 -
+    //Inverse tous les bits de A
+    //( == A XOR 0xFF)
     z80_.A = ~z80_.A;
     z80_.F |= 0x60; // H + N
 }
@@ -2093,46 +2094,46 @@ void Cpu::reset_halt(){
     if(z80_.F & FLAG_H) {temp |= 512;}
     if(z80_.F & FLAG_N) {temp |= 1024;}
     if(z80_.F & FLAG_Z) {temp |= 2048;}
-	temp = daa_table[temp];
+    temp = daa_table[temp];
     z80_.A = temp >> 8;
     z80_.F = temp;
 }
 
  void Cpu::dec_at(unsigned short addr){
-	// Z 1 H -
+    // Z 1 H -
     BYTE d8 = memory_->read(addr) - 1;
     z80_.F = FLAG_N | (z80_.F & FLAG_C) | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
     memory_->write(addr, d8);
 }
 
  void Cpu::dec_sp(){
-	// - - - -
+    // - - - -
     z80_.SP -= 1;
 }
 
  void Cpu::dec_smpl(BYTE *reg1){
-	// Z 1 H -
-	BYTE d8 = *reg1 - 1;
+    // Z 1 H -
+    BYTE d8 = *reg1 - 1;
     z80_.F = FLAG_N | (z80_.F & FLAG_C) | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
-	*reg1 = d8;
+    *reg1 = d8;
 }
 
  void Cpu::inc_at(unsigned short addr){
-	// Z 0 H -
+    // Z 0 H -
     BYTE d8 = memory_->read(addr) + 1;
     z80_.F = (z80_.F & FLAG_C) | ((d8 & 0x0F) ? 0:FLAG_H) | ((d8 == 0) ? FLAG_Z:0);
     memory_->write(addr, d8);
 }
 
  void Cpu::inc_smpl(BYTE *reg1){
-	// Z 0 H -
-	BYTE d8 = *reg1 + 1;
+    // Z 0 H -
+    BYTE d8 = *reg1 + 1;
     z80_.F = (z80_.F & FLAG_C) | ((d8 & 0x0F) ? 0:FLAG_H) | ((d8 == 0) ? FLAG_Z:0);
-	*reg1 = d8;
+    *reg1 = d8;
 }
 
  void Cpu::inc_sp(){
-	// - - - -
+    // - - - -
     z80_.SP += 1;
 }
  void Cpu::sbc(BYTE data){
@@ -2142,12 +2143,12 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::scf(){
-	// - 0 0 1
+    // - 0 0 1
     z80_.F = (z80_.F & FLAG_Z) | FLAG_C;
 }
 
  void Cpu::sub(BYTE data){
-	//Z 1 H C
+    //Z 1 H C
     BYTE op = z80_.A - data;
     z80_.F = FLAG_N | ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A - data < 0) ? FLAG_C : 0);
     z80_.A = op;
@@ -2166,12 +2167,12 @@ void Cpu::reset_halt(){
 //--------16bit arithmetic/logical instructions
 
  void Cpu::add_dbl(BYTE *reg1, BYTE *reg2, unsigned short data){
-	// - 0 H C
-	unsigned short r1r2 = (*reg1 << 8) + *reg2;
-	unsigned short op = r1r2 + data;
+    // - 0 H C
+    unsigned short r1r2 = (*reg1 << 8) + *reg2;
+    unsigned short op = r1r2 + data;
     z80_.F = ((z80_.F & FLAG_Z) ? FLAG_Z:0) | (((r1r2^data^op) & 0x1000) ? FLAG_H:0) | (((r1r2+data)&0x10000)? FLAG_C:0);
-	*reg1 =( 0xFF00 & op) >> 8;
-	*reg2 =( 0x00FF & op);
+    *reg1 =( 0xFF00 & op) >> 8;
+    *reg2 =( 0x00FF & op);
 }
 
  void Cpu::add_sp_r8(BYTE_S data){
@@ -2181,18 +2182,18 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::dec_dbl(BYTE *reg1, BYTE *reg2){
-	// - - - - 
-	unsigned short temp;
-	temp = (*reg1 << 8) + *reg2 - 0x01;
-	*reg1 =( 0xFF00 & temp) >> 8;
-	*reg2 =( 0x00FF & temp);
+    // - - - -
+    unsigned short temp;
+    temp = (*reg1 << 8) + *reg2 - 0x01;
+    *reg1 =( 0xFF00 & temp) >> 8;
+    *reg2 =( 0x00FF & temp);
 }
  void Cpu::inc_dbl(BYTE *reg1, BYTE *reg2){
-	// - - - -
-	unsigned short temp;
-	temp = (*reg1 << 8) + *reg2 + 0x01;
-	*reg1 =( 0xFF00 & temp) >> 8;
-	*reg2 =( 0x00FF & temp);
+    // - - - -
+    unsigned short temp;
+    temp = (*reg1 << 8) + *reg2 + 0x01;
+    *reg1 =( 0xFF00 & temp) >> 8;
+    *reg2 =( 0x00FF & temp);
 }
 
 
@@ -2204,37 +2205,37 @@ void Cpu::reset_halt(){
 
  void Cpu::res(BYTE b, BYTE *a)
 {
-	*a &= ~(1 << b);
+    *a &= ~(1 << b);
 }
 
  void Cpu::res_hl(BYTE b)
 {
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
-	hl &= ~(1 << b);
+    hl &= ~(1 << b);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
  void Cpu::rl(BYTE *data){
-	if(*data & 0x80){
+    if(*data & 0x80){
         *data = (*data << 1) | (((z80_.F & FLAG_C) ? 1:0));
         z80_.F = (((*data == 0) ? FLAG_Z:0)) | FLAG_C;
-	}
-	else{
+    }
+    else{
         *data = (*data << 1) | (((z80_.F & FLAG_C) ? 1:0));
         z80_.F = (((*data == 0) ? FLAG_Z:0));
-	}
+    }
 }
 
  void Cpu::rl_hl(){
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
-	if(hl & 0x80){
+    if(hl & 0x80){
         hl = (hl << 1) | (((z80_.F & FLAG_C) ? 1:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0)) | FLAG_C;
-	}
-	else{
+    }
+    else{
         hl = (hl << 1) | (((z80_.F & FLAG_C) ? 1:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0));
-	}
+    }
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2264,26 +2265,26 @@ void Cpu::reset_halt(){
     z80_.A = (z80_.A << 1) | ((z80_.F)? 1 : 0);
 }
  void Cpu::rr(BYTE *data){
-	if(*data & 0x01){
+    if(*data & 0x01){
         *data = (*data >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
         z80_.F = (((*data == 0) ? FLAG_Z:0)) | FLAG_C;
-	}
-	else{
+    }
+    else{
         *data = (*data >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
         z80_.F = (((*data == 0) ? FLAG_Z:0));
-	}
+    }
 }
 
  void Cpu::rr_hl(){
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
-	if(hl & 0x01){
+    if(hl & 0x01){
         hl = (hl >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0)) | FLAG_C;
-	}
-	else{
+    }
+    else{
         hl = (hl >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0));
-	}
+    }
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2291,7 +2292,7 @@ void Cpu::reset_halt(){
     BYTE F = z80_.F;
     z80_.F = ((z80_.A & 0x01) ? FLAG_C:0);
     z80_.A = (z80_.A >> 1) | ((F & FLAG_C) ? 0x80:0);
-}	
+}
 
  void Cpu::rrc(BYTE *data){
     z80_.F = ((*data & 0x01) ? FLAG_C:0);
@@ -2317,71 +2318,71 @@ void Cpu::reset_halt(){
 
  void Cpu::set(BYTE b, BYTE *a)
 {
-	*a |= (1 << b);
+    *a |= (1 << b);
 }
 
  void Cpu::set_hl(BYTE b)
 {
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
-	hl |= (1 << b);
+    hl |= (1 << b);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
  void Cpu::srl(BYTE *data){
     z80_.F = (((*data & 0x01) ? FLAG_C:0));
-	*data >>= 1;
+    *data >>= 1;
     z80_.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
  void Cpu::srl_hl(){
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
     z80_.F = (((hl & 0x01) ? FLAG_C:0));
-	hl >>= 1;
+    hl >>= 1;
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
  void Cpu::sla(BYTE *data){
     z80_.F = ((*data & 0x80) ? FLAG_C:0);
-	*data <<= 1;
+    *data <<= 1;
     z80_.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
  void Cpu::sla_hl(){
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
     z80_.F = ((hl & 0x80) ? FLAG_C:0);
-	hl <<= 1;
+    hl <<= 1;
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
  void Cpu::sra(BYTE *data){
     z80_.F = ((*data & 0x01) ? FLAG_C:0);
-	*data = (*data >> 1) | ((*data & 0x80) ? 0x80:0);
+    *data = (*data >> 1) | ((*data & 0x80) ? 0x80:0);
     z80_.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
  void Cpu::sra_hl(){
     BYTE hl = memory_->read((z80_.H << 8) +z80_.L);
     z80_.F = ((hl & 0x01) ? FLAG_C:0);
-	hl = (hl >> 1) | ((hl & 0x80) ? 0x80:0);
+    hl = (hl >> 1) | ((hl & 0x80) ? 0x80:0);
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
     memory_->write((z80_.H << 8) + z80_.L, hl);
-}	
+}
 
  void Cpu::swap(BYTE *data){
-	BYTE low_nibble = (*data & 0xF0) >> 4;
-	BYTE high_nibble = (*data & 0x0F) << 4;
-	*data = high_nibble + low_nibble;
+    BYTE low_nibble = (*data & 0xF0) >> 4;
+    BYTE high_nibble = (*data & 0x0F) << 4;
+    *data = high_nibble + low_nibble;
     z80_.F = ((*data == 0) ? FLAG_Z:0);
 }
 
  void Cpu::swap_hl(){
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
 
-	BYTE low_nibble = (hl & 0xF0) >> 4;
-	BYTE high_nibble = (hl & 0x0F) << 4;
-	hl = high_nibble + low_nibble;
+    BYTE low_nibble = (hl & 0xF0) >> 4;
+    BYTE high_nibble = (hl & 0x0F) << 4;
+    hl = high_nibble + low_nibble;
     z80_.F = ((hl == 0) ? FLAG_Z:0);
 
     memory_->write((z80_.H << 8) + z80_.L, hl);
@@ -2390,8 +2391,8 @@ void Cpu::reset_halt(){
 
 /*int save_cpu(FILE* file)
 {
-	int nb = 0;
-	int nb_elements =14;
+    int nb = 0;
+    int nb_elements =14;
     nb += fwrite(&cycles_,sizeof(int),1,file);
         nb += fwrite(&ime_counter,sizeof(int),1,file);
         nb += fwrite(&halted,sizeof(uint8_t),1,file);
@@ -2406,18 +2407,18 @@ void Cpu::reset_halt(){
         nb += fwrite(&z80_.E,sizeof(unsigned char),1,file);
         nb += fwrite(&z80_.H,sizeof(unsigned char),1,file);
         nb += fwrite(&z80_.L,sizeof(unsigned char),1,file);
-	if(nb!=nb_elements) printf("Error when writing cpu variables\n");
-	return nb;
+    if(nb!=nb_elements) printf("Error when writing cpu variables\n");
+    return nb;
 }
 
 void Cpu::restore_cpu(FILE* file)
 {
-	int nb = 0;
-	int nb_elements = 14;
+    int nb = 0;
+    int nb_elements = 14;
     nb += fread(&cycles_,sizeof(int),1,file);
-	nb += fread(&ime_counter,sizeof(int),1,file);
-	nb += fread(&halted,sizeof(uint8_t),1,file);
-	nb += fread(&skip,sizeof(uint8_t),1,file);
+    nb += fread(&ime_counter,sizeof(int),1,file);
+    nb += fread(&halted,sizeof(uint8_t),1,file);
+    nb += fread(&skip,sizeof(uint8_t),1,file);
     nb += fread(&z80_.PC,sizeof(unsigned short),1,file);
     nb += fread(&z80_.SP,sizeof(unsigned short),1,file);
     nb += fread(&z80_.A,sizeof(unsigned char),1,file);
@@ -2428,7 +2429,7 @@ void Cpu::restore_cpu(FILE* file)
     nb += fread(&z80_.E,sizeof(unsigned char),1,file);
     nb += fread(&z80_.H,sizeof(unsigned char),1,file);
     nb += fread(&z80_.L,sizeof(unsigned char),1,file);
-	if(nb!=nb_elements) printf("Error when reading cpu variables\n");
+    if(nb!=nb_elements) printf("Error when reading cpu variables\n");
 }*/
 
 const uint16_t daa_table[4096] =
@@ -2972,10 +2973,10 @@ const uint8_t z80_cb_cycles[] = {
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
+    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
+    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
+    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
+    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,

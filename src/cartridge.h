@@ -7,7 +7,7 @@
 class Cartridge{
 public:
     Cartridge();
-    ~Cartridge();
+    virtual ~Cartridge();
     int type() const;
     bool haveRam() const;
     BYTE *ram();

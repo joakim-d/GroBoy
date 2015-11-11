@@ -3,7 +3,7 @@ GroBoy
 
 A Nintendo Gameboy Emulator,
 
-To compile you will need cmake (https://cmake.org/download/)
+To compile you will need cmake (https://cmake.org/download/) and Qt5 (http://www.qt.io/download-open-source/)
 
 ##### To install cmake on ubuntu:
 
@@ -17,22 +17,7 @@ sudo apt-get install cmake
 git clone https://github.com/joakim-d/GroBoy.git
 ```
  
-##### Finally compile the project:
+##### Compile the project:
 
-```bash
-cd GroBoy
-mkdir build
-cd build
-cmake ..
-make
+Open the CMakeLists.txt file located in the root of the project with QtCreator and compile
 
-```
- 
-##### Optional : 
-The GUI front-end is made with Qt (http://www.qt.io/download-open-source/)
-you will need the libraries (Qt 5.5) if you want the front-end software as well!
-Note that you can open the CMakeLists.txt file with QtCreator as a project!
-
-
- 
- 

@@ -9,7 +9,7 @@ static const int tac_speed[] = {1024, 16, 64, 256};
 Timer::Timer() : div_timer_(0), tac_timer_(0), memory_(0){}
 
 void Timer::update(BYTE cycles){
-	BYTE timer_control;
+    BYTE timer_control;
 	BYTE timer_counter;
     div_timer_ += cycles;
     if(div_timer_ / DIVIDER_TIMER_SPEED >= 1){
@@ -21,14 +21,14 @@ void Timer::update(BYTE cycles){
     timer_control = memory_->read(0xFF07);
 	if(timer_control & 0x04){
         tac_timer_ += cycles;
-        if(tac_timer_ > tac_speed[timer_control & 0x03]){
+        while(tac_timer_ >= tac_speed[timer_control & 0x03]){
             tac_timer_ -= tac_speed[timer_control & 0x03];
             timer_counter = memory_->read(0xFF05);
-			if(timer_counter + 1 > 0xFF){
-                request_callback_(TIMER);
-                timer_counter = memory_->read(0xFF06);
-			}
-			else timer_counter++;
+            timer_counter++;
+            if(timer_counter == 0){
+              request_callback_(TIMER);
+              timer_counter = memory_->read(0xFF06);
+            }
             memory_->write(0xFF05, timer_counter);
 		}
 	}

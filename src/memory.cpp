@@ -48,6 +48,12 @@ Memory::Memory() : force_write_(false){
     write(0xFFFF,0x00);
 }
 
+Memory::~Memory(){
+  if(cartridge_){
+    delete cartridge_;
+  }
+}
+
 void Memory::write(int addr, BYTE data){
     switch(addr){
     case 0 ... 0x7FFF:

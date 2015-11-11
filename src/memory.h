@@ -26,6 +26,7 @@ enum type_mem{ALL,
 class Memory{
 public:
     Memory();
+    ~Memory();
 
     BYTE read(int addr);
     void write(int addr, BYTE data);
