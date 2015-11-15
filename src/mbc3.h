@@ -17,6 +17,8 @@ public:
     };
     virtual void write(int address, uint8_t data);
     virtual uint8_t read(int address);
+
+    virtual void update(int cycles);
 private:
     void latchTimer();
 
@@ -25,6 +27,7 @@ private:
     uint8_t* mapped_register_ {};
     bool latch_{false};
     bool half_latch_{false};
+    int cycles_{};
 
 };
 

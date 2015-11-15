@@ -61,6 +61,7 @@ void Gameboy::update(int cycles){
     timer_.update(cycles);
     gpu_.update(cycles);
     joypad_.update(cycles);
+    memory_.update(cycles);
 }
 
 void Gameboy::handle_ready(){

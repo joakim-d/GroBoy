@@ -42,3 +42,5 @@ BYTE Cartridge::read(int addr){
         return 0;
     }
 }
+
+void Cartridge::update(int){}

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <fstream>
 #include <iostream>
+#include <assert.h>
 
 Memory::Memory() : force_write_(false){
     reset();
@@ -248,6 +249,11 @@ void Memory::reset(){
     write(0xFF4B,0x00);
     write(0xFFFF,0x00);
     force_write_ = false;
+}
+
+void Memory::update(int cycles){
+    assert(cartridge_ != nullptr);
+    cartridge_->update(cycles);
 }
 
 /*

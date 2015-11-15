@@ -80,3 +80,28 @@ uint8_t MBC3::read(int address){
 void MBC3::latchTimer(){
     latch_ = !latch_;
 }
+
+void MBC3::update(int cycles){
+    if(!latch_){
+        cycles_ += cycles;
+        while(cycles_ >= 128 ){
+            cycles_ -= 128;
+            rtc_regs_.s++;
+            if(rtc_regs_.s == 60){
+                rtc_regs_.s = 0;
+                rtc_regs_.m++;
+                if(rtc_regs_.m == 60){
+                    rtc_regs_.m = 0;
+                    rtc_regs_.h++;
+                    if(rtc_regs_.h == 24){
+                        rtc_regs_.h = 0;
+                        rtc_regs_.dl++;
+                        if(rtc_regs_.dl == 0){
+                            rtc_regs_.dh |= 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

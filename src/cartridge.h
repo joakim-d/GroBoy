@@ -19,6 +19,8 @@ public:
     virtual void write(int address, BYTE data) = 0;
     virtual BYTE read(int address);
     void open(const std::string &path);
+
+    virtual void update(int cycles);
 protected:
     BYTE *rom_;
     BYTE *ram_;
