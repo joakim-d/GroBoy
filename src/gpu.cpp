@@ -10,6 +10,14 @@ Gpu::Gpu() :
 {
 }
 
+void Gpu::reset(){
+    current_line_ = 0;
+    vblank_clock_counter_ = 0;
+    line_clock_counter_ = 0;
+    frame_skip_ = 0;
+    frame_counter_ = 0;
+}
+
 void Gpu::set_memory(Memory *memory){
     memory_ = memory;
 }
@@ -129,7 +137,7 @@ static inline void sleep_SDL();*/
 	frame_counter = 0;
 	//fonctions SDL
 
-	/** //test pour connaitre les resolutions possibles
+     //test pour connaitre les resolutions possibles
 	  resolutions =SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
 
 	// On verifie si un mode est possible 

@@ -7,45 +7,7 @@
 #include <iostream>
 
 Memory::Memory() : force_write_(false){
-    int i;
-    //read_rom_info(rom_path);
-    for(i = 0; i < 0x10000; i++){
-        internal_ram_[i] = 0;
-    }
-    write(0xFF05,0x00);
-    write(0xFF06,0x00);
-    write(0xFF07,0x00);
-    write(0xFF10,0x80);
-    write(0xFF11,0xBF);
-    write(0xFF12,0xF3);
-    write(0xFF13,0xFF);
-    write(0xFF14,0xBF);
-    write(0xFF16,0x3F);
-    write(0xFF17,0x00);
-    write(0xFF18,0xFF);
-    write(0xFF19,0xBF);
-    write(0xFF1A,0x7F);
-    write(0xFF1B,0xFF);
-    write(0xFF1C,0x9F);
-    write(0xFF1D,0xFF);
-    write(0xFF1E,0xBF);
-    write(0xFF20,0xFF);
-    write(0xFF21,0x00);
-    write(0xFF22,0x00);
-    write(0xFF23,0xBF);
-    write(0xFF24,0x77);
-    write(0xFF25,0xF3);
-    write(0xFF26,0xF1);
-    write(0xFF40,0x91);
-    write(0xFF42,0x00);
-    write(0xFF43,0x00);
-    write(0xFF45,0x00);
-    write(0xFF47,0xFC);
-    write(0xFF48,0xFF);
-    write(0xFF49,0xFF);
-    write(0xFF4A,0x00);
-    write(0xFF4B,0x00);
-    write(0xFFFF,0x00);
+    reset();
 }
 
 Memory::~Memory(){
@@ -95,7 +57,7 @@ void Memory::write(int addr, BYTE data){
 void Memory::dma_transfer(BYTE data){
     int i;
     unsigned short source = data << 8;
-    for(i = 0; i < 0x9F; i++){
+    for(i = 0; i < 0xA0; i++){
         write(0xFE00 + i, read(source + i));
     }
 }
@@ -128,7 +90,7 @@ void Memory::load_cartridge(const std::string &path){
 
     if(memcmp(cartridge_rom_buffer + 0x0100, "\x00\xC3", 2) != 0){
         printf("Error reading rom magic code\n");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     BYTE cartridge_type = *(cartridge_rom_buffer + 0x0147);
@@ -154,7 +116,8 @@ void Memory::load_cartridge(const std::string &path){
     }
 
     if(!cartridge_){
-        exit(-1);
+        std::cout << "Cartridge selected not supported, code : " << std::hex << cartridge_type << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     cartridge_->set_rom(cartridge_rom_buffer);
@@ -243,6 +206,48 @@ void Memory::load_cartridge(const std::string &path){
 
 void Memory::set_force_write(bool value){
     force_write_ = value;
+}
+
+void Memory::reset(){
+    for(int i = 0; i < 0x10000; i++){
+        internal_ram_[i] = 0;
+    }
+    force_write_ = true;
+    write(0xFF05,0x00);
+    write(0xFF06,0x00);
+    write(0xFF07,0x00);
+    write(0xFF10,0x80);
+    write(0xFF11,0xBF);
+    write(0xFF12,0xF3);
+    write(0xFF13,0xFF);
+    write(0xFF14,0xBF);
+    write(0xFF16,0x3F);
+    write(0xFF17,0x00);
+    write(0xFF18,0xFF);
+    write(0xFF19,0xBF);
+    write(0xFF1A,0x7F);
+    write(0xFF1B,0xFF);
+    write(0xFF1C,0x9F);
+    write(0xFF1D,0xFF);
+    write(0xFF1E,0xBF);
+    write(0xFF20,0xFF);
+    write(0xFF21,0x00);
+    write(0xFF22,0x00);
+    write(0xFF23,0xBF);
+    write(0xFF24,0x77);
+    write(0xFF25,0xF3);
+    write(0xFF26,0xF1);
+    write(0xFF40,0x91);
+    write(0xFF42,0x00);
+    write(0xFF43,0x00);
+    write(0xFF45,0x00);
+    write(0xFF47,0xFC);
+    write(0xFF48,0xFF);
+    write(0xFF49,0xFF);
+    write(0xFF4A,0x00);
+    write(0xFF4B,0x00);
+    write(0xFFFF,0x00);
+    force_write_ = false;
 }
 
 /*

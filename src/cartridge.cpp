@@ -1,4 +1,5 @@
 #include "cartridge.h"
+#include <assert.h>
 
 Cartridge::Cartridge() : rom_(0), ram_(0){}
 
@@ -34,15 +35,10 @@ BYTE Cartridge::read(int addr){
         return rom_[addr];
     case 0x4000 ... 0x7FFF:
         return rom_[0x4000*(rom_selector_ - 1) + addr];
-    case 0xA000 ... 0xBFFF:
-        if(haveRam())
-        {
-            return ram_[(0x2000*ram_selector_) + addr - 0xA000];
-        }
-        else{
-            exit(EXIT_FAILURE);
-        }
+    case 0xA000 ... 0xBFFF:  
+        return haveRam() ? ram_[(0x2000*ram_selector_) + addr - 0xA000] : 0;
     default:
-        exit(EXIT_FAILURE);
+        assert(false);
+        return 0;
     }
 }

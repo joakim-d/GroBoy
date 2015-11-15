@@ -1,5 +1,6 @@
 #include "mbc3.h"
 #include <iostream>
+#include <assert.h>
 
 void MBC3::write(int address, BYTE data){
     switch(address){
@@ -53,7 +54,7 @@ void MBC3::write(int address, BYTE data){
         break;
     case 0xA000 ... 0xBFFF:
         if(address == address_map_){
-            if(mapped_register_ == nullptr) exit(EXIT_FAILURE);
+            assert(mapped_register_ != nullptr);
             *mapped_register_ = data;
         }
         else if(haveRam()){
@@ -68,11 +69,11 @@ void MBC3::write(int address, BYTE data){
 
 uint8_t MBC3::read(int address){
     if(address == address_map_){
-        if(mapped_register_ == nullptr) exit(EXIT_FAILURE);
+        assert(mapped_register_ != nullptr);
         return *mapped_register_;
     }
     else{
-        Cartridge::read(address);
+        return Cartridge::read(address);
     }
 }
 

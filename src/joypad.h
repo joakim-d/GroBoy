@@ -19,6 +19,7 @@ public:
     };
     Joypad();
     void update(int cycles);
+    void reset();
     void updateInput(BYTE input);
     void set_request_callback(std::tr1::function<void(int)> const &callback);
     void set_memory(Memory *memory);

@@ -6,7 +6,7 @@
 
 static const int tac_speed[] = {1024, 16, 64, 256};
 
-Timer::Timer() : div_timer_(0), tac_timer_(0), memory_(0){}
+Timer::Timer(){}
 
 void Timer::update(BYTE cycles){
     BYTE timer_control;
@@ -40,4 +40,9 @@ void Timer::set_request_callback(const std::tr1::function<void (int)> &callback)
 
 void Timer::set_memory(Memory *memory){
     memory_ = memory;
+}
+
+void Timer::reset(){
+    div_timer_ = 0;
+    tac_timer_ = 0;
 }

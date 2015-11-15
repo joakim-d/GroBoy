@@ -1,5 +1,6 @@
 #include "mbc1.h"
 #include <iostream>
+#include <assert.h>
 
 MBC1::MBC1() : Cartridge(){}
 
@@ -23,14 +24,14 @@ void MBC1::write(int address, BYTE data){
             rom_mode_ = true; //rom mode enabled
             if(ram_selector_ != 0){
                 std::cout << "Ram selector = " << ram_selector_ << "while in rom mode" << std::endl;
-                exit(EXIT_FAILURE);
+                assert(false);
             }
         }
         else {
             rom_mode_ = false; // ram mode enabled
             if(rom_selector_ > 0x1F){
                 std::cout << "Rom selector = " << rom_selector_ << "while in ram mode" << std::endl;
-                exit(EXIT_FAILURE);
+                assert(false);
             }
         }
         break;

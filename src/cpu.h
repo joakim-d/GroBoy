@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <tr1/functional>
 #include "def.h"
 #include "memory.h"
 
@@ -15,8 +16,10 @@ public:
     Cpu();
     ~Cpu();
     int run();
+    void reset();
     void set_memory(Memory *memory);
     void make_request(int type);
+    void set_update_callback(std::tr1::function<void (int)> const &callback);
     /*
     BYTE is_halted();
     int save_cpu(FILE* file);
@@ -36,11 +39,12 @@ private:
     };
     z80_t z80_;
     Memory *memory_;
-    int cycles_;
+    int post_cycles_;
     int ime_counter_;
     BYTE halted_;
     BYTE skip_;
     bool IME_;
+    std::tr1::function<void(int)> update_callback_{};
 
     //Interrupt handling
     void interrupts_init();

@@ -8,6 +8,8 @@ include_directories(src/gui)
 file(GLOB SOURCES src/*.cpp src/*.h src/gui/*.cpp src/gui/*.h)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)

@@ -9,6 +9,7 @@ class GameboyGui : public QThread, public Gameboy {
     Q_OBJECT
 public:
     GameboyGui(QObject *parent = 0);
+    ~GameboyGui();
     void run();
     void updateScreen(const unsigned char *buffer, unsigned int width, unsigned int height);
 

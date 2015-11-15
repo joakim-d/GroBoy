@@ -34,6 +34,8 @@ public:
 
     void load_cartridge(const std::string &path);
     void set_force_write(bool force);
+
+    void reset();
 private:
     void dma_transfer(BYTE data);
 

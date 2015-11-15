@@ -41,6 +41,7 @@ public:
     Gpu();
 
     void update(int cycles);
+    void reset();
     BYTE *get_buffer();
     void set_memory(Memory *memory);
     void set_ready_callback(std::tr1::function<void()> const &callback);

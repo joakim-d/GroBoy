@@ -10,11 +10,12 @@ public:
     void set_memory(Memory *memory);
     void set_request_callback(std::tr1::function<void (int)> const &callback);
     void update(BYTE cycles);
+    void reset();
 
 private:
-    unsigned int div_timer_;
-    unsigned int tac_timer_;
-    Memory *memory_;
+    int div_timer_ {0};
+    int tac_timer_ {0};
+    Memory *memory_ {};
 
     std::tr1::function<void (int)> request_callback_;
 };

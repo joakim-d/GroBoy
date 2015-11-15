@@ -3,6 +3,10 @@
 GameboyGui::GameboyGui(QObject *parent) : QThread(parent){
 }
 
+GameboyGui::~GameboyGui(){
+    stop();
+}
+
 void GameboyGui::run(){
     play();
 }

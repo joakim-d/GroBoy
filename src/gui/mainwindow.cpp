@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->configure_input, &QAction::triggered, this, &MainWindow::handle_configure_input);
     QObject::connect(&gb_, &GameboyGui::frameReady, ui->gameboywidget, &GameboyWidget::updateImage);
     QObject::connect(ui->gameboywidget, SIGNAL(newInput(uint8_t)), &gb_, SLOT(handleNewInput(uint8_t)));
+    QObject::connect(ui->exit, &QAction::triggered, QApplication::instance(), &QCoreApplication::quit);
     ui->gameboywidget->setFocus();
 }
 
@@ -27,6 +28,7 @@ void MainWindow::handle_open_rom(){
     QString rom = QFileDialog::getOpenFileName(this,
         tr("Open Rom"), "", tr("Image Files (*.rom *.gb)"));
     gb_.setGame(rom.toStdString());
+    gb_.stop();
     gb_.start();
 }
 

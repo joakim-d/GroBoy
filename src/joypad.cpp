@@ -39,3 +39,11 @@ void Joypad::set_request_callback(const std::tr1::function<void (int)> &callback
 void Joypad::updateInput(BYTE input){
     keystate_ = input;
 }
+
+void Joypad::reset(){
+    joypad_counter_ = 0;
+    keystate_ = 0;
+    joy_new_ = 0;
+    joy_old_ = 0;
+    key_buttons_ = 0xFF;
+}

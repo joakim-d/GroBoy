@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include <iostream>
 #define V_BLANK 0
 #define LCD_STAT 1
 #define TIMER 2
@@ -11,7 +12,11 @@ extern const uint8_t z80_cycles[];
 extern const uint8_t z80_cb_cycles[];
 extern int sound_cycles;
 
-Cpu::Cpu() : memory_(0), halted_(0), ime_counter_(0), IME_(false){
+Cpu::Cpu() : memory_(0), ime_counter_(0), halted_(0), IME_(false){
+    reset();
+}
+
+void Cpu::reset(){
     z80_.PC = 0x0100;
     z80_.SP = 0xFFFE;
     z80_.A = 0x01;
@@ -22,23 +27,27 @@ Cpu::Cpu() : memory_(0), halted_(0), ime_counter_(0), IME_(false){
     z80_.E = 0xD8;
     z80_.H = 0x01;
     z80_.L = 0x4D;
+    halted_ = 0;
+    ime_counter_ = 0;
+    IME_ = false;
 }
 
 Cpu::~Cpu(){}
+
+void Cpu::set_update_callback(const std::tr1::function<void (int)> &callback){
+    update_callback_ = callback;
+}
 
 void Cpu::set_memory(Memory *memory){
     memory_ = memory;
 }
 
 int Cpu::run(){
-    //int interrupt_period;
-    //int counter;
-    //counter=interrupt_period;
     BYTE op_code;
 
     op_code = memory_->read(z80_.PC);
-    cycles_ = z80_cycles[op_code];
-    //sound_cycles -= cycles_ % 8 ;
+    post_cycles_ = z80_cycles[op_code];
+    int pre_cycles = 0;
 
     if(!halted_){
 #ifdef DEBUG
@@ -276,14 +285,18 @@ int Cpu::run(){
                 break;
             case 0x34:
                 //INC (HL)
+                pre_cycles = 4;
                 inc_at((z80_.H << 8) + z80_.L);
                 break;
             case 0x35:
                 //DEC (HL)
+                pre_cycles = 4;
                 dec_at((z80_.H << 8) + z80_.L);
                 break;
             case 0x36:
                 //LD (HL),d8
+                pre_cycles = 4;
+                update_callback_(4);
                 ld_mem((z80_.H << 8)+z80_.L, memory_->read(z80_.PC++));
                 break;
             case 0x37:
@@ -855,7 +868,7 @@ int Cpu::run(){
                 break;
             case 0xCB: //Two bytes Opcode
                 op_code = memory_->read(z80_.PC++);
-                cycles_ = z80_cb_cycles[op_code];
+                post_cycles_ = z80_cb_cycles[op_code];
                 switch(op_code){
                     case 0x00: //RLC B
                         rlc(&z80_.B);
@@ -876,6 +889,7 @@ int Cpu::run(){
                         rlc(&z80_.L);
                         break;
                     case 0x06: //RLC (HL)
+                        pre_cycles = 8;
                         rlc_hl();
                         break;
                     case 0x07: //RLC A
@@ -900,6 +914,7 @@ int Cpu::run(){
                         rrc(&z80_.L);
                         break;
                     case 0x0E: //RRC (HL)
+                        pre_cycles = 8;
                         rrc_hl();
                         break;
                     case 0x0F: //RRC A
@@ -924,6 +939,7 @@ int Cpu::run(){
                         rl(&z80_.L);
                         break;
                     case 0x16: //RL (HL)
+                        pre_cycles = 8;
                         rl_hl();
                         break;
                     case 0x17: //RL A
@@ -948,6 +964,7 @@ int Cpu::run(){
                         rr(&z80_.L);
                         break;
                     case 0x1E: //RR (HL)
+                        pre_cycles = 8;
                         rr_hl();
                         break;
                     case 0x1F: //RR A
@@ -972,6 +989,7 @@ int Cpu::run(){
                         sla(&z80_.L);
                         break;
                     case 0x26: //SLA (HL)
+                        pre_cycles = 8;
                         sla_hl();
                         break;
                     case 0x27: //SLA A
@@ -996,6 +1014,7 @@ int Cpu::run(){
                         sra(&z80_.L);
                         break;
                     case 0x2E: //SRA (HL)
+                        pre_cycles = 8;
                         sra_hl();
                         break;
                     case 0x2F: //SRA A
@@ -1020,6 +1039,7 @@ int Cpu::run(){
                         swap(&z80_.L);
                         break;
                     case 0x36: //SWAP (HL)
+                        pre_cycles = 8;
                         swap_hl();
                         break;
                     case 0x37: //SWAP A
@@ -1044,6 +1064,7 @@ int Cpu::run(){
                         srl(&z80_.L);
                         break;
                     case 0x3E: //SRL (HL)
+                        pre_cycles = 8;
                         srl_hl();
                         break;
                     case 0x3F: //SRL A
@@ -1068,6 +1089,8 @@ int Cpu::run(){
                         bit(0x01, z80_.L);
                         break;
                     case 0x46: //BIT 0,(HL)
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit(0x01, memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x47: //BIT 0,A
@@ -1092,6 +1115,8 @@ int Cpu::run(){
                         bit(0x02, z80_.L);
                         break;
                     case 0x4E: //BIT 1,(HL)
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit(0x02, memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x4F: //BIT 1,A
@@ -1116,6 +1141,8 @@ int Cpu::run(){
                         bit(0x04, z80_.L);
                         break;
                     case 0x56: //BIT 2,(HL)
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit(0x04, memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x57: //BIT 2,A
@@ -1140,6 +1167,8 @@ int Cpu::run(){
                         bit(0x08, z80_.L);
                         break;
                     case 0x5E: //BIT 3,(HL)
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit(0x08, memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x5F: //BIT 3,A
@@ -1164,6 +1193,8 @@ int Cpu::run(){
                         bit((0x10),z80_.L);
                         break;
                     case 0x66: //BIT 4,HL
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit((0x10),memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x67: //BIT 4,A
@@ -1188,6 +1219,8 @@ int Cpu::run(){
                         bit((0x20),z80_.L);
                         break;
                     case 0x6E: //BIT 5,HL
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit((0x20),memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x6F: //BIT 5,A
@@ -1212,6 +1245,8 @@ int Cpu::run(){
                         bit((0x40),z80_.L);
                         break;
                     case 0x76: //BIT 6,HL
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit((0x40),memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x77: //BIT 6,A
@@ -1236,6 +1271,8 @@ int Cpu::run(){
                         bit((0x80),z80_.L);
                         break;
                     case 0x7E: //BIT 7,HL
+                        pre_cycles = 4;
+                        update_callback_(4);
                         bit((0x80),memory_->read((z80_.H << 8) + z80_.L));
                         break;
                     case 0x7F: //BIT 7,A
@@ -1260,6 +1297,7 @@ int Cpu::run(){
                         res(0,&z80_.L);
                         break;
                     case 0x86: //RES 0,HL
+                        pre_cycles = 8;
                         res_hl(0);
                         break;
                     case 0x87: //RES 0,A
@@ -1284,6 +1322,7 @@ int Cpu::run(){
                         res(1,&z80_.L);
                         break;
                     case 0x8E: //RES 1,HL
+                        pre_cycles = 8;
                         res_hl(1);
                         break;
                     case 0x8F: //RES 1,A
@@ -1308,6 +1347,7 @@ int Cpu::run(){
                         res(2,&z80_.L);
                         break;
                     case 0x96: //RES 2,HL
+                        pre_cycles = 8;
                         res_hl(2);
                         break;
                     case 0x97: //RES 2,A
@@ -1332,6 +1372,7 @@ int Cpu::run(){
                         res(3,&z80_.L);
                         break;
                     case 0x9E: //RES 3,HL
+                        pre_cycles = 8;
                         res_hl(3);
                         break;
                     case 0x9F: //RES 3,A
@@ -1356,6 +1397,7 @@ int Cpu::run(){
                         res(4,&z80_.L);
                         break;
                     case 0xA6: //RES 4,HL
+                        pre_cycles = 8;
                         res_hl(4);
                         break;
                     case 0xA7: //RES 4,A
@@ -1380,6 +1422,7 @@ int Cpu::run(){
                         res(5,&z80_.L);
                         break;
                     case 0xAE: //RES 5,HL
+                        pre_cycles = 8;
                         res_hl(5);
                         break;
                     case 0xAF: //RES 5,A
@@ -1404,6 +1447,7 @@ int Cpu::run(){
                         res(6,&z80_.L);
                         break;
                     case 0xB6: //RES 6,Hl
+                        pre_cycles = 8;
                         res_hl(6);
                         break;
                     case 0xB7: //RES 6,A
@@ -1428,6 +1472,7 @@ int Cpu::run(){
                         res(7,&z80_.L);
                         break;
                     case 0xBE: //RES 7,HL
+                        pre_cycles = 8;
                         res_hl(7);
                         break;
                     case 0xBF: //RES 7,A
@@ -1452,6 +1497,7 @@ int Cpu::run(){
                         set(0,&z80_.L);
                         break;
                     case 0xC6: //SET 0,HL
+                        pre_cycles = 8;
                         set_hl(0);
                         break;
                     case 0xC7: //SET 0,A
@@ -1476,6 +1522,7 @@ int Cpu::run(){
                         set(1,&z80_.L);
                         break;
                     case 0xCE: //SET 1,HL
+                        pre_cycles = 8;
                         set_hl(1);
                         break;
                     case 0xCF: //SET 1,A
@@ -1500,6 +1547,7 @@ int Cpu::run(){
                         set(2,&z80_.L);
                         break;
                     case 0xD6: //SET 2,HL
+                        pre_cycles = 8;
                         set_hl(2);
                         break;
                     case 0xD7: //SET 2,A
@@ -1524,6 +1572,7 @@ int Cpu::run(){
                         set(3,&z80_.L);
                         break;
                     case 0xDE: //SET 3,Hl
+                        pre_cycles = 8;
                         set_hl(3);
                         break;
                     case 0xDF: //SET 3,A
@@ -1548,6 +1597,7 @@ int Cpu::run(){
                         set(4,&z80_.L);
                         break;
                     case 0xE6: //SET 4,HL
+                        pre_cycles = 8;
                         set_hl(4);
                         break;
                     case 0xE7: //SET 4,A
@@ -1572,6 +1622,7 @@ int Cpu::run(){
                         set(5,&z80_.L);
                         break;
                     case 0xEE: //SET 5,HL
+                        pre_cycles = 8;
                         set_hl(5);
                         break;
                     case 0xEF: //SET 5,A
@@ -1596,6 +1647,7 @@ int Cpu::run(){
                         set(6,&z80_.L);
                         break;
                     case 0xF6: //SET 6,HL
+                        pre_cycles = 8;
                         set_hl(6);
                         break;
                     case 0xF7: //SET 6,A
@@ -1620,6 +1672,7 @@ int Cpu::run(){
                         set(7,&z80_.L);
                         break;
                     case 0xFE: //SET 7,HL
+                        pre_cycles = 8;
                         set_hl(7);
                         break;
                     case 0xFF: //SET 7,A
@@ -1679,6 +1732,8 @@ int Cpu::run(){
                 rst(0x18);
                 break;
             case 0xE0: //LDH (a8),A
+                pre_cycles = 4;
+                update_callback_(4);
                 ld_at(0xFF00 + memory_->read(z80_.PC++));
                 break;
             case 0xE1: //POP HL
@@ -1703,6 +1758,8 @@ int Cpu::run(){
                 jp((z80_.H << 8) + z80_.L);
                 break;
             case 0xEA: //LD (a16),A
+                pre_cycles = 8;
+                update_callback_(8);
                 ld_at((memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC));
                 z80_.PC += 2;
                 break;
@@ -1713,6 +1770,8 @@ int Cpu::run(){
                 rst(0x28);
                 break;
             case 0xF0: //LDH A,(a8)
+                pre_cycles = 4;
+                update_callback_(4);
                 ld_reg(&z80_.A, memory_->read(0xFF00 + memory_->read(z80_.PC++)));
                 break;
             case 0xF1: //POP AF
@@ -1725,7 +1784,6 @@ int Cpu::run(){
             case 0xF3: //DI
                 di();
                 break;
-
             case 0xF5: //PUSH AF
                 push(z80_.A, z80_.F);
                 break;
@@ -1742,6 +1800,8 @@ int Cpu::run(){
                 ld_sp((z80_.H << 8) + z80_.L);
                 break;
             case 0xFA: //LD A,(a16)
+                pre_cycles = 8;
+                update_callback_(8);
                 ld_reg(&z80_.A, memory_->read((memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC)));
                 z80_.PC +=2;
                 break;
@@ -1751,23 +1811,24 @@ int Cpu::run(){
             case 0xFE: //CP d8
                 cp(memory_->read(z80_.PC++));
                 break;
-
             case 0xFF: //RST 38H
                 rst(0x38);
                 break;
         }
     }
 
-    handle_interrupts(&z80_);
-
     if(ime_counter_ > 0){
-        ime_counter_ -= cycles_;
+        ime_counter_ -= post_cycles_ + pre_cycles;
         if(ime_counter_ <= 0){
             set_IME(true);
         }
     }
 
-    return cycles_;
+    update_callback_(post_cycles_);
+    handle_interrupts(&z80_);
+
+    return post_cycles_ + pre_cycles;
+
 }
 
 //Interrupt handling
@@ -1902,7 +1963,7 @@ void Cpu::reset_halt(){
         memory_->write(z80_.SP - 2, (z80_.PC + 2) & 0x00FF);
         z80_.SP -= 2;
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
-        cycles_ += 12;
+        post_cycles_ += 12;
     }
     else z80_.PC += 2;
 }
@@ -1913,7 +1974,7 @@ void Cpu::reset_halt(){
         memory_->write(z80_.SP - 2, (z80_.PC + 2) & 0xFF);
         z80_.SP -= 2;
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
-        cycles_ += 12;
+        post_cycles_ += 12;
     }
     else z80_.PC += 2;
 }
@@ -1925,7 +1986,7 @@ void Cpu::reset_halt(){
  void Cpu::jp_cond(BYTE cond){
     if(z80_.F & cond){
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
-        cycles_ += 4;
+        post_cycles_ += 4;
     }
     else z80_.PC += 2;
 }
@@ -1933,7 +1994,7 @@ void Cpu::reset_halt(){
  void Cpu::jp_n_cond(BYTE cond){
     if((z80_.F & cond) == 0){
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
-        cycles_ += 4;
+        post_cycles_ += 4;
     }
     else z80_.PC += 2;
 }
@@ -1948,7 +2009,7 @@ void Cpu::reset_halt(){
     // - - - -
     if(z80_.F & cond){
         z80_.PC += d;
-        cycles_ += 4;
+        post_cycles_ += 4;
     }
 }
 
@@ -1956,7 +2017,7 @@ void Cpu::reset_halt(){
     // - - - -
     if(!(z80_.F & cond)){
         z80_.PC += d;
-        cycles_ += 4;
+        post_cycles_ += 4;
     }
 }
 
@@ -1969,7 +2030,7 @@ void Cpu::reset_halt(){
     if(z80_.F & cond){
         z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);
         z80_.SP += 2;
-        cycles_ += 12;
+        post_cycles_ += 12;
     }
 }
 
@@ -1977,7 +2038,7 @@ void Cpu::reset_halt(){
     if(!(z80_.F & cond)){
         z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);;
         z80_.SP += 2;
-        cycles_ += 12;
+        post_cycles_ += 12;
     }
 }
 
@@ -2103,6 +2164,7 @@ void Cpu::reset_halt(){
     // Z 1 H -
     BYTE d8 = memory_->read(addr) - 1;
     z80_.F = FLAG_N | (z80_.F & FLAG_C) | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
+    update_callback_(4);
     memory_->write(addr, d8);
 }
 
@@ -2122,6 +2184,7 @@ void Cpu::reset_halt(){
     // Z 0 H -
     BYTE d8 = memory_->read(addr) + 1;
     z80_.F = (z80_.F & FLAG_C) | ((d8 & 0x0F) ? 0:FLAG_H) | ((d8 == 0) ? FLAG_Z:0);
+    update_callback_(4);
     memory_->write(addr, d8);
 }
 
@@ -2210,7 +2273,9 @@ void Cpu::reset_halt(){
 
  void Cpu::res_hl(BYTE b)
 {
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    update_callback_(4);
     hl &= ~(1 << b);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
@@ -2227,6 +2292,7 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::rl_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
     if(hl & 0x80){
         hl = (hl << 1) | (((z80_.F & FLAG_C) ? 1:0));
@@ -2236,6 +2302,7 @@ void Cpu::reset_halt(){
         hl = (hl << 1) | (((z80_.F & FLAG_C) ? 1:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0));
     }
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2252,12 +2319,13 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::rlc_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
 
     z80_.F = ((hl & 0x80) ? FLAG_C:0);
     hl = (hl << 1) | ((z80_.F) ? 1:0);
     z80_.F |= ((hl == 0)? FLAG_Z:0);
-
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
  void Cpu::rlca(){
@@ -2276,6 +2344,7 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::rr_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
     if(hl & 0x01){
         hl = (hl >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
@@ -2285,6 +2354,7 @@ void Cpu::reset_halt(){
         hl = (hl >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0));
     }
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2301,12 +2371,14 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::rrc_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
 
     z80_.F = ((hl & 0x01) ? FLAG_C:0);
     hl = (hl >> 1) | ((z80_.F) ? 0x80:0);
     z80_.F |= ((hl == 0)? FLAG_Z:0);
 
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2323,7 +2395,9 @@ void Cpu::reset_halt(){
 
  void Cpu::set_hl(BYTE b)
 {
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    update_callback_(4);
     hl |= (1 << b);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
@@ -2335,10 +2409,12 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::srl_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
     z80_.F = (((hl & 0x01) ? FLAG_C:0));
     hl >>= 1;
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2349,10 +2425,12 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::sla_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
     z80_.F = ((hl & 0x80) ? FLAG_C:0);
     hl <<= 1;
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2363,10 +2441,12 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::sra_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) +z80_.L);
     z80_.F = ((hl & 0x01) ? FLAG_C:0);
     hl = (hl >> 1) | ((hl & 0x80) ? 0x80:0);
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2378,6 +2458,7 @@ void Cpu::reset_halt(){
 }
 
  void Cpu::swap_hl(){
+    update_callback_(4);
     BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
 
     BYTE low_nibble = (hl & 0xF0) >> 4;
@@ -2385,6 +2466,7 @@ void Cpu::reset_halt(){
     hl = high_nibble + low_nibble;
     z80_.F = ((hl == 0) ? FLAG_Z:0);
 
+    update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
@@ -2431,6 +2513,44 @@ void Cpu::restore_cpu(FILE* file)
     nb += fread(&z80_.L,sizeof(unsigned char),1,file);
     if(nb!=nb_elements) printf("Error when reading cpu variables\n");
 }*/
+
+ const uint8_t z80_cycles[] = {
+     4, 12, 8, 8, 4, 4, 8, 4, 20, 8, 8, 8, 4, 4, 8, 4,
+     4, 12, 8, 8, 4, 4, 8, 4, 12, 8, 8, 8, 4, 4, 8, 4,
+     8, 12, 8, 8, 4, 4, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4,
+     8, 12, 8, 8, 8, 8, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4,
+     4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
+     4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
+     4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
+     8, 8, 8, 8, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 8, 4,
+     4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
+     4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
+     4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
+     4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
+     8, 12, 12, 16, 12, 16, 8, 16, 8, 16, 12, 4, 12, 24, 8, 16,
+     8, 12, 12, 0, 12, 16, 8, 16, 8, 16, 12, 0, 12, 0, 8, 16,
+     8, 12, 8, 0, 0, 16, 8, 16, 16, 4, 8, 0, 0, 0, 8, 16,
+     8, 12, 8, 4, 0, 16, 8, 16, 12, 8, 8, 4, 0, 0, 8, 16
+ };
+
+ const uint8_t z80_cb_cycles[] = {
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
+ };
 
 const uint16_t daa_table[4096] =
 {
@@ -2949,40 +3069,4 @@ const uint16_t daa_table[4096] =
 0x9250,0x9350,0x9450,0x9550,0x9650,0x9750,0x9850,0x9950
 };
 
-const uint8_t z80_cycles[] = {
-    4, 12, 8, 8, 4, 4, 8, 4, 20, 8, 8, 8, 4, 4, 8, 4,
-    4, 12, 8, 8, 4, 4, 8, 4, 12, 8, 8, 8, 4, 4, 8, 4,
-    8, 12, 8, 8, 4, 4, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4,
-    8, 12, 8, 8, 12, 12, 12, 4, 8, 8, 8, 8, 4, 4, 8, 4,
-    4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-    4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-    4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-    8, 8, 8, 8, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 8, 4,
-    4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-    4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-    4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-    4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-    8, 12, 12, 16, 12, 16, 8, 16, 8, 16, 12, 4, 12, 24, 8, 16,
-    8, 12, 12, 0, 12, 16, 8, 16, 8, 16, 12, 0, 12, 0, 8, 16,
-    12, 12, 8, 0, 0, 16, 8, 16, 16, 4, 16, 0, 0, 0, 8, 16,
-    12, 12, 8, 4, 0, 16, 8, 16, 12, 8, 16, 4, 0, 0, 8, 16
-};
 
-const uint8_t z80_cb_cycles[] = {
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-    8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
-    8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8
-};
