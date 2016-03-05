@@ -17,7 +17,7 @@ public:
     void setGame(const std::string &path);
     void play();
     void reset();
-    void updateInput(BYTE touches);
+    void updateInput(uint8_t touches);
     virtual void updateScreen(const unsigned char *buffer, unsigned int width, unsigned int height) = 0;
     void stop();
     bool isRunning();

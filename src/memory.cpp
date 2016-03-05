@@ -17,7 +17,7 @@ Memory::~Memory(){
   }
 }
 
-void Memory::write(int addr, BYTE data){
+void Memory::write(int addr, uint8_t data){
     switch(addr){
     case 0 ... 0x7FFF:
     case 0xA000 ... 0xBFFF:
@@ -55,7 +55,7 @@ void Memory::write(int addr, BYTE data){
     }
 }
 
-void Memory::dma_transfer(BYTE data){
+void Memory::dma_transfer(uint8_t data){
     int i;
     unsigned short source = data << 8;
     for(i = 0; i < 0xA0; i++){
@@ -63,7 +63,7 @@ void Memory::dma_transfer(BYTE data){
     }
 }
 
-BYTE Memory::read(int addr){
+uint8_t Memory::read(int addr){
     switch(addr){
     case 0 ... 0x7FFF:
         return cartridge_->read(addr);
@@ -76,13 +76,28 @@ BYTE Memory::read(int addr){
     }
 }
 
+uint8_t* Memory::getBuf(int addr){
+  if(addr <= 0x7FFF){
+    return cartridge_->getBuf(addr);
+  }
+  else if(addr <= 0x9FFF){
+    return internal_ram_ + addr;
+  }
+  else if(addr <= 0xBFFF){
+    return cartridge_->getBuf(addr);
+  }
+  else{
+    return internal_ram_ + addr;
+  }
+}
+
 void Memory::load_cartridge(const std::string &path){
     std::ifstream file(path, std::ios::binary);
     file.seekg(0, std::ios::end);
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    BYTE *cartridge_rom_buffer = new BYTE[size];
+    uint8_t *cartridge_rom_buffer = new uint8_t[size];
     if (!file.read(reinterpret_cast<char *>(cartridge_rom_buffer), size))
     {
         std::cout << "Error while reading rom file" << std::endl;
@@ -94,7 +109,7 @@ void Memory::load_cartridge(const std::string &path){
         exit(EXIT_FAILURE);
     }
 
-    BYTE cartridge_type = *(cartridge_rom_buffer + 0x0147);
+    uint8_t cartridge_type = *(cartridge_rom_buffer + 0x0147);
 
     switch(cartridge_type){
     case 0x00:
@@ -259,9 +274,9 @@ void Memory::update(int cycles){
 /*
 static void read_rom_info(char* rom_path);
 static void alloc_ram_mem(size_t size);
-static inline void write_mbc1(unsigned short addr, BYTE data);
-static inline void write_mbc2(unsigned short addr, BYTE data);
-static inline void dma_transfer(BYTE data);
+static inline void write_mbc1(unsigned short addr, uint8_t data);
+static inline void write_mbc2(unsigned short addr, uint8_t data);
+static inline void dma_transfer(uint8_t data);
 void set_force_write(){
 	force_write = 1;
 }
@@ -277,7 +292,7 @@ static void read_rom_info(char* rom_path){
 	file_d = open(rom_path, O_RDONLY);
 	fstat(file_d, &file_stat);
 
-	cartridge_rom_buffer = (BYTE *) malloc(file_stat.st_size);
+    cartridge_rom_buffer = (uint8_t *) malloc(file_stat.st_size);
 	if(read(file_d, cartridge_rom_buffer, file_stat.st_size) == -1){
 		printf("Error while reading rom file\n");
 		exit(-1);
@@ -426,11 +441,11 @@ void memory_init(char *rom_path){
 
 static void alloc_ram_mem(size_t size){
 	cartridge_ram_enabled = 1;
-	cartridge_ram_buffer = (BYTE *) malloc(size);
+    cartridge_ram_buffer = (uint8_t *) malloc(size);
 	restore_cartridge(size);
 }
 
-inline void write(unsigned short addr, BYTE data){
+inline void write(unsigned short addr, uint8_t data){
 	if((addr <= 0x7FFF) || (addr >= 0xA000 && addr <= 0xBFFF)){
 		if(cartridge_type >= 0x01 && cartridge_type <= 0x03){//MBC1
 			write_mbc1(addr, data);		
@@ -468,7 +483,7 @@ inline void write(unsigned short addr, BYTE data){
 
 }
 
-static inline void write_mbc2(unsigned short addr, BYTE data){
+static inline void write_mbc2(unsigned short addr, uint8_t data){
 	if(addr <= 0x1FFF){
 		if(!(addr & 0x100)) enable_ram = 1;
 		else enable_ram = 0;
@@ -481,7 +496,7 @@ static inline void write_mbc2(unsigned short addr, BYTE data){
 		cartridge_ram_buffer[addr - 0xA000] = data;
 }
 
-static inline void write_mbc1(unsigned short addr, BYTE data){
+static inline void write_mbc1(unsigned short addr, uint8_t data){
 	if(addr <= 0x1FFF){
 		if((data & 0x0A) == 0x0A) enable_ram = 1;
 		else enable_ram = 0;
@@ -728,16 +743,16 @@ int save_memory(FILE* file)
 		default: size = 0;
         }
 	
-	if(fwrite(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(0);
-	if(fwrite(&cartridge_type,sizeof(BYTE),1,file) != 1) print_error(0);
-	if(fwrite(&enable_ram, sizeof(BYTE),1,file) != 1) print_error(0);
-	if(fwrite(&cartridge_ram_enabled,sizeof(BYTE),1,file) != 1) print_error(0);
-	if(fwrite(&rom_mode,sizeof(BYTE),1,file) != 1) print_error(0);
-	if(fwrite(&rom_selector,sizeof(BYTE),1,file) != 1) print_error(0);
-	if(fwrite(&ram_selector,sizeof(BYTE),1,file) != 1) print_error(0);
-	if(fwrite(&force_write,sizeof(BYTE),1,file) != 1) print_error(0);
+    if(fwrite(internal_ram,sizeof(uint8_t),0x10000,file) != 0x10000) print_error(0);
+    if(fwrite(&cartridge_type,sizeof(uint8_t),1,file) != 1) print_error(0);
+    if(fwrite(&enable_ram, sizeof(uint8_t),1,file) != 1) print_error(0);
+    if(fwrite(&cartridge_ram_enabled,sizeof(uint8_t),1,file) != 1) print_error(0);
+    if(fwrite(&rom_mode,sizeof(uint8_t),1,file) != 1) print_error(0);
+    if(fwrite(&rom_selector,sizeof(uint8_t),1,file) != 1) print_error(0);
+    if(fwrite(&ram_selector,sizeof(uint8_t),1,file) != 1) print_error(0);
+    if(fwrite(&force_write,sizeof(uint8_t),1,file) != 1) print_error(0);
 	if(size != 0){
-		if(fwrite(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(0);
+        if(fwrite(cartridge_ram_buffer,sizeof(uint8_t),size,file) != size) print_error(0);
 	}
 	return nb;	
 }
@@ -759,16 +774,16 @@ void restore_memory(FILE* file)
                 case 2: size = 0x2000;break;
                 case 3: size = 0x8000;break;
         }
-	if(fread(internal_ram,sizeof(BYTE),0x10000,file) != 0x10000) print_error(1);
-	if(fread(&cartridge_type,sizeof(BYTE),1,file) != 1) print_error(1);
-	if(fread(&enable_ram, sizeof(BYTE),1,file) != 1) print_error(1);
-	if(fread(&cartridge_ram_enabled,sizeof(BYTE),1,file) != 1) print_error(1);
-	if(fread(&rom_mode,sizeof(BYTE),1,file) != 1) print_error(1);
-	if(fread(&rom_selector,sizeof(BYTE),1,file) != 1) print_error(1);
-	if(fread(&ram_selector, sizeof(BYTE),1,file) != 1) print_error(1);
-	if(fread(&force_write,sizeof(BYTE),1,file) != 1) print_error(1);
+    if(fread(internal_ram,sizeof(uint8_t),0x10000,file) != 0x10000) print_error(1);
+    if(fread(&cartridge_type,sizeof(uint8_t),1,file) != 1) print_error(1);
+    if(fread(&enable_ram, sizeof(uint8_t),1,file) != 1) print_error(1);
+    if(fread(&cartridge_ram_enabled,sizeof(uint8_t),1,file) != 1) print_error(1);
+    if(fread(&rom_mode,sizeof(uint8_t),1,file) != 1) print_error(1);
+    if(fread(&rom_selector,sizeof(uint8_t),1,file) != 1) print_error(1);
+    if(fread(&ram_selector, sizeof(uint8_t),1,file) != 1) print_error(1);
+    if(fread(&force_write,sizeof(uint8_t),1,file) != 1) print_error(1);
 	if(size != 0){
-		if(fread(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
+        if(fread(cartridge_ram_buffer,sizeof(uint8_t),size,file) != size) print_error(1);
 	}
 }
 
@@ -791,7 +806,7 @@ void save_cartridge(FILE* file)
         }
 
 	if(size != 0){
-                if(fwrite(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(0);
+                if(fwrite(cartridge_ram_buffer,sizeof(uint8_t),size,file) != size) print_error(0);
         }
 }
 
@@ -809,7 +824,7 @@ void restore_cartridge(size_t size)
         else
 	{
 		if(size != 0){
-        	        if(fread(cartridge_ram_buffer,sizeof(BYTE),size,file) != size) print_error(1);
+                    if(fread(cartridge_ram_buffer,sizeof(uint8_t),size,file) != size) print_error(1);
 	        }
 		fclose(file);
 	}

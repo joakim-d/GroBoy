@@ -2,7 +2,7 @@
 #include <iostream>
 #include <assert.h>
 
-void MBC3::write(int address, BYTE data){
+void MBC3::write(int address, uint8_t data){
     switch(address){
     case 0 ... 0x1FFF:
         if((data & 0x0A) == 0x0A) enable_ram_ = true;

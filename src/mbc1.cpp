@@ -4,7 +4,7 @@
 
 MBC1::MBC1() : Cartridge(){}
 
-void MBC1::write(int address, BYTE data){
+void MBC1::write(int address, uint8_t data){
     switch(address){
     case 0 ... 0x1FFF:
         if((data & 0x0A) == 0x0A) enable_ram_ = true;

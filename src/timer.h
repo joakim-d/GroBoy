@@ -9,7 +9,7 @@ public:
     Timer();
     void set_memory(Memory *memory);
     void set_request_callback(std::tr1::function<void (int)> const &callback);
-    void update(BYTE cycles);
+    void update(uint8_t cycles);
     void reset();
 
 private:

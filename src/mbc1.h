@@ -7,7 +7,7 @@ class MBC1 : public Cartridge{
 public:
     MBC1();
 
-    virtual void write(int address, BYTE data);
+    virtual void write(int address, uint8_t data) override;
 
 private:
     bool rom_mode_ {true};

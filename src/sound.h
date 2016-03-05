@@ -122,20 +122,20 @@ typedef struct{
 
 
 	//NR10	
-	BYTE sweep_period;
-	BYTE sweep_shift;
+	uint8_t sweep_period;
+	uint8_t sweep_shift;
 	int sweep_regulation; // 0 : up, 1 : down
 	//NR11	
-	BYTE wave_duty;
-	BYTE sound_length;
+	uint8_t wave_duty;
+	uint8_t sound_length;
 	//NR12	
-	BYTE initial_volume;
-	BYTE nb_sweep_env;
+	uint8_t initial_volume;
+	uint8_t nb_sweep_env;
 	int env_direction; // 0 : down, 1 : up
 	//NR13	
-	BYTE freq_low;
+	uint8_t freq_low;
 	//NR14	
-	BYTE freq_high;
+	uint8_t freq_high;
 	int initier; // booleen
 	int counter_consec; // booleen
 
@@ -160,16 +160,16 @@ typedef struct{
 	int is_right;
 
 	//NR21
-	BYTE sound_length;
-	BYTE wave_duty;
+	uint8_t sound_length;
+	uint8_t wave_duty;
 	//NR22
-	BYTE initial_env_volume;
+	uint8_t initial_env_volume;
 	int env_direction;
-	BYTE nb_sweep_env;
+	uint8_t nb_sweep_env;
 	//NR23
-	BYTE freq_low;
+	uint8_t freq_low;
 	//NR24
-	BYTE freq_high;
+	uint8_t freq_high;
 	int initier; //booleen
 	int counter_consec; //booleen
 
@@ -195,13 +195,13 @@ typedef struct{
 	//NR30
 	int sound_trigger; //booleen (on/off)
 	//NR31
-	BYTE sound_length;
+	uint8_t sound_length;
 	//NR32
-	BYTE output_level;
+	uint8_t output_level;
 	//NR33
-	BYTE freq_low;
+	uint8_t freq_low;
 	//NR34
-	BYTE freq_high;
+	uint8_t freq_high;
 	int initier; //booleen
 	int counter_consec; //booleen
 
@@ -229,14 +229,14 @@ typedef struct{
 
 
 	//NR41
-	BYTE sound_length;
+	uint8_t sound_length;
 	//NR42
-	BYTE initial_env_volume;
-	BYTE sweep_number;
+	uint8_t initial_env_volume;
+	uint8_t sweep_number;
 	int env_direction; //0 = down, 1 = up
 	//NR43
-	BYTE freq_shift;
-	BYTE freq_division_ratio;
+	uint8_t freq_shift;
+	uint8_t freq_division_ratio;
 	int step_counter; // 0 = 15b, 1 = 7b
 	//NR44
 	int initier; //booleen
@@ -252,8 +252,8 @@ typedef struct {
 	unsigned left_level;
 
 	//NR50
-	BYTE so2_output_level;
-	BYTE so1_output_level;
+	uint8_t so2_output_level;
+	uint8_t so1_output_level;
 	int output_to_so2; //booleen
 	int output_to_so1; //booleen
 	//NR51
@@ -285,8 +285,8 @@ void clear_apu();
 void stop_sound();
 void start_sound();
 void sound_reset();
-void write_sound(unsigned short addr, BYTE data);
-void write_wave(unsigned short addr, BYTE data);
+void write_sound(unsigned short addr, uint8_t data);
+void write_wave(unsigned short addr, uint8_t data);
 void update_sound();
 
 void sc1_freq();

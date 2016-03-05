@@ -20,18 +20,18 @@ enum{
 };
 
 struct tile_t{
-    BYTE px[16][8];
-    BYTE size;
-    BYTE x_flip;
-    BYTE y_flip;
-    BYTE palette;
+    uint8_t px[16][8];
+    uint8_t size;
+    uint8_t x_flip;
+    uint8_t y_flip;
+    uint8_t palette;
 };
 
 struct sprite_t{
-    BYTE x;
-    BYTE y;
-    BYTE pattern_nb;
-    BYTE attributes;
+    uint8_t x;
+    uint8_t y;
+    uint8_t pattern_nb;
+    uint8_t attributes;
 };
 
 class Gpu {
@@ -42,14 +42,14 @@ public:
 
     void update(int cycles);
     void reset();
-    BYTE *get_buffer();
+    uint8_t *get_buffer();
     void set_memory(Memory *memory);
     void set_ready_callback(std::tr1::function<void()> const &callback);
     void set_request_callback(std::tr1::function<void(int)> const &callback);
 private:
     void gpu_drawblackline();
     void gpu_drawline();
-    void get_tile(BYTE num, tile_t *tile, int type);
+    void get_tile(uint8_t num, tile_t *tile, int type);
     void tile_flip(tile_t *tile, int flipx_y, int size);
     void swap_sprites(sprite_t *spr1, sprite_t *spr2);
 
@@ -63,7 +63,7 @@ private:
     int cycle_length_;
 
     Memory *memory_;
-    BYTE buffer_[BUFFER_WIDTH * BUFFER_HEIGHT];
+    uint8_t buffer_[BUFFER_WIDTH * BUFFER_HEIGHT];
     std::tr1::function<void()> ready_callback_;
     std::tr1::function<void(int)> request_callback_;
 };
@@ -82,8 +82,8 @@ private:
 
 
 int screen_mode; //0 pour fenetré , 1 pour plein ecran
-BYTE current_line;
-BYTE gpu_screen[144][160];
+uint8_t current_line;
+uint8_t gpu_screen[144][160];
 SDL_Surface* sdl_matrix[144][160];
 SDL_Surface *sdl_screen;
 SDL_Surface *sdl_screenTemp;
@@ -92,8 +92,8 @@ int timer2;
 int cycle_length;
 unsigned int vblank_clock_counter_;
 unsigned int line_clock_counter_;
-BYTE frame_skip;
-BYTE frame_counter;
+uint8_t frame_skip;
+uint8_t frame_counter;
 
 //SDL_Rect **resolutions; //test pour savoir les resolutions possibles
 void gpu_init(SDL_Surface *sdl_scr);

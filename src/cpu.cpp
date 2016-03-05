@@ -1,5 +1,9 @@
 #include "cpu.h"
 #include <iostream>
+
+#include "def.h"
+#include "memory.h"
+
 #define V_BLANK 0
 #define LCD_STAT 1
 #define TIMER 2
@@ -12,38 +16,171 @@ extern const uint8_t z80_cycles[];
 extern const uint8_t z80_cb_cycles[];
 extern int sound_cycles;
 
-Cpu::Cpu() : memory_(0), ime_counter_(0), halted_(0), IME_(false){
+class Cpu::CpuPrivate {
+public:
+  CpuPrivate(){
     reset();
-}
+  }
 
-void Cpu::reset(){
-    z80_.PC = 0x0100;
-    z80_.SP = 0xFFFE;
-    z80_.A = 0x01;
-    z80_.F = 0xB0;
-    z80_.B = 0x00;
-    z80_.C = 0x13;
-    z80_.D = 0x00;
-    z80_.E = 0xD8;
-    z80_.H = 0x01;
-    z80_.L = 0x4D;
-    halted_ = 0;
-    ime_counter_ = 0;
-    IME_ = false;
-}
+  void reset(){
+      z80_.PC = 0x0100;
+      z80_.SP = 0xFFFE;
+      z80_.A = 0x01;
+      z80_.F = 0xB0;
+      z80_.B = 0x00;
+      z80_.C = 0x13;
+      z80_.D = 0x00;
+      z80_.E = 0xD8;
+      z80_.H = 0x01;
+      z80_.L = 0x4D;
+      halted_ = 0;
+      ime_counter_ = 0;
+      IME_ = false;
+  }
+  int run();
 
-Cpu::~Cpu(){}
+  struct z80 {
+      unsigned short PC;
+      unsigned short SP;
+      unsigned char A;
+      unsigned char F;
+      unsigned char B;
+      unsigned char C;
+      unsigned char D;
+      unsigned char E;
+      unsigned char H;
+      unsigned char L;
+  };
+  z80 z80_;
+  Memory *memory_{};
+  int cycles_{};
+  int ime_counter_{};
+  uint8_t halted_{};
+  uint8_t skip_{};
+  bool IME_{};
+  std::tr1::function<void(int)> update_callback_{};
+  int post_cycles_{};
+
+  //Interrupt handling
+  void interrupts_init();
+  void set_IME(bool);
+  void handle_interrupts(z80 *z80);
+  void execute_interrupt(uint8_t type, z80 *z80);
+
+  void reset_halt();
+
+
+  //Misc/control instructions
+  void di();
+  void ei();
+  void halt();
+  void stop();
+  //Jumps/calls
+  void call_n_cond(uint8_t cond);
+  void call_cond(uint8_t cond);
+  void call();
+  void jp_n_cond(uint8_t cond);
+  void jp(unsigned short addr);
+  void jp_cond(uint8_t cond);
+  void jr(int8_t d);
+  void jr_cond(uint8_t cond, int8_t d);
+  void jr_n_cond(uint8_t cond, int8_t d);
+  void ret();
+  void ret_cond(uint8_t cond);
+  void ret_n_cond(uint8_t cond);
+  void reti();
+  void rst(uint8_t addr);
+  //8bit load/store/move instructions
+  void ld_reg(uint8_t *reg, uint8_t data);
+  void ld_mem(unsigned short addr, uint8_t data);
+  //16bit load/store/move instructions
+  void ld_a16_sp();
+  void ld_at(unsigned short addr);
+  void ld_from_a8(unsigned short addr);
+  void ld_hl_sp_p_r8();
+  void ld_sp(unsigned short data);
+  void pop(uint8_t *reg1, uint8_t *reg2);
+  void push(uint8_t reg1, uint8_t reg2);
+
+  //8bit arithmetic/logical instructions
+  void adc(uint8_t data);
+  void add(uint8_t data);
+  void and_(uint8_t data);
+  void ccf();
+  void cp(uint8_t data);
+  void cpl();
+  void daa();
+  void dec_at(unsigned short addr);
+  void dec_smpl(uint8_t *reg1);
+  void dec_sp();
+  void inc_at(unsigned short addr);
+  void inc_smpl(uint8_t *reg1);
+  void inc_sp();
+  void sbc(uint8_t data);
+  void scf();
+  void sub(uint8_t data);
+  void or_(uint8_t data);
+  void xor_(uint8_t data);
+
+  //16 bit arithmetic/logical instructions
+  void add_dbl(uint8_t *reg1, uint8_t *reg2, unsigned short data);
+  void add_sp_r8(int8_t data);
+  void dec_dbl(uint8_t *reg1, uint8_t *reg2);
+  void inc_dbl(uint8_t *reg1, uint8_t *reg2);
+
+  //8bit rotations/shifts and bit instructions
+  void bit(uint8_t bit, uint8_t data);
+  void res(uint8_t b, uint8_t *a);
+  void res_hl(uint8_t b);
+  void rl(uint8_t *data);
+  void rl_hl();
+  void rla();
+  void rlc(uint8_t *data);
+  void rlc_hl();
+  void rlca();
+  void rr(uint8_t *data);
+  void rr_hl();
+  void rra();
+  void rrc(uint8_t *data);
+  void rrc_hl();
+  void rrca();
+  void set(uint8_t b, uint8_t *a);
+  void set_hl(uint8_t b);
+  void srl(uint8_t *data);
+  void srl_hl();
+  void sla(uint8_t *data);
+  void sla_hl();
+  void sra(uint8_t *data);
+  void sra_hl();
+  void swap(uint8_t *data);
+  void swap_hl();
+};
+
+Cpu::Cpu() : d_(new Cpu::CpuPrivate()){}
+
+Cpu::~Cpu() = default;
 
 void Cpu::set_update_callback(const std::tr1::function<void (int)> &callback){
-    update_callback_ = callback;
+    d_->update_callback_ = callback;
 }
 
 void Cpu::set_memory(Memory *memory){
-    memory_ = memory;
+    d_->memory_ = memory;
 }
 
 int Cpu::run(){
-    BYTE op_code;
+  return d_->run();
+}
+
+void Cpu::reset(){
+  return d_->reset();
+}
+
+int Cpu::CpuPrivate::run(){
+    //int interrupt_period;
+    //int counter;
+    //counter=interrupt_period;
+    uint8_t op_code;
 
     op_code = memory_->read(z80_.PC);
     post_cycles_ = z80_cycles[op_code];
@@ -1833,13 +1970,13 @@ int Cpu::run(){
 
 //Interrupt handling
 
-void Cpu::set_IME(bool value){
+void Cpu::CpuPrivate::set_IME(bool value){
     IME_ = value;
 }
 
-void Cpu::handle_interrupts(Cpu::z80_t *z80){
-    BYTE IE;
-    BYTE IF;
+void Cpu::CpuPrivate::handle_interrupts(Cpu::CpuPrivate::z80 *z80){
+    uint8_t IE;
+    uint8_t IF;
 
     if(IME_){
         IE = memory_->read(0xFFFF);
@@ -1874,7 +2011,7 @@ void Cpu::handle_interrupts(Cpu::z80_t *z80){
     }
 }
 
-void Cpu::execute_interrupt(BYTE type, Cpu::z80_t *z80){
+void Cpu::CpuPrivate::execute_interrupt(uint8_t type, Cpu::CpuPrivate::z80 *z80){
     set_IME(false);
     reset_halt();
     memory_->write(z80->SP - 1, (z80->PC & 0xFF00) >> 8);
@@ -1903,38 +2040,38 @@ void Cpu::execute_interrupt(BYTE type, Cpu::z80_t *z80){
 void Cpu::make_request(int type){
     switch(type){
         case V_BLANK:
-            memory_->write(0xFF0F, memory_->read(0xFF0F) | 0x01);
+            d_->memory_->write(0xFF0F, d_->memory_->read(0xFF0F) | 0x01);
             break;
         case LCD_STAT:
-            memory_->write(0xFF0F, memory_->read(0xFF0F) | 0x02);
+            d_->memory_->write(0xFF0F, d_->memory_->read(0xFF0F) | 0x02);
             break;
         case TIMER:
-            memory_->write(0xFF0F, memory_->read(0xFF0F) | 0x04);
+            d_->memory_->write(0xFF0F, d_->memory_->read(0xFF0F) | 0x04);
             break;
         case SERIAL:
-            memory_->write(0xFF0F, memory_->read(0xFF0F) | 0x08);
+            d_->memory_->write(0xFF0F, d_->memory_->read(0xFF0F) | 0x08);
             break;
         case JOYPAD:
-            memory_->write(0xFF0F, memory_->read(0xFF0F) | 0x10);
+            d_->memory_->write(0xFF0F, d_->memory_->read(0xFF0F) | 0x10);
             break;
     }
 }
 
-void Cpu::reset_halt(){
+void Cpu::CpuPrivate::reset_halt(){
     halted_ = 0;
 }
 
 //-----------Misc/control instructions------------------
 
- void Cpu::di(){
+ void Cpu::CpuPrivate::di(){
     set_IME(false);
     ime_counter_ = 0;
 }
- void Cpu::ei(){
+ void Cpu::CpuPrivate::ei(){
     set_IME(true);
     ime_counter_ = z80_cycles[0xFB] * 4;
 }
- void Cpu::halt(){
+ void Cpu::CpuPrivate::halt(){
     if( ime_counter_ > 0){
         set_IME(true);
         ime_counter_ = 0;
@@ -1945,19 +2082,19 @@ void Cpu::reset_halt(){
     }
 
 }
- void Cpu::stop(){
+ void Cpu::CpuPrivate::stop(){
     printf("appel de stop\n");
 }
 //----------Jumps/calls--------------------------------
 
- void Cpu::call(){
+ void Cpu::CpuPrivate::call(){
     memory_->write(z80_.SP - 1, ((z80_.PC + 2) & 0xFF00) >> 8);
     memory_->write(z80_.SP - 2, (z80_.PC + 2) & 0x00FF);
     z80_.SP -= 2;
     z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
 }
 
- void Cpu::call_cond(BYTE cond){
+ void Cpu::CpuPrivate::call_cond(uint8_t cond){
     if(z80_.F & cond){
         memory_->write(z80_.SP - 1, ((z80_.PC + 2) & 0xFF00) >> 8);
         memory_->write(z80_.SP - 2, (z80_.PC + 2) & 0x00FF);
@@ -1968,7 +2105,7 @@ void Cpu::reset_halt(){
     else z80_.PC += 2;
 }
 
- void Cpu::call_n_cond(BYTE cond){
+ void Cpu::CpuPrivate::call_n_cond(uint8_t cond){
     if(!(z80_.F & cond)){
         memory_->write(z80_.SP - 1, ((z80_.PC + 2) & 0xFF00) >> 8);
         memory_->write(z80_.SP - 2, (z80_.PC + 2) & 0xFF);
@@ -1979,11 +2116,11 @@ void Cpu::reset_halt(){
     else z80_.PC += 2;
 }
 
- void Cpu::jp(unsigned short addr){
+ void Cpu::CpuPrivate::jp(unsigned short addr){
     z80_.PC = addr;
 }
 
- void Cpu::jp_cond(BYTE cond){
+ void Cpu::CpuPrivate::jp_cond(uint8_t cond){
     if(z80_.F & cond){
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
         post_cycles_ += 4;
@@ -1991,7 +2128,7 @@ void Cpu::reset_halt(){
     else z80_.PC += 2;
 }
 
- void Cpu::jp_n_cond(BYTE cond){
+ void Cpu::CpuPrivate::jp_n_cond(uint8_t cond){
     if((z80_.F & cond) == 0){
         z80_.PC = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
         post_cycles_ += 4;
@@ -1999,13 +2136,13 @@ void Cpu::reset_halt(){
     else z80_.PC += 2;
 }
 
- void Cpu::jr(BYTE_S d){
+ void Cpu::CpuPrivate::jr(int8_t d){
     // - - - -
     //Jump Relatif
     z80_.PC += d;
 }
 
- void Cpu::jr_cond(BYTE cond, BYTE_S d){
+ void Cpu::CpuPrivate::jr_cond(uint8_t cond, int8_t d){
     // - - - -
     if(z80_.F & cond){
         z80_.PC += d;
@@ -2013,7 +2150,7 @@ void Cpu::reset_halt(){
     }
 }
 
- void Cpu::jr_n_cond(BYTE cond, BYTE_S d){
+ void Cpu::CpuPrivate::jr_n_cond(uint8_t cond, int8_t d){
     // - - - -
     if(!(z80_.F & cond)){
         z80_.PC += d;
@@ -2021,12 +2158,12 @@ void Cpu::reset_halt(){
     }
 }
 
- void Cpu::ret(){
+ void Cpu::CpuPrivate::ret(){
     z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);
     z80_.SP += 2;
 }
 
- void Cpu::ret_cond(BYTE cond){
+ void Cpu::CpuPrivate::ret_cond(uint8_t cond){
     if(z80_.F & cond){
         z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);
         z80_.SP += 2;
@@ -2034,7 +2171,7 @@ void Cpu::reset_halt(){
     }
 }
 
- void Cpu::ret_n_cond(BYTE cond){
+ void Cpu::CpuPrivate::ret_n_cond(uint8_t cond){
     if(!(z80_.F & cond)){
         z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);;
         z80_.SP += 2;
@@ -2042,14 +2179,14 @@ void Cpu::reset_halt(){
     }
 }
 
- void Cpu::reti(){
+ void Cpu::CpuPrivate::reti(){
     //PLUS FLAG IF
     z80_.PC = (memory_->read(z80_.SP + 1) << 8) + memory_->read(z80_.SP);
     z80_.SP += 2;
     set_IME(true);
 }
 
- void Cpu::rst(BYTE addr){
+ void Cpu::CpuPrivate::rst(uint8_t addr){
     memory_->write(z80_.SP - 1, (z80_.PC & 0xFF00) >> 8);
     memory_->write(z80_.SP - 2, z80_.PC & 0xFF);
     z80_.PC = addr;
@@ -2058,32 +2195,32 @@ void Cpu::reset_halt(){
 
 //--------8bit load/store/move instructions
 
- void Cpu::ld_reg(BYTE *reg, BYTE data){
+ void Cpu::CpuPrivate::ld_reg(uint8_t *reg, uint8_t data){
     *reg = data;
 }
- void Cpu::ld_mem(unsigned short addr, BYTE data){
+ void Cpu::CpuPrivate::ld_mem(unsigned short addr, uint8_t data){
     memory_->write(addr, data);
 
 }
 //--------16bit load/store/move instructions
 
- void Cpu::ld_a16_sp(){
+ void Cpu::CpuPrivate::ld_a16_sp(){
     unsigned short addr = (memory_->read(z80_.PC + 1) << 8) + memory_->read(z80_.PC);
     memory_->write(addr, (z80_.SP & 0x00FF));
     memory_->write(addr + 1, (z80_.SP & 0xFF00) >> 8);
     z80_.PC += 2;
 }
 
- void Cpu::ld_at(unsigned short addr){
+ void Cpu::CpuPrivate::ld_at(unsigned short addr){
     memory_->write(addr, z80_.A);
 }
 
- void Cpu::ld_from_a8(unsigned short addr){
+ void Cpu::CpuPrivate::ld_from_a8(unsigned short addr){
     z80_.A = memory_->read(addr);
 }
 
- void Cpu::ld_hl_sp_p_r8(){
-    BYTE_S r8 = memory_->read(z80_.PC);
+ void Cpu::CpuPrivate::ld_hl_sp_p_r8(){
+    int8_t r8 = memory_->read(z80_.PC);
     unsigned short op = z80_.SP + r8;
     z80_.F = ((((z80_.SP^r8^op) & 0x100) == 0x100) ? FLAG_C:0) | ((((z80_.SP^r8^op) & 0x10) == 0x10) ? FLAG_H:0);
     z80_.H = (op & 0xFF00) >> 8 ;
@@ -2091,17 +2228,17 @@ void Cpu::reset_halt(){
     z80_.PC++;
 }
 
- void Cpu::ld_sp(unsigned short data){
+ void Cpu::CpuPrivate::ld_sp(unsigned short data){
     z80_.SP = data;
 }
 
- void Cpu::pop(BYTE *reg1, BYTE *reg2){
+ void Cpu::CpuPrivate::pop(uint8_t *reg1, uint8_t *reg2){
     *reg1 = memory_->read(z80_.SP + 1);
     *reg2 = memory_->read(z80_.SP);
     z80_.SP += 2;
 }
 
- void Cpu::push(BYTE reg1, BYTE reg2){
+ void Cpu::CpuPrivate::push(uint8_t reg1, uint8_t reg2){
     memory_->write(z80_.SP - 1, reg1);
     memory_->write(z80_.SP - 2, reg2);
     z80_.SP -= 2;
@@ -2110,38 +2247,38 @@ void Cpu::reset_halt(){
 //--------8bit arithmetic/logical instructions
 
 
- void Cpu::adc(BYTE data){
+ void Cpu::CpuPrivate::adc(uint8_t data){
     //Z 0 H C
-    BYTE op = z80_.A + data + ((z80_.F & FLAG_C)? 1:0);
+    uint8_t op = z80_.A + data + ((z80_.F & FLAG_C)? 1:0);
     z80_.F = ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A + data + ((z80_.F & FLAG_C)? 1:0) > 0xFF) ? FLAG_C:0);
     z80_.A = op;
 }
 
- void Cpu::add(BYTE data){
+ void Cpu::CpuPrivate::add(uint8_t data){
     //Z 0 H C
-    BYTE op = z80_.A + data;
+    uint8_t op = z80_.A + data;
     z80_.F = ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A + data > 0xFF) ? FLAG_C:0);
     z80_.A = op;
 }
 
- void Cpu::and_(BYTE data){
+ void Cpu::CpuPrivate::and_(uint8_t data){
     z80_.A &= data;
     z80_.F = FLAG_H | ((z80_.A == 0) ? FLAG_Z:0);
 }
 
- void Cpu::ccf(){
+ void Cpu::CpuPrivate::ccf(){
     // - 0 0 C
     //Inverse le Carry Flag
     //Clear le N flag et le H flag
     z80_.F = (z80_.F & FLAG_Z) | ((z80_.F & FLAG_C) ? 0:FLAG_C);
 }
 
- void Cpu::cp(BYTE data){
-    BYTE op = z80_.A - data;
+ void Cpu::CpuPrivate::cp(uint8_t data){
+    uint8_t op = z80_.A - data;
     z80_.F = FLAG_N | ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A - data < 0) ? FLAG_C : 0);
 }
 
- void Cpu::cpl(){
+ void Cpu::CpuPrivate::cpl(){
     // - 1 1 -
     //Inverse tous les bits de A
     //( == A XOR 0xFF)
@@ -2149,7 +2286,7 @@ void Cpu::reset_halt(){
     z80_.F |= 0x60; // H + N
 }
 
- void Cpu::daa(){
+ void Cpu::CpuPrivate::daa(){
     unsigned short temp = z80_.A;
     if(z80_.F & FLAG_C) {temp |= 256;}
     if(z80_.F & FLAG_H) {temp |= 512;}
@@ -2160,76 +2297,76 @@ void Cpu::reset_halt(){
     z80_.F = temp;
 }
 
- void Cpu::dec_at(unsigned short addr){
+ void Cpu::CpuPrivate::dec_at(unsigned short addr){
     // Z 1 H -
-    BYTE d8 = memory_->read(addr) - 1;
+    uint8_t d8 = memory_->read(addr) - 1;
     z80_.F = FLAG_N | (z80_.F & FLAG_C) | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
     update_callback_(4);
     memory_->write(addr, d8);
 }
 
- void Cpu::dec_sp(){
+ void Cpu::CpuPrivate::dec_sp(){
     // - - - -
     z80_.SP -= 1;
 }
 
- void Cpu::dec_smpl(BYTE *reg1){
+ void Cpu::CpuPrivate::dec_smpl(uint8_t *reg1){
     // Z 1 H -
-    BYTE d8 = *reg1 - 1;
+    uint8_t d8 = *reg1 - 1;
     z80_.F = FLAG_N | (z80_.F & FLAG_C) | (((d8 & 0x0F) == 0x0F) ? FLAG_H:0) | ((d8 == 0) ? FLAG_Z:0);
     *reg1 = d8;
 }
 
- void Cpu::inc_at(unsigned short addr){
+ void Cpu::CpuPrivate::inc_at(unsigned short addr){
     // Z 0 H -
-    BYTE d8 = memory_->read(addr) + 1;
+    uint8_t d8 = memory_->read(addr) + 1;
     z80_.F = (z80_.F & FLAG_C) | ((d8 & 0x0F) ? 0:FLAG_H) | ((d8 == 0) ? FLAG_Z:0);
     update_callback_(4);
     memory_->write(addr, d8);
 }
 
- void Cpu::inc_smpl(BYTE *reg1){
+ void Cpu::CpuPrivate::inc_smpl(uint8_t *reg1){
     // Z 0 H -
-    BYTE d8 = *reg1 + 1;
+    uint8_t d8 = *reg1 + 1;
     z80_.F = (z80_.F & FLAG_C) | ((d8 & 0x0F) ? 0:FLAG_H) | ((d8 == 0) ? FLAG_Z:0);
     *reg1 = d8;
 }
 
- void Cpu::inc_sp(){
+ void Cpu::CpuPrivate::inc_sp(){
     // - - - -
     z80_.SP += 1;
 }
- void Cpu::sbc(BYTE data){
-    BYTE op = z80_.A - data - ((z80_.F & FLAG_C)? 1:0);
+ void Cpu::CpuPrivate::sbc(uint8_t data){
+    uint8_t op = z80_.A - data - ((z80_.F & FLAG_C)? 1:0);
     z80_.F = FLAG_N | ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A - data - ((z80_.F & FLAG_C) ? 1:0) < 0) ? FLAG_C : 0);
     z80_.A = op;
 }
 
- void Cpu::scf(){
+ void Cpu::CpuPrivate::scf(){
     // - 0 0 1
     z80_.F = (z80_.F & FLAG_Z) | FLAG_C;
 }
 
- void Cpu::sub(BYTE data){
+ void Cpu::CpuPrivate::sub(uint8_t data){
     //Z 1 H C
-    BYTE op = z80_.A - data;
+    uint8_t op = z80_.A - data;
     z80_.F = FLAG_N | ((op == 0) ? FLAG_Z:0) | (((z80_.A^data^op) & 0x10) ? FLAG_H:0) | ((z80_.A - data < 0) ? FLAG_C : 0);
     z80_.A = op;
 }
 
- void Cpu::or_(BYTE data){
+ void Cpu::CpuPrivate::or_(uint8_t data){
     z80_.A |= data;
     z80_.F = (z80_.A == 0) ? FLAG_Z:0;
 }
 
- void Cpu::xor_(BYTE data){
+ void Cpu::CpuPrivate::xor_(uint8_t data){
     z80_.A ^= (data);
     z80_.F = (z80_.A == 0) ? FLAG_Z:0;
 }
 
 //--------16bit arithmetic/logical instructions
 
- void Cpu::add_dbl(BYTE *reg1, BYTE *reg2, unsigned short data){
+ void Cpu::CpuPrivate::add_dbl(uint8_t *reg1, uint8_t *reg2, unsigned short data){
     // - 0 H C
     unsigned short r1r2 = (*reg1 << 8) + *reg2;
     unsigned short op = r1r2 + data;
@@ -2238,20 +2375,20 @@ void Cpu::reset_halt(){
     *reg2 =( 0x00FF & op);
 }
 
- void Cpu::add_sp_r8(BYTE_S data){
+ void Cpu::CpuPrivate::add_sp_r8(int8_t data){
     unsigned short op = z80_.SP + data;
     z80_.F = ((((z80_.SP^data^op) & 0x100) == 0x100) ? FLAG_C:0) | ((((z80_.SP^data^op) & 0x10) == 0x10) ? FLAG_H:0);
     z80_.SP = op;
 }
 
- void Cpu::dec_dbl(BYTE *reg1, BYTE *reg2){
+ void Cpu::CpuPrivate::dec_dbl(uint8_t *reg1, uint8_t *reg2){
     // - - - -
     unsigned short temp;
     temp = (*reg1 << 8) + *reg2 - 0x01;
     *reg1 =( 0xFF00 & temp) >> 8;
     *reg2 =( 0x00FF & temp);
 }
- void Cpu::inc_dbl(BYTE *reg1, BYTE *reg2){
+ void Cpu::CpuPrivate::inc_dbl(uint8_t *reg1, uint8_t *reg2){
     // - - - -
     unsigned short temp;
     temp = (*reg1 << 8) + *reg2 + 0x01;
@@ -2262,25 +2399,25 @@ void Cpu::reset_halt(){
 
 //-----------8bit rotations/shifts and_ bit instructions
 
- void Cpu::bit(BYTE bit, BYTE data){
+ void Cpu::CpuPrivate::bit(uint8_t bit, uint8_t data){
     z80_.F = (z80_.F&FLAG_C) | FLAG_H | ((data&bit) ? 0:FLAG_Z);
 }
 
- void Cpu::res(BYTE b, BYTE *a)
+ void Cpu::CpuPrivate::res(uint8_t b, uint8_t *a)
 {
     *a &= ~(1 << b);
 }
 
- void Cpu::res_hl(BYTE b)
+ void Cpu::CpuPrivate::res_hl(uint8_t b)
 {
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
     update_callback_(4);
     hl &= ~(1 << b);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
- void Cpu::rl(BYTE *data){
+ void Cpu::CpuPrivate::rl(uint8_t *data){
     if(*data & 0x80){
         *data = (*data << 1) | (((z80_.F & FLAG_C) ? 1:0));
         z80_.F = (((*data == 0) ? FLAG_Z:0)) | FLAG_C;
@@ -2291,9 +2428,9 @@ void Cpu::reset_halt(){
     }
 }
 
- void Cpu::rl_hl(){
+ void Cpu::CpuPrivate::rl_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
     if(hl & 0x80){
         hl = (hl << 1) | (((z80_.F & FLAG_C) ? 1:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0)) | FLAG_C;
@@ -2306,21 +2443,21 @@ void Cpu::reset_halt(){
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
- void Cpu::rla(){
-    BYTE F = z80_.F;
+ void Cpu::CpuPrivate::rla(){
+    uint8_t F = z80_.F;
     z80_.F = ((z80_.A & 0x80) ? FLAG_C:0);
     z80_.A = (z80_.A << 1) | ((F & FLAG_C)? 1:0);
 }
 
- void Cpu::rlc(BYTE *data){
+ void Cpu::CpuPrivate::rlc(uint8_t *data){
     z80_.F = ((*data & 0x80) ? FLAG_C:0);
     *data = (*data << 1) | ((z80_.F) ? 1:0);
     z80_.F |= ((*data == 0)? FLAG_Z:0);
 }
 
- void Cpu::rlc_hl(){
+ void Cpu::CpuPrivate::rlc_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
 
     z80_.F = ((hl & 0x80) ? FLAG_C:0);
     hl = (hl << 1) | ((z80_.F) ? 1:0);
@@ -2328,11 +2465,11 @@ void Cpu::reset_halt(){
     update_callback_(4);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
- void Cpu::rlca(){
+ void Cpu::CpuPrivate::rlca(){
     z80_.F = ((z80_.A & 0x80) ? FLAG_C:0);
     z80_.A = (z80_.A << 1) | ((z80_.F)? 1 : 0);
 }
- void Cpu::rr(BYTE *data){
+ void Cpu::CpuPrivate::rr(uint8_t *data){
     if(*data & 0x01){
         *data = (*data >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
         z80_.F = (((*data == 0) ? FLAG_Z:0)) | FLAG_C;
@@ -2343,9 +2480,9 @@ void Cpu::reset_halt(){
     }
 }
 
- void Cpu::rr_hl(){
+ void Cpu::CpuPrivate::rr_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
     if(hl & 0x01){
         hl = (hl >> 1) | (((z80_.F & FLAG_C) ? 0x80:0));
         z80_.F = (((hl == 0) ? FLAG_Z:0)) | FLAG_C;
@@ -2358,21 +2495,21 @@ void Cpu::reset_halt(){
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
- void Cpu::rra(){
-    BYTE F = z80_.F;
+ void Cpu::CpuPrivate::rra(){
+    uint8_t F = z80_.F;
     z80_.F = ((z80_.A & 0x01) ? FLAG_C:0);
     z80_.A = (z80_.A >> 1) | ((F & FLAG_C) ? 0x80:0);
 }
 
- void Cpu::rrc(BYTE *data){
+ void Cpu::CpuPrivate::rrc(uint8_t *data){
     z80_.F = ((*data & 0x01) ? FLAG_C:0);
     *data = (*data >> 1) | ((z80_.F) ? 0x80:0);
     z80_.F |= ((*data == 0)? FLAG_Z:0);
 }
 
- void Cpu::rrc_hl(){
+ void Cpu::CpuPrivate::rrc_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
 
     z80_.F = ((hl & 0x01) ? FLAG_C:0);
     hl = (hl >> 1) | ((z80_.F) ? 0x80:0);
@@ -2383,34 +2520,34 @@ void Cpu::reset_halt(){
 }
 
 
- void Cpu::rrca(){
+ void Cpu::CpuPrivate::rrca(){
     z80_.F = ((z80_.A & 0x01) ? FLAG_C: 0);
     z80_.A = (z80_.A >> 1) | (z80_.F ? 0x80:0);
 }
 
- void Cpu::set(BYTE b, BYTE *a)
+ void Cpu::CpuPrivate::set(uint8_t b, uint8_t *a)
 {
     *a |= (1 << b);
 }
 
- void Cpu::set_hl(BYTE b)
+ void Cpu::CpuPrivate::set_hl(uint8_t b)
 {
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
     update_callback_(4);
     hl |= (1 << b);
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
- void Cpu::srl(BYTE *data){
+ void Cpu::CpuPrivate::srl(uint8_t *data){
     z80_.F = (((*data & 0x01) ? FLAG_C:0));
     *data >>= 1;
     z80_.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
- void Cpu::srl_hl(){
+ void Cpu::CpuPrivate::srl_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
     z80_.F = (((hl & 0x01) ? FLAG_C:0));
     hl >>= 1;
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
@@ -2418,15 +2555,15 @@ void Cpu::reset_halt(){
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
- void Cpu::sla(BYTE *data){
+ void Cpu::CpuPrivate::sla(uint8_t *data){
     z80_.F = ((*data & 0x80) ? FLAG_C:0);
     *data <<= 1;
     z80_.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
- void Cpu::sla_hl(){
+ void Cpu::CpuPrivate::sla_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
     z80_.F = ((hl & 0x80) ? FLAG_C:0);
     hl <<= 1;
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
@@ -2434,15 +2571,15 @@ void Cpu::reset_halt(){
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
- void Cpu::sra(BYTE *data){
+ void Cpu::CpuPrivate::sra(uint8_t *data){
     z80_.F = ((*data & 0x01) ? FLAG_C:0);
     *data = (*data >> 1) | ((*data & 0x80) ? 0x80:0);
     z80_.F |= ((*data == 0) ? FLAG_Z:0);
 }
 
- void Cpu::sra_hl(){
+ void Cpu::CpuPrivate::sra_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) +z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) +z80_.L);
     z80_.F = ((hl & 0x01) ? FLAG_C:0);
     hl = (hl >> 1) | ((hl & 0x80) ? 0x80:0);
     z80_.F |= ((hl == 0) ? FLAG_Z:0);
@@ -2450,19 +2587,19 @@ void Cpu::reset_halt(){
     memory_->write((z80_.H << 8) + z80_.L, hl);
 }
 
- void Cpu::swap(BYTE *data){
-    BYTE low_nibble = (*data & 0xF0) >> 4;
-    BYTE high_nibble = (*data & 0x0F) << 4;
+ void Cpu::CpuPrivate::swap(uint8_t *data){
+    uint8_t low_nibble = (*data & 0xF0) >> 4;
+    uint8_t high_nibble = (*data & 0x0F) << 4;
     *data = high_nibble + low_nibble;
     z80_.F = ((*data == 0) ? FLAG_Z:0);
 }
 
- void Cpu::swap_hl(){
+ void Cpu::CpuPrivate::swap_hl(){
     update_callback_(4);
-    BYTE hl = memory_->read((z80_.H << 8) + z80_.L);
+    uint8_t hl = memory_->read((z80_.H << 8) + z80_.L);
 
-    BYTE low_nibble = (hl & 0xF0) >> 4;
-    BYTE high_nibble = (hl & 0x0F) << 4;
+    uint8_t low_nibble = (hl & 0xF0) >> 4;
+    uint8_t high_nibble = (hl & 0x0F) << 4;
     hl = high_nibble + low_nibble;
     z80_.F = ((hl == 0) ? FLAG_Z:0);
 
@@ -2471,7 +2608,7 @@ void Cpu::reset_halt(){
 }
 
 
-/*int save_cpu(FILE* file)
+/*int save_Cpu::CpuPrivate(FILE* file)
 {
     int nb = 0;
     int nb_elements =14;

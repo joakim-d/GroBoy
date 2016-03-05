@@ -31,9 +31,9 @@ void Gpu::set_request_callback(const std::tr1::function<void (int)> &callback){
 }
 
 void Gpu::update(int cycles){
-    BYTE lcdc;		//FF40 lcdcontrol
-    BYTE lcdstat;		//FF41 lcdstat
-    BYTE lyc;		//FF45 ly compare
+    uint8_t lcdc;		//FF40 lcdcontrol
+    uint8_t lcdstat;		//FF41 lcdstat
+    uint8_t lyc;		//FF45 ly compare
 
     vblank_clock_counter_ += cycles;
     if(vblank_clock_counter_ >= 70224){//si on dépasse la période de vblank
@@ -114,14 +114,14 @@ void Gpu::update(int cycles){
     }
 }
 
-BYTE *Gpu::get_buffer(){
+uint8_t *Gpu::get_buffer(){
     return buffer_;
 }
 
 /*static inline void swap_sprites(sprite_t *spr1, sprite_t *spr2);
 static inline void gpu_drawblackline();
 static inline void gpu_drawline();
-static inline void get_tile(BYTE num, tile_t *tile, int type);
+static inline void get_tile(uint8_t num, tile_t *tile, int type);
 static inline void tile_flip(tile_t *tile, int flipx_y, int size);
 static inline void draw_screen();
 static inline void ChangeMode();
@@ -175,15 +175,15 @@ void Gpu::gpu_drawline(){
     int bg_y, bg_x;
 	int window_y, window_x;
 	int i,j;
-	BYTE lcd_cont;
-	BYTE current_pixel = 0; 		//compteur allant de 0 à 160 pour savoir lorsque l'on finit la ligne
-	BYTE cur_tile_px_x; 			//compteur pour savoir quel pixel récupérer sur la tuile et pour passer à la suivante lorsque > 7
-	BYTE cur_tile_px_y; 			//Permet de savoir quelle ligne du pixel choisir
-	static BYTE ordered_sprites_num[40];
-	BYTE displyd_sprites_nb;
-	BYTE sprite_size;
-	BYTE scy;
-	BYTE scx;
+    uint8_t lcd_cont;
+    uint8_t current_pixel = 0; 		//compteur allant de 0 à 160 pour savoir lorsque l'on finit la ligne
+    uint8_t cur_tile_px_x; 			//compteur pour savoir quel pixel récupérer sur la tuile et pour passer à la suivante lorsque > 7
+    uint8_t cur_tile_px_y; 			//Permet de savoir quelle ligne du pixel choisir
+    static uint8_t ordered_sprites_num[40];
+    uint8_t displyd_sprites_nb;
+    uint8_t sprite_size;
+    uint8_t scy;
+    uint8_t scx;
 	static tile_t tile; 				//tuile courante
 	static sprite_t sprites[40];
 
@@ -307,12 +307,12 @@ void Gpu::gpu_drawline(){
 //type 2 -> background
 //type 3 -> window
 
-void Gpu::get_tile(BYTE num, tile_t *tile, int type){
+void Gpu::get_tile(uint8_t num, tile_t *tile, int type){
 	int size;// 8x8 ou 8x16
 	int lig;
 	int i;
-	BYTE byte1,byte2; 
-	BYTE lcd_cont;
+    uint8_t byte1,byte2;
+    uint8_t lcd_cont;
 	int pt;
 	unsigned short pos;
     lcd_cont = memory_->read(0xFF40);
@@ -335,7 +335,7 @@ void Gpu::get_tile(BYTE num, tile_t *tile, int type){
 		size = 8;
 		if(lcd_cont & 0x10) pos = 0x8000 + (num * 16);
 		else {
-			BYTE_S num_s = (BYTE_S) num;
+            int8_t num_s = static_cast<int8_t>(num);
 			pos = 0x8800 + (num_s + 128) * 16;
 		}
 	}
@@ -375,7 +375,7 @@ void Gpu::get_tile(BYTE num, tile_t *tile, int type){
 
 void Gpu::tile_flip(tile_t *tile, int flipx_y, int size)
 {
-	BYTE tempflip[16][8];
+    uint8_t tempflip[16][8];
 	int cpt;
 
 	if(flipx_y == 0)
@@ -528,14 +528,14 @@ int save_gpu(FILE* file)
     nb += fwrite(&line_clock_counter_,sizeof(int),1,file);
         nb += fwrite(&vblank_clock_counter_,sizeof(int),1,file);
         nb += fwrite(&screen_mode,sizeof(int),1,file);
-        nb += fwrite(&current_line_,sizeof(BYTE),1,file);
+        nb += fwrite(&current_line_,sizeof(uint8_t),1,file);
         nb += fwrite(&timer1,sizeof(int),1,file);
         nb += fwrite(&timer2,sizeof(int),1,file);
         nb += fwrite(&cycle_length,sizeof(int),1,file);
     nb += fwrite(&vblank_clock_counter_, sizeof(int), 1, file);
     nb += fwrite(&line_clock_counter_, sizeof(int), 1, file);
-	nb += fwrite(&frame_counter, sizeof(BYTE), 1, file);
-	nb += fwrite(&frame_skip, sizeof(BYTE), 1, file);
+    nb += fwrite(&frame_counter, sizeof(uint8_t), 1, file);
+    nb += fwrite(&frame_skip, sizeof(uint8_t), 1, file);
 	if(nb!=nb_elements) printf("Error when writing gpu variables\n");
 	return nb;
 }
@@ -547,14 +547,14 @@ void restore_gpu(FILE * file)
     nb+=fread(&line_clock_counter_,sizeof(int),1,file);
     nb+=fread(&vblank_clock_counter_,sizeof(int),1,file);
 	nb+=fread(&screen_mode,sizeof(int),1,file);
-    nb+=fread(&current_line_,sizeof(BYTE),1,file);
+    nb+=fread(&current_line_,sizeof(uint8_t),1,file);
 	nb+=fread(&timer1,sizeof(int),1,file);
 	nb+=fread(&timer2,sizeof(int),1,file);
 	nb+=fread(&cycle_length,sizeof(int),1,file);
     nb += fread(&vblank_clock_counter_, sizeof(unsigned int), 1, file);
     nb += fread(&line_clock_counter_, sizeof(unsigned int), 1, file);
-	nb += fread(&frame_counter, sizeof(BYTE), 1, file);
-	nb += fread(&frame_skip, sizeof(BYTE), 1, file);
+    nb += fread(&frame_counter, sizeof(uint8_t), 1, file);
+    nb += fread(&frame_skip, sizeof(uint8_t), 1, file);
 	if(nb!=nb_elements) printf("Error when reading gpu variables\n");
 }
 

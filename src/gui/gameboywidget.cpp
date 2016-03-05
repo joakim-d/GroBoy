@@ -12,7 +12,7 @@ GameboyWidget::GameboyWidget(QWidget *parent) : QWidget(parent){
 GameboyWidget::~GameboyWidget(){}
 
 void GameboyWidget::updateImage(const QImage &image){
-    current_image_ = image.scaled(this->width(), this->height());
+    current_image_ = image;
     update();
 }
 
@@ -21,11 +21,7 @@ void GameboyWidget::paintEvent(QPaintEvent *e){
 
     QPainter painter(this);
 
-    //int width = current_image_.width();
-    //int height = current_image_.height();
-    //int posx = this->width() - (width >> 1);
-    //int posy = this->height() - (height >> 1);
-    painter.drawPixmap(0, 0, QPixmap::fromImage(current_image_));
+    painter.drawPixmap(rect(), QPixmap::fromImage(current_image_));
 }
 
 void GameboyWidget::mouseDoubleClickEvent(QMouseEvent *e){

@@ -5,7 +5,7 @@
 
 class MBC2 : public Cartridge{
 public:
-    virtual void write(int address, uint8_t data);
+    virtual void write(int address, uint8_t data) override;
 
 };
 

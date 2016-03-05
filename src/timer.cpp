@@ -8,9 +8,9 @@ static const int tac_speed[] = {1024, 16, 64, 256};
 
 Timer::Timer(){}
 
-void Timer::update(BYTE cycles){
-    BYTE timer_control;
-	BYTE timer_counter;
+void Timer::update(uint8_t cycles){
+    uint8_t timer_control;
+	uint8_t timer_counter;
     div_timer_ += cycles;
     if(div_timer_ / DIVIDER_TIMER_SPEED >= 1){
         memory_->set_force_write(true);

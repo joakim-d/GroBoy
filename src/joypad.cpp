@@ -11,7 +11,7 @@ void Joypad::update(int cycles){
         key_buttons_ = ~keystate_;
     }
 
-    BYTE joy_cur = memory_->read(0xFF00);
+    uint8_t joy_cur = memory_->read(0xFF00);
     joy_new_ = 0x0F;
 
     if(0x10 & joy_cur) {
@@ -36,7 +36,7 @@ void Joypad::set_request_callback(const std::tr1::function<void (int)> &callback
     request_callback_ = callback;
 }
 
-void Joypad::updateInput(BYTE input){
+void Joypad::updateInput(uint8_t input){
     keystate_ = input;
 }
 
